@@ -1,0 +1,5 @@
+<div class="hero slant-down search-banner" style="background-image: url(${pdict.imageUrl})">    
+        <h1 class="page-title">
+            <isprint value="${pdict.heading ? pdict.heading : ''}" encoding="off"/>
+        </h1>    
+</div>
