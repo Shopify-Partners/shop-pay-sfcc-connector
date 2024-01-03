@@ -6,3 +6,4 @@ package-lock.json
 dist
 storefront-reference-architecture
 .vscode
+storefront-reference-architecture/package-lock.json

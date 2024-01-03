@@ -2,7 +2,10 @@
   "name": "shop-pay-sfcc-connector",
   "version": "1.0.0",
   "description": "SFCC Shop Pay Link Cartridge",
-  "main": "index.js",
+  "private": true,
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "nodemonConfig": {
     "exec": "npm-run-all code:bundle code:deploy",
     "ignore": [
