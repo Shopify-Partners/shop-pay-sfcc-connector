@@ -1,9 +1,0 @@
-<isset name="product" value="${typeof product === 'undefined' || empty(product) ? pdict.product : product}" scope="page" />
-
-<isloop items="${product.options}" var="option" status="loopStatus">
-    <div class="row product-option" data-option-id="${option.id}">
-        <div class="col-8">
-            <isinclude template="product/components/option" />
-        </div>
-    </div>
-</isloop>
