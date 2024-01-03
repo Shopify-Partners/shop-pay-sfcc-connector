@@ -1,0 +1,53 @@
+{
+  "name": "shop-pay-sfcc-connector",
+  "version": "1.0.0",
+  "description": "SFCC Shop Pay Link Cartridge",
+  "main": "index.js",
+  "nodemonConfig": {
+    "exec": "npm-run-all code:bundle code:deploy",
+    "ignore": [
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "cartridges/*"
+    ]
+  },
+  "scripts": {
+    "build": "cd storefront-reference-architecture && npm run build",
+    "build:watch": "npx nodemon",
+    "code:zip": "node bin/index code:zip",
+    "code:bundle": "npm-run-all build code:zip",
+    "deploy:build": "npm-run-all code:bundle code:deploy",
+    "code:deploy": "node bin/index code:deploy",
+    "postinstall": "cd storefront-reference-architecture && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maze-consulting/shop-pay-sfcc-connector.git"
+  },
+  "author": "The Maze Group",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maze-consulting/shop-pay-sfcc-connector/issues"
+  },
+  "homepage": "https://github.com/maze-consulting/shop-pay-sfcc-connector#readme",
+  "devDependencies": {
+    "archiver": "^5.3.1",
+    "chai": "^4.2.0",
+    "chalk": "^4.1.2",
+    "fs-extra": "^11.1.0",
+    "klaw": "^4.1.0",
+    "mocha": "^6.2.2",
+    "npm-run-all": "^4.1.5",
+    "path": "^0.12.7",
+    "sfcc-ci": "^2.11.0",
+    "sgmf-scripts": "^2.4.1",
+    "walk": "^2.3.15",
+    "xml2js": "^0.4.23",
+    "zip-folder": "^1.0.0"
+  },
+  "dependencies": {
+    "proxyquire": "^2.1.3"
+  }
+}
