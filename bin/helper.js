@@ -1,6 +1,6 @@
-const path = require('path');
-const sfraBuilderConfig = require('./sfraBuilderConfig');
-const WebpackExtractTextPlugin = require('extract-text-webpack-plugin');
+const path = require("path");
+const sfraBuilderConfig = require("./sfraBuilderConfig");
+const WebpackExtractTextPlugin = require("extract-text-webpack-plugin");
 
 /**
  * Add task runners and plugins to ruleSet
@@ -11,81 +11,83 @@ const WebpackExtractTextPlugin = require('extract-text-webpack-plugin');
  * @returns {array} Rulesets for frontend compilation
  */
 function buildRuleSet(executingDir, cartridge, env, fileType) {
-    const sourcePath = path.resolve(executingDir, cartridge, 'cartridge/client');
+    const sourcePath = path.resolve(executingDir, cartridge, "cartridge/client");
     const ruleSet = [];
-    if (fileType === 'js') {
+    if (fileType === "js") {
         if (env.useLinter) {
             ruleSet.push({
                 test: /\.js$/,
                 include: sourcePath,
                 exclude: /node_modules/,
-                use: ['eslint-loader'],
-                enforce: 'pre',
+                use: ["eslint-loader"],
+                enforce: "pre",
             });
         }
         ruleSet.push({
             test: /bootstrap(.)*\.js$/,
             use: {
-                loader: 'babel-loader',
+                loader: "babel-loader",
                 options: {
-                    presets: ['@babel/env'],
-                    plugins: ['@babel/plugin-proposal-object-rest-spread'],
+                    presets: ["@babel/env"],
+                    plugins: ["@babel/plugin-proposal-object-rest-spread"],
                     cacheDirectory: true,
                 },
             },
         });
-    } else if (fileType === 'jsx') {
+    } else if (fileType === "jsx") {
         if (env.useLinter) {
             ruleSet.push({
                 test: /\.jsx$/,
                 include: sourcePath,
                 exclude: /node_modules/,
-                use: ['eslint-loader'],
-                enforce: 'pre',
+                use: ["eslint-loader"],
+                enforce: "pre",
             });
         }
         ruleSet.push({
             test: /\.jsx$/,
-            loader: 'babel-loader',
+            loader: "babel-loader",
             options: {
                 cacheDirectory: true,
-                presets: ['react'],
+                presets: ["react"],
             },
         });
-    }  else {
+    } else {
         // include all node_modules folder from each cartridge
         // this allows to reuse node_modules folder from other cartridges without the need
         // to directly install them in each cartridge
         let scssIncludePath = [];
-        sfraBuilderConfig.cartridges.map(includeCartridges => {
-            scssIncludePath.push(path.resolve(includeCartridges.split('cartridges')[0], 'node_modules'));
-            scssIncludePath.push(path.resolve(includeCartridges.split('cartridges')[0], 'node_modules/flag-icon-css/sass'));
+        sfraBuilderConfig.cartridges.map((includeCartridges) => {
+            scssIncludePath.push(path.resolve(includeCartridges.split("cartridges")[0], "node_modules"));
+            scssIncludePath.push(
+                path.resolve(includeCartridges.split("cartridges")[0], "node_modules/flag-icon-css/sass"),
+            );
         });
-        scssIncludePath.push(path.resolve(executingDir, 'node_modules'));
-        scssIncludePath.push(path.resolve(executingDir, 'node_modules/flag-icon-css/sass'));
+        scssIncludePath.push(path.resolve(executingDir, "node_modules"));
+        scssIncludePath.push(path.resolve(executingDir, "node_modules/flag-icon-css/sass"));
         ruleSet.push({
             test: /\.scss$/,
             loader: WebpackExtractTextPlugin.extract([
                 {
-                    loader: 'css-loader',
+                    loader: "css-loader",
                     options: {
                         url: false,
-                        sourceMap: (env.dev === true),
-                        minimize: (env.dev === false),
+                        sourceMap: env.dev === true,
+                        minimize: env.dev === false,
                     },
                 },
                 {
-                    loader: 'postcss-loader',
+                    loader: "postcss-loader",
                     options: {
-                        plugins: () => [require('autoprefixer')],
+                        plugins: () => [require("autoprefixer")],
                     },
                 },
                 {
-                    loader: 'sass-loader',
+                    loader: "sass-loader",
                     options: {
                         includePaths: scssIncludePath,
-                        sourceMap: (env.dev === true),
-                        minimize: (env.dev === false),
+                        sourceMap: env.dev === true,
+                        minimize: env.dev === false,
                     },
                 },
             ]),
@@ -95,5 +97,5 @@ function buildRuleSet(executingDir, cartridge, env, fileType) {
 }
 
 module.exports = {
-    buildRuleSet
+    buildRuleSet,
 };

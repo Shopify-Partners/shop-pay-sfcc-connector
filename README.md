@@ -26,7 +26,7 @@ This project was built using node `v14.21.3` but any version of node 14 will wor
 
 Install
 
-```npm install```
+`npm install`
 
 ## Code builds
 

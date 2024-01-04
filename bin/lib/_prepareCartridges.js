@@ -1,9 +1,9 @@
 /* eslint-disable valid-jsdoc */
 /* eslint-disable no-console */
 /* eslint-env es6 */
-const zipCartridges = require('./_zipCartridges');
-const fs = require('fs-extra');
-const chalk = require('chalk');
+const zipCartridges = require("./_zipCartridges");
+const fs = require("fs-extra");
+const chalk = require("chalk");
 const log = console.log;
 
 /**
@@ -14,18 +14,18 @@ const log = console.log;
  */
 function prepareCartridges(releaseName, cartridges, start) {
     const cartridgePaths = cartridges;
-    const distDir = './dist';
+    const distDir = "./dist";
     const codeVersionDir = `${distDir}/${releaseName}/${releaseName}`;
 
-    log(' -----------------------------------');
-    log(' Preparing Cartridges');
-    log(' -----------------------------------');
-    log('');
+    log(" -----------------------------------");
+    log(" Preparing Cartridges");
+    log(" -----------------------------------");
+    log("");
 
     log(chalk.yellow.bold(` -- code deployment name: ${releaseName}\n`));
-    log(chalk.yellow.bold(' -- cartridges found:\n'));
+    log(chalk.yellow.bold(" -- cartridges found:\n"));
     log(cartridgePaths);
-    log('');
+    log("");
 
     log(chalk.yellow.bold(` -- code version directory: ${distDir}/${releaseName}\n`));
 
@@ -36,8 +36,8 @@ function prepareCartridges(releaseName, cartridges, start) {
     fs.emptyDirSync(codeVersionDir);
 
     // Copy all cartridges into /dist/<build> folder
-    cartridgePaths.forEach(cartridge => {
-        let cartridgeFolderName = cartridge.split('/');
+    cartridgePaths.forEach((cartridge) => {
+        let cartridgeFolderName = cartridge.split("/");
         // eslint-disable-next-line one-var
         let cartridgeName = cartridgeFolderName[cartridgeFolderName.length - 1];
         // eslint-disable-next-line one-var

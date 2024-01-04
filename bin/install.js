@@ -1,8 +1,8 @@
-const sfraBuilderConfig = require('./sfraBuilderConfig');
-const npmInstallHelper = require('./installHelper');
+const sfraBuilderConfig = require("./sfraBuilderConfig");
+const npmInstallHelper = require("./installHelper");
 
 (() => {
-    sfraBuilderConfig.cartridges.forEach(cartridge => {
-        npmInstallHelper.npmInstall(cartridge)
-    })
-})()
+    sfraBuilderConfig.cartridges.forEach((cartridge) => {
+        npmInstallHelper.npmInstall(cartridge);
+    });
+})();

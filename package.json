@@ -17,13 +17,17 @@
     ]
   },
   "scripts": {
+    "lint": "eslint --ext .js, ./cartridges/int_shoppay_core/cartridge/client/default/js --ext .js, ./cartridges/int_shoppay/cartridge/client/default/js",
+    "lint:fix": "eslint --fix --ext .js, ./cartridges/int_shoppay_core/cartridge/client/default/js --ext .js, ./cartridges/int_shoppay/cartridge/client/default/js",
+    "format": "prettier --write . --ignore-unknown",
     "build": "cd storefront-reference-architecture && npm run build",
     "build:watch": "npx nodemon",
     "code:zip": "node bin/index code:zip",
     "code:bundle": "npm-run-all build code:zip",
     "deploy:build": "npm-run-all code:bundle code:deploy",
     "code:deploy": "node bin/index code:deploy",
-    "postinstall": "cd storefront-reference-architecture && npm install"
+    "postinstall": "cd storefront-reference-architecture && npm install",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -36,14 +40,18 @@
   },
   "homepage": "https://github.com/maze-consulting/shop-pay-sfcc-connector#readme",
   "devDependencies": {
+    "@babel/core": "^7.23.7",
     "archiver": "^5.3.1",
     "chai": "^4.2.0",
     "chalk": "^4.1.2",
+    "eslint": "^8.56.0",
     "fs-extra": "^11.1.0",
+    "husky": "^8.0.0",
     "klaw": "^4.1.0",
     "mocha": "^6.2.2",
     "npm-run-all": "^4.1.5",
     "path": "^0.12.7",
+    "prettier": "^3.1.1",
     "sfcc-ci": "^2.11.0",
     "sgmf-scripts": "^2.4.1",
     "walk": "^2.3.15",
@@ -51,6 +59,7 @@
     "zip-folder": "^1.0.0"
   },
   "dependencies": {
+    "lint-staged": "^15.2.0",
     "proxyquire": "^2.1.3"
   }
 }
