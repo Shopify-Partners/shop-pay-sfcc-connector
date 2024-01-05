@@ -17,8 +17,8 @@
     ]
   },
   "scripts": {
-    "lint": "eslint --ext .js, ./cartridges/int_shoppay_core/cartridge/client/default/js --ext .js, ./cartridges/int_shoppay/cartridge/client/default/js",
-    "lint:fix": "eslint --fix --ext .js, ./cartridges/int_shoppay_core/cartridge/client/default/js --ext .js, ./cartridges/int_shoppay/cartridge/client/default/js",
+    "lint": "eslint --ext .js, ./cartridges/int_shoppay/cartridge/client/default/js --ext .js, ./cartridges/int_shoppay/cartridge/client/default/js",
+    "lint:fix": "eslint --fix --ext .js, ./cartridges/int_shoppay/cartridge/client/default/js --ext .js, ./cartridges/int_shoppay/cartridge/client/default/js",
     "format": "prettier --write . --ignore-unknown",
     "build": "cd storefront-reference-architecture && npm run build",
     "build:watch": "npx nodemon",

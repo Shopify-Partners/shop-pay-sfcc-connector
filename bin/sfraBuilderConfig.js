@@ -21,6 +21,6 @@ module.exports.aliasConfig = {
  */
 module.exports.cartridges = [
     "./storefront-reference-architecture/cartridges/app_storefront_base",
-    "./cartridges/int_shoppay_core",
     "./cartridges/int_shoppay",
+    "./cartridges/int_shoppay_sfra",
 ];
