@@ -1,0 +1,5 @@
+<isif condition="${pdict.type === 'FILE'}">
+    <link rel="stylesheet" href="${pdict.url}">  
+<iselse>
+    <isprint value="${pdict.markup}" encoding="off">
+</isif>

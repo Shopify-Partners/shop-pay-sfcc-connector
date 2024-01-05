@@ -1,0 +1,13 @@
+<isloop items="${pdict.productSearch.productIds}" var="product" status="loopState">    
+    <isif condition="${pdict.regions['gridRegion' + loopState.count].region.size > 0}">
+        <isprint value="${pdict.regions['gridRegion' + loopState.count].setClassName(pdict.gridClassName).render()}" encoding="off"/>
+    </isif>
+    <div class="region col-6 col-sm-4">
+        <isif condition="${pdict.isEditMode && pdict.regions['gridRegion' + loopState.count].region.size === 0}">
+            <isprint value="${pdict.regions['gridRegion' + loopState.count].setClassName('emptyListRegion').render()}" encoding="off"/>
+        </isif>
+        <isobject object="${product.productSearchHit}" view="searchhit">
+            <isinclude url="${URLUtils.url('Tile-Show', 'pid', product.productID, 'swatches', true, 'ratings', true)}" />        
+        </isobject>
+    </div>
+</isloop>
