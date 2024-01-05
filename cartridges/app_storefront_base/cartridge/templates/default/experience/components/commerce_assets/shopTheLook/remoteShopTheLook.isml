@@ -1,0 +1,8 @@
+<isscript>
+    var assets = require('*/cartridge/scripts/assets.js');
+    assets.addCss('/css/experience/components/commerceAssets/shopTheLook.css');
+</isscript>
+
+<isinclude url="${URLUtils.url('PageDesigner-CommerceAssets_ShopTheLook', 'data', pdict.data)}" />
+
+

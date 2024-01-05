@@ -1,0 +1,37 @@
+<isdecorate template="common/layout/page">
+    <isscript>
+        var assets = require('*/cartridge/scripts/assets.js');
+        assets.addJs('/js/paymentInstruments.js');
+        assets.addCss('/css/account/payment.css');
+    </isscript>
+    <div class="hero slant-down account-image">
+        <h1 class="page-title">${Resource.msg('page.heading.payments','payment',null)}</h1>
+    </div>
+    <div class="container">
+        <isinclude template="account/payment/deletePaymentModal"/>
+        <!---Breadcrumbs--->
+        <isinclude template="components/breadcrumbs/pageBreadcrumbs"/>
+        <isif condition="${pdict.noSavedPayments}">
+            <div class="row justify-content-center h3 no-saved-payments">
+                <p>${Resource.msg('msg.no.saved.payments','payment',null)}</p>
+            </div>
+        </isif>
+        <isinclude template="account/payment/savedPayments"/>
+        <div class="row justify-content-center">
+            <div class="col-6">
+                <div class="row">
+                    <div class="col">
+                        <a href="${URLUtils.url('Account-Show')}" class="text-center back-to-account-link" aria-label="${Resource.msg('label.addressbook.myaccount','account',null)}">
+                          ${Resource.msg('link.profile.backtomyaccount','account',null)}
+                        </a>
+                    </div>
+                    <isif condition="${pdict.addPaymentUrl}">
+                        <div class="col">
+                            <a href="${pdict.addPaymentUrl}" class="btn btn-save btn-block btn-primary" aria-label="${Resource.msg('label.payment.addnewpayment','payment',null)}">${Resource.msg('button.addnew','payment',null)}</a>
+                        </div>
+                    </isif>
+                </div>
+            </div>
+        </div>
+    </div>
+</isdecorate>

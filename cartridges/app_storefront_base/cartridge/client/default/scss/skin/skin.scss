@@ -1,0 +1,140 @@
+body,
+.card,
+.card-header,
+.hero {
+    background-color: var(--skin-background-color-1);
+    font-family: var(--skin-body-font);
+    color: var(--skin-main-text-color-1);
+}
+
+.hero {
+    border-bottom-color: var(--skin-background-color-1);
+}
+
+.main-menu {
+    background-color: var(--skin-banner-background-color-1);
+}
+
+.banner-color {
+    background-color: var(--skin-banner-background-color-1);
+}
+
+.header-banner {
+    background-color: var(--skin-banner-background-color-2);
+    color: var(--skin-banner-text-color-1);
+}
+
+.header-banner .close-button .close {
+    background-color: var(--skin-primary-color-1);
+}
+
+h1.header.page-title,
+h1.header.page-title::before {
+    background-color: var(--skin-heading-color-1);
+    color: var(--skin-heading-color-1-invert);
+}
+
+.product-tile {
+    background-color: var(--skin-background-color-1);
+    border: 10px solid var(--skin-border-color-1);
+}
+
+.refinements ul li button {
+    color: var(--skin-primary-color-1);
+}
+
+.custom-select {
+    background-color: var(--skin-selectbox-background-color-1);
+    color: var(--skin-selectbox-text-color-1);
+}
+
+a {
+    color: var(--skin-primary-color-1);
+}
+
+header ~ #maincontent .container a:not(.btn-primary, .btn-outline-primary) {
+    color: var(--skin-primary-color-1);
+}
+
+.price {
+    color: var(--skin-price-1);
+}
+
+.navbar,
+.navbar .nav-item,
+.navbar .nav-item a,
+.navbar .nav-item.dropdown,
+.navbar .nav-item.dropdown a,
+.dropdown-menu,
+.dropdown-menu a {
+    color: var(--skin-menu-color-1);
+
+    @media (min-width: 769px) { // stylelint-disable-line
+        color: var(--skin-menu-color-1-invert);
+    }
+}
+
+.navbar .nav-item.dropdown,
+.navbar .nav-item.dropdown .dropdown-menu.show {
+    color: var(--skin-selectbox-text-color-1);
+}
+
+.navbar .nav-item.dropdown .dropdown-menu.show {
+    background-color: var(--skin-selectbox-background-color-1);
+
+    a,
+    .nav-item {
+        color: var(--skin-selectbox-text-color-1);
+    }
+}
+
+.nav-item .nav-link:hover,
+.nav-item .nav-link:focus,
+.nav-item.show .nav-link {
+    background-color: var(--skin-menu-color-1-invert);
+    color: var(--skin-menu-color-1) !important;
+}
+
+.btn-primary {
+    background-color: #{var(--skin-primary-color-1)};
+    border-color: #{var(--skin-primary-color-1)};
+    color: var(--skin-primary-color-invert-1);
+}
+
+.btn-primary:hover {
+    color: #{var(--skin-primary-color-1)};
+    border-color: #{var(--skin-primary-color-1)};
+    background-color: var(--skin-primary-color-invert-1);
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled {
+    background-color: var(--skin-primary-color-1);
+    border-color: var(--skin-primary-color);
+    color: var(--skin-primary-color-invert-1);
+    opacity: 0.5;
+}
+
+.btn-outline-primary {
+    color: var(--skin-primary-color-1);
+    border-color: var(--skin-primary-color-1);
+}
+
+.btn-outline-primary:hover {
+    color: var(--skin-primary-color-invert-1);
+    background-color: var(--skin-primary-color-1);
+    border-color: var(--skin-primary-color-1);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--skin-header-font), sans-serif;
+}
+
+a {
+    color: var(--skin-link-color-1);
+}
