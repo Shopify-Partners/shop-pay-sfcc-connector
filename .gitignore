@@ -4,7 +4,6 @@ node_modules/
 package-lock.json
 .idea
 dist
-storefront-reference-architecture
 .vscode
-storefront-reference-architecture/package-lock.json
 storefront-reference-architecture
+storefront-reference-architecture/package-lock.json

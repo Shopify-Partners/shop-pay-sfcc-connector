@@ -10,16 +10,6 @@ When you use subtree, you add the subtree to an existing repository where the su
 
 When you stage and commit files for the main repo, it will add all of the remote files in the same operation. The subtree checkout will pull all the files in one pass, so there is no need to try and connect to another repo to get the portion of subtree files, because they were already included in the main repo.
 
-## Adding SFRA as a subtree
-
-Execute the following in a terminal
-
-```
-git subtree add --prefix storefront-reference-architecture git@github.com:maze-consulting/storefront-reference-architecture.git master --squash
-```
-
-That's it! Next up is how to build code to a Sandbox
-
 ## Install dependencies
 
 This project was built using node `v14.21.3` but any version of node 14 will work. [Node Version Manager](https://github.com/nvm-sh/nvm) or `nvm` is an easy way to use different versions of node
