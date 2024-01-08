@@ -1,0 +1,12 @@
+{
+    "name": "Einstein products in a category Recommender Selector",
+    "description": "Returns a selector for the category based recommenders available on the instance. Allows products-in-a-category",
+    "resources": {
+        "scripts": [
+            "/experience/editors/einstein/recommenderselector.js"
+        ],
+        "styles": [
+            "https://cdnjs.cloudflare.com/ajax/libs/design-system/2.8.3/styles/salesforce-lightning-design-system.min.css"
+        ]
+    }
+}

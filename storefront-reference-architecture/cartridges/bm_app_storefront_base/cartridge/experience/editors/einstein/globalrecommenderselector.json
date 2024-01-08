@@ -1,0 +1,12 @@
+{
+    "name": "Einstein Global Recommender Selector",
+    "description": "Returns a selector for the recommenders available on the instance, allows products-in-all-categories recommender",
+    "resources": {
+        "scripts": [
+            "/experience/editors/einstein/recommenderselector.js"
+        ],
+        "styles": [
+            "https://cdnjs.cloudflare.com/ajax/libs/design-system/2.8.3/styles/salesforce-lightning-design-system.min.css"
+        ]
+    }
+}

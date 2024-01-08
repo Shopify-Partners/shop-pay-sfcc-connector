@@ -1,0 +1,14 @@
+@import "bootstrap/scss/mixins/breakpoints";
+@import "../../variables";
+
+.emptyListRegion {
+    position: absolute;
+    width: calc(100% - 10px);
+    height: 100%;
+}
+
+@include media-breakpoint-up(md) {
+    .emptyListRegion {
+        width: calc(100% - 30px);
+    }
+}
