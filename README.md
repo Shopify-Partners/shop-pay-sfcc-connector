@@ -16,7 +16,9 @@ This project was built using node `v14.21.3` but any version of node 14 will wor
 
 Install
 
-`npm install`
+`npm install && npm run sfra:init`
+
+The above will install both project and SFRA dependencies
 
 ## Code builds
 
@@ -32,7 +34,9 @@ If you have trouble using the Prophet extension this project ships with custom b
     "username": "test@example.com",
     "password": "xxxxxxxxxxxxxxxx",
     "client-secret": "xxxxxxxxxxxxx",
-    "hostname": "sandbox.commercecloud.salesforce.com"
+    "cartridgesPath": "cartridges", // Must be added
+    "hostname": "sandbox.commercecloud.salesforce.com",
+    "code-version": "<version>"
 }
 ```
 
