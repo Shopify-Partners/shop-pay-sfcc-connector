@@ -1,0 +1,12 @@
+{
+    "name": "Color Picker",
+    "description": "One can pick a color",
+    "resources": {
+        "scripts": [
+            "/experience/editors/themer/colorpicker.js"
+        ],
+        "styles": [
+            "https://cdnjs.cloudflare.com/ajax/libs/design-system/2.8.3/styles/salesforce-lightning-design-system.min.css"
+        ]
+    }
+}

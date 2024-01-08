@@ -1,0 +1,52 @@
+{
+    "name": "Dynamic Category Banner",
+    "description": "Banner for category or product pages",
+    "group": "dynamic",
+    "attribute_definition_groups": [
+        {
+            "id": "dynamicCategory",
+            "description": "Determines banner content",
+            "attribute_definitions": [
+                {
+                    "id": "category",
+                    "name": "Category",
+                    "type": "category",
+                    "required": false,
+                    "dynamic_lookup": {
+                        "aspect_attribute_alias" : "category"
+                    }
+                },
+                {
+                    "id": "product",
+                    "name": "Product",
+                    "type": "product",
+                    "required": false,
+                    "dynamic_lookup":{
+                        "aspect_attribute_alias": "product"
+                    }
+                }
+            ]
+        },        
+        {            
+            "id": "overrideContent",
+            "name": "Override Content",
+            "description": "You can define content to override the defaults configured in Business Manager",
+            "attribute_definitions": [
+                {
+                    "id": "image",
+                    "name": "Banner Image",
+                    "description": "Overrides the default image configured in Business Manager",
+                    "type": "image",
+                    "required": false
+                },
+                {
+                  "id": "heading",
+                  "name": "Banner Text",
+                  "type": "text",
+                  "required": false
+                }
+            ]
+        }
+    ],
+    "region_definitions": []
+}

@@ -1,0 +1,31 @@
+<div class="paymentInstruments">
+	<!-- Rows for Credit Cards -->
+	<isloop items="${pdict.paymentInstruments}" var="paymentInstrument">
+	    <div class="row justify-content-center" id="uuid-${paymentInstrument.UUID}">
+	        <div class="col-sm-8 col-md-6">
+	            <div class="card">
+	                <div class="card-header">
+	                    <h2 class="pull-left">${paymentInstrument.creditCardHolder}</h2>
+	                </div>
+	                <div class="card-body card-body-positioning">
+	                    <div class="card-info-group">
+	                        <isset name="payment" value="${paymentInstrument}" scope="page">
+	                        <isinclude template="account/payment/savedPayment"/>
+	                    </div>
+	                    <button
+	                        type="button"
+	                        class="remove-btn remove-payment btn-light"
+	                        data-toggle="modal"
+	                        data-target="#deletePaymentModal"
+	                        data-id="${paymentInstrument.UUID}"
+	                        data-card="${paymentInstrument.maskedCreditCardNumber}"
+	                        data-url="${pdict.actionUrl}"
+	                        aria-label="${Resource.msg('label.payment.deletepayment','payment',null)}">
+	                        &times;
+	                    </button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</isloop>
+</div>
