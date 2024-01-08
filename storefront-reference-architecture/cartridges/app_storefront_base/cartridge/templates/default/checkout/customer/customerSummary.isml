@@ -1,8 +1,0 @@
-<span class="summary-section-label customer-label">
-    ${Resource.msg('label.customer.data', 'confirmation', null)}
-</span>
-<br/>
-<div class="summary-details customer">
-    <span class="customer-summary-email">${(pdict.customer.profile && pdict.customer.profile.email) ? pdict.customer.profile.email : pdict.order.orderEmail}</span>
-</div>
-

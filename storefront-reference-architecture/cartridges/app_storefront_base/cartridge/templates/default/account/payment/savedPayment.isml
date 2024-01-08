@@ -1,3 +1,0 @@
-<p>${Resource.msg('label.payment.credit','account',null)} ${payment.creditCardType}</p>
-<p>${payment.maskedCreditCardNumber}</p>
-<p>${Resource.msg('label.payment.ending','account',null)} ${payment.creditCardExpirationMonth}/${payment.creditCardExpirationYear}</p>
