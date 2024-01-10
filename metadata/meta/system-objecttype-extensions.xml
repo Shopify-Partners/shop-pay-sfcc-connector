@@ -65,13 +65,13 @@
 
     <type-extension type-id="SitePreferences">
         <custom-attribute-definitions>
-            <attribute-definition attribute-id="shopPayAdminAPIToken">
+            <attribute-definition attribute-id="shoppayAdminAPIToken">
                 <display-name xml:lang="x-default">Shopify Admin API Access Token</display-name>
                 <type>password</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
             </attribute-definition>
-            <attribute-definition attribute-id="shopPayStorefrontAPIToken">
+            <attribute-definition attribute-id="shoppayStorefrontAPIToken">
                 <display-name xml:lang="x-default">Shopify Storefront API Access Token</display-name>
                 <type>password</type>
                 <mandatory-flag>false</mandatory-flag>
