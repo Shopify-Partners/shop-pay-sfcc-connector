@@ -20,33 +20,13 @@ Install
 
 The above will install both project and SFRA dependencies
 
-## Code builds
+## Local Development
 
 You can use the VS Code [Prophet Debugger](https://marketplace.visualstudio.com/items?itemName=SqrTT.prophet) extension
 
-### Trouble with Prophet
+## CI/CD
 
-If you have trouble using the Prophet extension this project ships with custom build scripts to help with CI builds. To use them your `dw.json` file contain the following:
-
-```json
-{
-    "client-id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "username": "test@example.com",
-    "password": "xxxxxxxxxxxxxxxx",
-    "client-secret": "xxxxxxxxxxxxx",
-    "cartridgesPath": "cartridges", // Must be added
-    "hostname": "sandbox.commercecloud.salesforce.com",
-    "code-version": "<version>"
-}
-```
-
-## Build & Deploy
-
-```
-npm run deploy:build
-```
-
-By default builds created this way are named: `localBuild-YMDm`
+The project uses a custom build solution which simply finds, zips, uploads, and activates bundled code to a specified instance.
 
 ## Authors
 
