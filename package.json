@@ -7,7 +7,7 @@
     "node": ">=14.0.0"
   },
   "nodemonConfig": {
-    "exec": "npm-run-all code:bundle code:deploy",
+    "exec": "npm-run-all ci:code:bundle ci:code:deploy",
     "ignore": [
       ".git",
       "node_modules"
@@ -22,10 +22,10 @@
     "format": "prettier --write . --ignore-unknown",
     "build": "cd storefront-reference-architecture && npm run build",
     "build:watch": "npx nodemon",
-    "code:zip": "node bin/index code:zip",
-    "code:bundle": "npm-run-all build code:zip",
-    "deploy:build": "npm-run-all code:bundle code:deploy",
-    "code:deploy": "node bin/index code:deploy",
+    "ci:code:zip": "node bin/index code:zip",
+    "ci:code:bundle": "npm-run-all build ci:code:zip",
+    "ci:deploy:build": "npm-run-all ci:code:bundle ci:code:deploy",
+    "ci:code:deploy": "node bin/index code:deploy",
     "sfra:init": "cd storefront-reference-architecture && npm install",
     "prepare": "husky install"
   },

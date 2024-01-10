@@ -27,7 +27,7 @@ module.exports = {
         "prefer-const": "off",
         "prefer-spread": "off",
         indent: ["error", 4, { SwitchCase: 1 }],
-        quotes: ["error", "double"],
+        quotes: "off",
         radix: ["error", "always"],
         semi: ["error", "always"],
     },
