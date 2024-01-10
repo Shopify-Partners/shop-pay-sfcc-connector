@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<payment-settings xmlns="http://www.demandware.com/xml/impex/paymentsettings/2009-09-15">
-    <payment-method method-id="ShopPay">
-        <name xml:lang="x-default">Shop Pay</name>
-        <enabled-flag>true</enabled-flag>
-        <processor-id>SHOPPAY</processor-id>
-    </payment-method>
-</payment-settings>
