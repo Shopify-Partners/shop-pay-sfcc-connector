@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <payment-processors xmlns="http://www.demandware.com/xml/impex/paymentprocessor/2007-03-31">
-    <description>Shop Pay express checkout</description>
     <payment-processor processor-id="SHOPPAY">
+        <description>Shop Pay express checkout</description>
         <preferences>
             <all-instances/>
             <development/>
