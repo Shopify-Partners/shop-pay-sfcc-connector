@@ -14,21 +14,7 @@ var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
  */
 server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var paymentRequestObj = {
-        "paymentMethod": "db4eede13822684b13a607823b7ba40d",
-        "shippingAddress": {
-            "countryCode": "US",
-            "postalCode": "60661",
-            "provinceCode": null,
-            "city": "Chicago",
-            "firstName": "Jane",
-            "lastName": "Doe",
-            "address1": "500 W Madison St",
-            "address2": "Ste 2200",
-            "phone": "3125551212",
-            "email": "jane.doe@example.com",
-            "companyName": null
-        },
-        "paymentMethod": "string",
+        "shippingAddress": null,
         "discountCodes": [
             "LOYALTY15"
         ],
@@ -62,42 +48,8 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
                 }
             }
         ],
-        "shippingLines": [
-            {
-                "label": "Standard",
-                "amount": {
-                    "amount": 10.00,
-                    "currencyCode": "USD"
-                },
-                "code": "STANDARD"
-            }
-        ],
-        "deliveryMethods": [
-            {
-                "label": "Standard",
-                "amount": {
-                    "amount": 0.00,
-                    "currencyCode": "USD"
-                },
-                "code": "STANDARD",
-                "detail": "Ground Shipping",
-                "minDeliveryDate": '2024-01-01',
-                "maxDeliveryDate": '2026-01-01',
-                "deliveryExpectation": "Orders ship within 2 business days"
-            },
-            {
-                "label": "Express",
-                "amount": {
-                    "amount": 20.00,
-                    "currencyCode": "USD"
-                },
-                "code": "EXPRESS",
-                "detail": "2-day Shipping",
-                "minDeliveryDate": '2024-01-01',
-                "maxDeliveryDate": '2025-01-01',
-                "deliveryExpectation": "Order ships same business day if order placed before 12pm EST"
-            }
-        ],
+        "shippingLines": [],
+        "deliveryMethods": [],
         "locale": "en",
         "presentmentCurrency": "USD",
         "subtotal": {
@@ -113,25 +65,6 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
                 }
             }
         ],
-        "totalShippingPrice": {
-            "discounts": [
-                {
-                    "label": "free shipping",
-                    "amount": {
-                        "amount": 10.00,
-                        "currencyCode": "USD"
-                    }
-                }
-            ],
-            "originalTotal": {
-                "amount": 10.00,
-                "currencyCode": "USD"
-            },
-            "finalTotal": {
-                "amount": 0.00,
-                "currencyCode": "USD"
-            }
-        },
         "totalTax": {
             "amount": 1.06,
             "currencyCode": "USD"
