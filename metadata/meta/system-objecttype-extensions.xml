@@ -122,8 +122,8 @@
                 <attribute attribute-id="shoppayPDPButtonEnabled"/>
                 <attribute attribute-id="shoppayCartButtonEnabled"/>
                 <attribute attribute-id="shoppayStoreId"/>
-                <attribute attribute-id="shopPayAdminAPIToken"/>
-                <attribute attribute-id="shopPayStorefrontAPIToken"/>
+                <attribute attribute-id="shoppayAdminAPIToken"/>
+                <attribute attribute-id="shoppayStorefrontAPIToken"/>
                 <attribute attribute-id="shoppayAdminAPIVersion"/>
                 <attribute attribute-id="shoppayStorefrontAPIVersion"/>
             </attribute-group>
