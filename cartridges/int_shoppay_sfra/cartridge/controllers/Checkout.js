@@ -10,7 +10,7 @@ var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 /**
  * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS
  */
-server.append('Begin', csrfProtection.generateToken, function(req, res, next) {
+server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
     res.viewData.includeShopPayJS = true;
     next();
 });
