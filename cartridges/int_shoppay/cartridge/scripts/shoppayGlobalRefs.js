@@ -2,6 +2,7 @@
 
 var URLUtils = require('dw/web/URLUtils');
 var PaymentMgr = require('dw/order/PaymentMgr');
+var currentSite = require('dw/system/Site').current;
 
 var urls = {
     GetCartSummary: URLUtils.https('ShopPay-GetCartSummary').toString(),
@@ -33,19 +34,12 @@ function shoppayApplicable() { // req, currentBasket
     return true;
 }
 
-// abstracted helper to get any site pref value by ID
-// will return false if preference is not found, or if
-// pref value type is boolean and is set to either None or No
-function getSitePref(id) {
-    var pref = dw.system.Site.current.getCustomPreferenceValue(id);
-    return (pref) ? pref : false;
-}
 // shortcut references to individual Shop Pay site preference values
-var isShoppayPDPButtonEnabled   = function() { return getSitePref('shoppayPDPButtonEnabled'); }
-var isShoppayCartButtonEnabled  = function() { return getSitePref('shoppayCartButtonEnabled'); }
-var shoppayStoreId              = function() { return getSitePref('shoppayStoreId'); }
-var shoppayAdminAPIVersion      = function() { return getSitePref('shoppayAdminAPIVersion'); }
-var shoppayStorefrontAPIVersion = function() { return getSitePref('shoppayStorefrontAPIVersion'); }
+var isShoppayPDPButtonEnabled   = function() { return currentSite.getCustomPreferenceValue('shoppayPDPButtonEnabled'); }
+var isShoppayCartButtonEnabled  = function() { return currentSite.getCustomPreferenceValue('shoppayCartButtonEnabled'); }
+var shoppayStoreId              = function() { return currentSite.getCustomPreferenceValue('shoppayStoreId'); }
+var shoppayAdminAPIVersion      = function() { return currentSite.getCustomPreferenceValue('shoppayAdminAPIVersion'); }
+var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPreferenceValue('shoppayStorefrontAPIVersion'); }
 
 
 /*
