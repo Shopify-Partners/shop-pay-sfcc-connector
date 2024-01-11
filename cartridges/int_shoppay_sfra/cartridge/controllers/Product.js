@@ -5,6 +5,8 @@ const server = require('server');
 
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 
+const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
 server.extend(page);
 
 /**
@@ -12,6 +14,9 @@ server.extend(page);
  */
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
     res.viewData.includeShopPayJS = true;
+    var shoppayEnabled = shoppayGlobalRefs.shoppayEnabled();
+    var shoppayUrls = shoppayGlobalRefs.urls; // note this is a keyed object
+    var SPGetCartSummaryURL = shoppayGlobalRefs.urls.GetCartSummary;
     next();
 });
 
