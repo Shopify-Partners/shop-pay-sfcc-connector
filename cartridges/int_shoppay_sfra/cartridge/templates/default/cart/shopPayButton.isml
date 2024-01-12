@@ -1,0 +1,8 @@
+<isscript>
+    var assets = require('*/cartridge/scripts/assets.js');
+    assets.addJs('/js/cart/initShopPayCart.js');
+</isscript>
+
+<div class="shop-pay-container" data-csrf-name="${pdict.csrf.tokenName}" data-csrf-token="${pdict.csrf.token}">
+    <div id="shop-pay-button-container"></div>
+</div>
