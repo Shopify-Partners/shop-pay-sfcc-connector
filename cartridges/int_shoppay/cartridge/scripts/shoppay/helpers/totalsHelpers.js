@@ -1,47 +1,79 @@
 'use strict'
 
-function getSubtotal() {
-    return {
-        "amount": 20.00,
-        "currencyCode": "USD"
-    };
+var collections = require('*/cartridge/scripts/util/collections');
+var util = require('*/cartridge/scripts/util');
+
+/**
+ * Plain JS object that represents the merchandize total price of the dw.order.LineItemCtnr
+ * @param {dw.order.LineItemCtnr} basket
+ * @returns {Object} raw JSON representing the merchandize total price
+ */
+function getTotal(basket) {
+    return util.getPriceObject(basket.getTotalGrossPrice());
+}
+function getSubtotal(basket) {
+    return util.getPriceObject(basket.getAdjustedMerchandizeTotalPrice(false));
 }
 
-function getTotalShippingPrice() {
-    /* return {
-        "discounts": [
-            {
-                "label": "free shipping",
-                "amount": {
-                    "amount": 10.00,
-                    "currencyCode": "USD"
-                }
+/**
+ * Plain JS object that represents the shipping price and discounts in the dw.order.LineItemCtnr
+ * @param {dw.order.LineItemCtnr} basket
+ * @returns {Object} raw JSON representing the shipping costs
+ */
+function getTotalShippingPrice(basket) {
+    var shippingPrice = basket.getShippingTotalPrice();
+    // only generate the shipping cost JSON object if a shipping price exists
+    if (!shippingPrice || !shippingPrice.isAvailable()) {
+        return {};
+    }
+
+    var originalTotal = {
+        "amount": shippingPrice.value,
+        "currencyCode": shippingPrice.currencyCode
+    };
+
+    var finalTotal = util.getPriceObject(basket.getAdjustedShippingTotalPrice());
+
+    var discounts = [];
+    var shippingAdjustments = basket.getAllShippingPriceAdjustments();
+    if (shippingAdjustments.length > 0) {
+        collections.forEach(shippingAdjustments, function(shippingAdjustment) {
+            if (shippingAdjustment.price.isAvailable()) {
+                var discount = {
+                    "label": shippingAdjustment.lineItemText,
+                    "amount": {
+                        "amount": shippingAdjustment.price.value * -1.00,
+                        "currencyCode": shippingAdjustment.price.currencyCode
+                    }
+                };
             }
-        ],
-        "originalTotal": {
-            "amount": 10.00,
-            "currencyCode": "USD"
-        },
-        "finalTotal": {
-            "amount": 0.00,
-            "currencyCode": "USD"
-        }
-    }; */
-    return {};
-}
+            discounts.push(discount);
+        });
+    }
 
-function getTotalTax() {
     return {
-        "amount": 1.06,
-        "currencyCode": "USD"
+        discounts: discounts,
+        originalTotal: originalTotal,
+        finalTotal: finalTotal
     };
 }
 
-function getTotal() {
-    return {
-        "amount": 18.06,
-        "currencyCode": "USD"
-    };
+/**
+ * Plain JS object that represents the total taxes of the dw.order.LineItemCtnr
+ * @param {dw.order.LineItemCtnr} basket
+ * @returns {Object} raw JSON representing the order total tax
+ */
+function getTotalTax(basket) {
+    return util.getPriceObject(basket.getTotalTax());
+}
+
+/**
+ * Plain JS object that represents the total price of the dw.order.LineItemCtnr
+ * @param {dw.order.LineItemCtnr} basket
+ * @returns {Object} raw JSON representing the order total price
+ */
+function getTotal(basket) {
+    return util.getPriceObject(basket.getTotalGrossPrice());
 }
 
 module.exports = {
