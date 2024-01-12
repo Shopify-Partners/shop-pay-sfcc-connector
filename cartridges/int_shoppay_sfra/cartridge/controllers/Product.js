@@ -3,11 +3,11 @@
 const page = module.superModule;
 const server = require('server');
 
+server.extend(page);
+
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 
 const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
-
-server.extend(page);
 
 /**
  * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS
