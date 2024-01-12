@@ -42,7 +42,7 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     try {
         var paymentRequestModel = new PaymentRequestModel(currentBasket);
     } catch (e) {
-        logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.fileName + ' | line ' + e.lineNumber + '\n\r' + e.stack);
+        logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
         res.json({
             error: false,
             errorMsg: e.message,
