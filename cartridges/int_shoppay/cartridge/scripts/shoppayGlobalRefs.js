@@ -19,21 +19,6 @@ var shoppayEnabled = function() {
     return (paymentMethod) ? paymentMethod.isActive() : false;
 };
 
-// Kristin TODO: flesh this logic out
-// core reference for if the Shop Pay payment method is valid based on
-// payment amount, country / regions, customer group, etc
-function shoppayApplicable() { // req, currentBasket
-    // var paymentAmount = currentBasket.totalGrossPrice.value;
-    // var countryCode = req.geolocation.countryCode;
-    // var currentCustomer = req.currentCustomer.raw;
-    // return PaymentMgr.getApplicablePaymentMethods(
-    //     currentCustomer,
-    //     countryCode,
-    //     paymentAmount
-    // );
-    return true;
-}
-
 // shortcut references to individual Shop Pay site preference values
 var isShoppayPDPButtonEnabled   = function() { return currentSite.getCustomPreferenceValue('shoppayPDPButtonEnabled'); }
 var isShoppayCartButtonEnabled  = function() { return currentSite.getCustomPreferenceValue('shoppayCartButtonEnabled'); }
@@ -41,6 +26,64 @@ var shoppayStoreId              = function() { return currentSite.getCustomPrefe
 var shoppayAdminAPIVersion      = function() { return currentSite.getCustomPreferenceValue('shoppayAdminAPIVersion'); }
 var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPreferenceValue('shoppayStorefrontAPIVersion'); }
 
+/**
+ * Core reference for whether the Shop Pay payment method is valid based on payment amount,
+ * country / regions, customer group, cart contents, etc.
+ * @param {Object} req
+ * @param {dw.order.Basket} currentBasket
+ * @returns {boolean} true if the cart is eligible for checkout with Shop Pay payment, otherwise false
+ */
+function shoppayApplicable(req, currentBasket) {
+    var shoppayPaymentMethod = PaymentMgr.getPaymentMethod('ShopPay');
+    var paymentAmount = currentBasket.totalGrossPrice.value;
+    var countryCode = req.geolocation.countryCode;
+    var currentCustomer = req.currentCustomer.raw;
+    var applicablePaymentMethods = PaymentMgr.getApplicablePaymentMethods(
+        currentCustomer,
+        countryCode,
+        paymentAmount
+    );
+    var eligible = true;
+    var message = null;
+    var shippingHelpers = require('*/cartridge/scripts/shoppay/helpers/shippingHelpers');
+    var hasIneligibleShipments = shippingHelpers.hasIneligibleShipments(currentBasket);
+
+    return !hasIneligibleShipments && applicablePaymentMethods.contains(shoppayPaymentMethod);
+}
+
+/**
+ * Core reference for whether to include the Shop Pay script tag and JS on a specific page
+ * based on site preferences, payment method enablement, etc.
+ * Note that these elements may be needed on a page such as PDP or cart where a customer's
+ * eligibility for Shop Pay may change as the cart is updated via Ajax, so the code to support
+ * Shop Pay should still need to be included.
+ * @param {String} context - A string representing the page context ['pdp', 'cart', 'checkout']
+ * @returns {boolean} true if Shop Pay elements should be included on the page, otherwise false
+ */
+function shoppayElementsApplicable(context) {
+    var showShoppayButton = false;
+    switch (context) {
+        case 'pdp':
+            if (isShoppayPDPButtonEnabled() && shoppayEnabled()) {
+                showShoppayButton = true;
+            }
+            break;
+        case 'cart':
+            if (isShoppayCartButtonEnabled() && shoppayEnabled()) {
+                showShoppayButton = true;
+            }
+            break;
+        case 'checkout':
+            if (shoppayEnabled()) {
+                showShoppayButton = true;
+            }
+            break;
+        default:
+            break;
+    }
+
+    return showShoppayButton;
+}
 
 /*
  add any values you want made available to client-side JS to the object below.
@@ -62,6 +105,7 @@ var clientRefs = {
 module.exports = {
     shoppayEnabled: shoppayEnabled,
     shoppayApplicable: shoppayApplicable,
+    shoppayElementsApplicable: shoppayElementsApplicable,
     isShoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(),
     isShoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
     shoppayStoreId: shoppayStoreId(),

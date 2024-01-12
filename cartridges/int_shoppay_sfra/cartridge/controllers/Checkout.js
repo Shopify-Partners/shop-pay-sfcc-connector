@@ -7,11 +7,13 @@ server.extend(page);
 
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 
+const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
 /**
  * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS
  */
 server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
-    res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayApplicable();
+    res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('checkout');
     res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.clientRefs);
     next();
 });
