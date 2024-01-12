@@ -25,7 +25,7 @@ function PaymentRequest(basket) {
     this.discountCodes = discountHelpers.getDiscountCodes();
     this.lineItems = productLineItemHelpers.getLineItems();
     this.shippingLines = shippingHelpers.getShippingLines(basket);
-    this.deliveryMethods = shippingHelpers.getApplicableDeliveryMethods();
+    this.deliveryMethods = shippingHelpers.getApplicableDeliveryMethods(mainShipment);
     this.locale = paymentHelpers.getLocale();
     this.presentmentCurrency = paymentHelpers.getPresentmentCurrency();
     this.subtotal = totalsHelpers.getSubtotal(basket);
