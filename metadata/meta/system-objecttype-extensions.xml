@@ -115,6 +115,15 @@
                 <min-length>0</min-length>
                 <default-value>2024-01</default-value>
             </attribute-definition>
+            <attribute-definition attribute-id="shoppayModalImageViewType">
+                <display-name xml:lang="x-default">Shop Pay Modal Image View Type</display-name>
+                <description xml:lang="x-default">Image view type from the product catalog to be used in the Shop Pay modal</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+                <default-value>small</default-value>
+            </attribute-definition>
         </custom-attribute-definitions>
         <group-definitions>
             <attribute-group group-id="ShopPay">
@@ -126,6 +135,7 @@
                 <attribute attribute-id="shoppayStorefrontAPIToken"/>
                 <attribute attribute-id="shoppayAdminAPIVersion"/>
                 <attribute attribute-id="shoppayStorefrontAPIVersion"/>
+                <attribute attribute-id="shoppayModalImageViewType"/>
             </attribute-group>
         </group-definitions>
     </type-extension>
