@@ -4,6 +4,8 @@ var URLUtils = require('dw/web/URLUtils');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var currentSite = require('dw/system/Site').current;
 
+const shoppayPaymentMethodId = 'ShopPay';
+
 var urls = {
     GetCartSummary: URLUtils.https('ShopPay-GetCartSummary').toString(),
     BeginSession: URLUtils.https('ShopPay-BeginSession').toString(),
@@ -15,7 +17,7 @@ var urls = {
 // core reference for if Shop Pay is enabled, controlled by
 // enabling or disabling the Shop Pay payment method
 var shoppayEnabled = function() {
-    var paymentMethod = PaymentMgr.getPaymentMethod('ShopPay');
+    var paymentMethod = PaymentMgr.getPaymentMethod(shoppayPaymentMethodId);
     return (paymentMethod) ? paymentMethod.isActive() : false;
 };
 
@@ -34,7 +36,7 @@ var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPrefe
  * @returns {boolean} true if the cart is eligible for checkout with Shop Pay payment, otherwise false
  */
 function shoppayApplicable(req, currentBasket) {
-    var shoppayPaymentMethod = PaymentMgr.getPaymentMethod('ShopPay');
+    var shoppayPaymentMethod = PaymentMgr.getPaymentMethod(shoppayPaymentMethodId);
     var paymentAmount = currentBasket.totalGrossPrice.value;
     var countryCode = req.geolocation.countryCode;
     var currentCustomer = req.currentCustomer.raw;
@@ -115,5 +117,6 @@ module.exports = {
     shoppayStoreId: shoppayStoreId(),
     shoppayAdminAPIVersion: shoppayAdminAPIVersion(),
     shoppayStorefrontAPIVersion: shoppayStorefrontAPIVersion(),
-    clientRefs: clientRefs
+    clientRefs: clientRefs,
+    shoppayPaymentMethodId: shoppayPaymentMethodId
 };

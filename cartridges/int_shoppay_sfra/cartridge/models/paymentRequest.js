@@ -14,8 +14,10 @@ var totalsHelpers = require('*/cartridge/scripts/shoppay/helpers/totalsHelpers')
  */
 function PaymentRequest(basket) {
 
+    // Kristin TODO: Add basket check and return... {}?
+
     var mainShipment = shippingHelpers.getPrimaryShipment(basket);
-    var paymentMethod = paymentHelpers.getPaymentMethod();
+    var paymentMethod = paymentHelpers.getPaymentMethod(basket);
     var totalShippingPrice = totalsHelpers.getTotalShippingPrice(basket);
 
     this.shippingAddress = shippingHelpers.getShippingAddress(mainShipment);
@@ -27,7 +29,7 @@ function PaymentRequest(basket) {
     this.shippingLines = shippingHelpers.getShippingLines(basket);
     this.deliveryMethods = shippingHelpers.getApplicableDeliveryMethods(mainShipment);
     this.locale = paymentHelpers.getLocale();
-    this.presentmentCurrency = paymentHelpers.getPresentmentCurrency();
+    this.presentmentCurrency = paymentHelpers.getPresentmentCurrency(basket);
     this.subtotal = totalsHelpers.getSubtotal(basket);
     this.discounts = discountHelpers.getDiscounts();
     if (totalShippingPrice && Object.keys(totalShippingPrice).length > 0) {
