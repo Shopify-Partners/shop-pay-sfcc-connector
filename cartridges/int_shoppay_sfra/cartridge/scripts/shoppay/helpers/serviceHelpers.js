@@ -1,142 +1,141 @@
 const mockPaymentRequestObject = {
     shippingAddress: null,
     discountCodes: [
-        "LOYALTY15"
+        'LOYALTY15'
     ],
     lineItems: [
         {
-            label: "T-Shirt",
+            label: 'T-Shirt',
             quantity: 2,
-            sku: "M1234",
+            sku: 'M1234',
             requiresShipping: true,
             image: {
-                url: "https://example.com/myshirtimage.jpg",
-                alt: "Red T-Shirt"
+                url: 'https://example.com/myshirtimage.jpg',
+                alt: 'Red T-Shirt'
             },
             originalItemPrice: {
                 amount: 10.00,
-                currencyCode: "USD"
+                currencyCode: 'USD'
             },
             itemDiscounts: [],
             finalItemPrice: {
                 amount: 10.00,
-                currencyCode: "USD"
+                currencyCode: 'USD'
             },
             originalLinePrice: {
                 amount: 20.00,
-                currencyCode: "USD"
+                currencyCode: 'USD'
             },
             lineDiscounts: [],
             finalLinePrice: {
                 amount: 20.00,
-                currencyCode: "USD"
+                currencyCode: 'USD'
             }
         }
     ],
     shippingLines: [],
     deliveryMethods: [],
-    locale: "en",
-    presentmentCurrency: "USD",
+    locale: 'en',
+    presentmentCurrency: 'USD',
     subtotal: {
         amount: 20.00,
-        currencyCode: "USD"
+        currencyCode: 'USD'
     },
     discounts: [
         {
-            label: "15% off",
+            label: '15% off',
             amount: {
                 amount: 3.00,
-                currencyCode: "USD"
+                currencyCode: 'USD'
             }
         }
     ],
     total: {
         amount: 17.00,
-        currencyCode: "USD"
+        currencyCode: 'USD'
     },
 }
 
 const mockShippingMethod = {
-    countryCode: "US",
-    postalCode: "60661",
+    countryCode: 'US',
+    postalCode: '60661',
     provinceCode: null,
-    city: "Chicago",
-    firstName: "Jane",
-    lastName: "Doe",
-    address1: "500 W Madison St",
-    address2: "Ste 2200",
-    phone: "3125551212",
-    email: "jane.doe@example.com",
+    city: 'Chicago',
+    firstName: 'Jane',
+    lastName: 'Doe',
+    address1: '500 W Madison St',
+    address2: 'Ste 2200',
+    phone: '3125551212',
+    email: 'jane.doe@example.com',
     companyName: null
 }
 
 const mockShippingLinesArray = [
     {
-        label: "Standard",
+        label: 'Standard',
         amount: {
             amount: 10.00,
-            currencyCode: "USD"
+            currencyCode: 'USD'
         },
-        code: "STANDARD"
+        code: 'STANDARD'
     }
 ];
 
 const mockDeliveryMethodsArray = [
     {
-        label: "Standard",
+        label: 'Standard',
         amount: {
             amount: 0.00,
-            currencyCode: "USD"
+            currencyCode: 'USD'
         },
-        code: "STANDARD",
-        detail: "Ground Shipping",
+        code: 'STANDARD',
+        detail: 'Ground Shipping',
         minDeliveryDate: '2024-01-01',
         maxDeliveryDate: '2026-01-01',
-        deliveryExpectation: "Orders ship within 2 business days"
+        deliveryExpectation: 'Orders ship within 2 business days'
     },
     {
-        label: "Express",
+        label: 'Express',
         amount: {
             amount: 20.00,
-            currencyCode: "USD"
+            currencyCode: 'USD'
         },
-        code: "EXPRESS",
-        detail: "2-day Shipping",
+        code: 'EXPRESS',
+        detail: '2-day Shipping',
         minDeliveryDate: '2024-01-01',
         maxDeliveryDate: '2025-01-01',
-        deliveryExpectation: "Order ships same business day if order placed before 12pm EST"
+        deliveryExpectation: 'Order ships same business day if order placed before 12pm EST'
     }
 ];
 
 const mockTotalShippingPrice = {
     discounts: [
         {
-            label: "free shipping",
+            label: 'free shipping',
             amount: {
                 amount: 10.00,
-                currencyCode: "USD"
+                currencyCode: 'USD'
             }
         }
     ],
     originalTotal: {
         amount: 10.00,
-        currencyCode: "USD"
+        currencyCode: 'USD'
     },
     finalTotal: {
         amount: 0.00,
-        currencyCode: "USD"
+        currencyCode: 'USD'
     }
 };
 
 const mockTotalTax = {
     amount: 1.06,
-    currencyCode: "USD"
+    currencyCode: 'USD'
 }
 
 const buildSubmitPaymetRequest = () => {
     var mockSubmitPaymentRequest = mockPaymentRequest;
     mockSubmitPaymentRequest.shippingAddress = mockShippingMethod;
-    mockSubmitPaymentRequest['paymentMethod'] = 'db4eede13822684b13a607823b7ba40d';
     mockSubmitPaymentRequest.shippingLines = mockShippingLinesArray;
     mockSubmitPaymentRequest.deliveryMethods = mockDeliveryMethodsArray;
     mockSubmitPaymentRequest['totalShippingPrice'] = mockTotalShippingPrice;
@@ -145,18 +144,40 @@ const buildSubmitPaymetRequest = () => {
     return mockSubmitPaymentRequest;
 }
 
+const mockShopPayPaymentRequestSessionCreateResponse = {
+    shopPayPaymentRequestSessionCreate: {
+        shopPayPaymentRequestSession: {
+            sourceIdentfier: 'xyz123',
+            token: 'db4eede13822684b13a607823b7ba40d',
+            checkoutUrl: 'https://shop.app/checkout/1/spe/db4eede13822684b13a607823b7ba40d/shoppay',
+            paymentRequest: mockPaymentRequest
+        },
+        userErrors: []
+    }
+}
+
+const mockShopPayPaymentRequestSessionSubmitResponse = {
+    shopPaySessionSubmit: {
+        paymentRequestReceipt: {
+            token: 'a607823b7ba40ddb4eede13822684b13',
+            processingStatusType: 'ready'
+        },
+        userErrors: []
+    }
+}
+
 /**
  * return mock payment request
- * @param  {string} mockType current service credential
+ * @param  {string} mockType type of mock payment request to be recieved
  * @returns {object} payment request
  */
 function getMockPaymentRequest(mockType) {
     switch (mockType) {
-        case "createSession":
+        case 'createSession':
             return JSON.stringify(mockPaymentRequest);
             break;
 
-        case "sessionSubmit":
+        case 'sessionSubmit':
             return JSON.stringify(buildSubmitPaymetRequest());
             break;
     
@@ -166,6 +187,28 @@ function getMockPaymentRequest(mockType) {
     }
 }
 
+/**
+ * return mock response
+ * @param  {string} mockType type of mock responce to be recieved
+ * @returns {object} response
+ */
+const getMockResopnse = (mockType) => {
+    switch (mockType) {
+        case 'createSession':
+            return JSON.stringify(mockShopPayPaymentRequestSessionCreateResponse);
+            break;
+
+        case 'sessionSubmit':
+            return JSON.stringify(mockShopPayPaymentRequestSessionSubmitResponse);
+            break;
+    
+        default:
+            return {};
+            break;
+    }
+}
+
 module.exports = {
-    getMockPaymentRequest: getMockPaymentRequest
+    getMockPaymentRequest: getMockPaymentRequest,
+    getMockResopnse: getMockResopnse
 };

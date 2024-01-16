@@ -4,7 +4,7 @@ const serviceName = 'shoppay.api.admin';
 const ServiceCredential = require('dw/svc/ServiceCredential');
 const LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
 const Resource = require('dw/web/Resource');
-const tokenCache = require('dw/system/CacheMgr').getCache('paypalRestOauthToken');
+const shopPayServiceHelper = require('*/cartridge/scripts/shopify/helpers/serviceHelpers');
 
 /** Create service
  * @returns {dw.svc.Service} service instance
@@ -25,7 +25,7 @@ const initService = () => {
 const createRequest = (service, data) => {
     var credential = service.configuration.credential;
 
-    const token = getToken(service);
+    const token = //shoppayStorefrontAPIToken;
 
     service.addHeader('Content-Type', 'application/json');
     service.setRequestMethod('POST');
@@ -34,11 +34,19 @@ const createRequest = (service, data) => {
     return requestData.body ? JSON.stringify(requestData.body) : '';
 }
 
-module.exports = function() {
+module.exports = () => {
     return LocalServiceRegistry.createService(serviceName, {
         createRequest: createRequest,
-        parseResponse: function(service, param) {
+        parseResponse: (service, param) => {
             return JSON.parse(param.text);
-        }
+        },
+        mockCall: (service, param) => {
+            const mockResponse = shopPayServiceHelper.getMockResopnse(param.variables.token ? 'sessionSubmit' : 'createSession');
+            return {
+                statusCode: 200,
+                statusMessage: 'success',
+                text: mockResponse
+            }
+        },
     });
 };
