@@ -31,7 +31,7 @@ function PaymentRequest(basket) {
     this.locale = paymentHelpers.getLocale();
     this.presentmentCurrency = paymentHelpers.getPresentmentCurrency(basket);
     this.subtotal = totalsHelpers.getSubtotal(basket);
-    this.discounts = discountHelpers.getDiscounts(basket);
+    this.discounts = discountHelpers.getOrderDiscounts(basket);
     if (totalShippingPrice && Object.keys(totalShippingPrice).length > 0) {
         this.totalShippingPrice = totalShippingPrice;
     }

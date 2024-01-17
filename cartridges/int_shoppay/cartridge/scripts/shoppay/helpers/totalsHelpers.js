@@ -5,20 +5,17 @@ var discountHelpers = require('*/cartridge/scripts/shoppay/helpers/discountHelpe
 var util = require('*/cartridge/scripts/util');
 
 /**
- * Plain JS object that represents the merchandize total price of the dw.order.LineItemCtnr
- * @param {dw.order.LineItemCtnr} basket
- * @returns {Object} raw JSON representing the merchandize total price
+ * Plain JS object that represents the discounted merchandize subtotal of the dw.order.LineItemCtnr
+ * @param {dw.order.LineItemCtnr} basket - the current line item container
+ * @returns {Object} raw JSON representing the discounted merchandize subtotal
  */
-function getTotal(basket) {
-    return util.getPriceObject(basket.getTotalGrossPrice());
-}
 function getSubtotal(basket) {
     return util.getPriceObject(basket.getAdjustedMerchandizeTotalPrice(false));
 }
 
 /**
  * Plain JS object that represents the shipping price and discounts in the dw.order.LineItemCtnr
- * @param {dw.order.LineItemCtnr} basket
+ * @param {dw.order.LineItemCtnr} basket - the current line item container
  * @returns {Object} raw JSON representing the shipping costs
  */
 function getTotalShippingPrice(basket) {
@@ -41,7 +38,7 @@ function getTotalShippingPrice(basket) {
 
 /**
  * Plain JS object that represents the total taxes of the dw.order.LineItemCtnr
- * @param {dw.order.LineItemCtnr} basket
+ * @param {dw.order.LineItemCtnr} basket - the current line item container
  * @returns {Object} raw JSON representing the order total tax
  */
 function getTotalTax(basket) {
@@ -50,7 +47,7 @@ function getTotalTax(basket) {
 
 /**
  * Plain JS object that represents the total price of the dw.order.LineItemCtnr
- * @param {dw.order.LineItemCtnr} basket
+ * @param {dw.order.LineItemCtnr} basket - the current line item container
  * @returns {Object} raw JSON representing the order total price
  */
 function getTotal(basket) {

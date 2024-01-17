@@ -7,7 +7,7 @@ var util = require('*/cartridge/scripts/util');
 /**
  * Checks the current cart or order for any BOPIS shipments. Note that BOPIS is not currently
  * supported in the Shop Pay checkout modal.
- * @param {dw.order.LineItemCtnr} basket - The current basket
+ * @param {dw.order.LineItemCtnr} basket - the current line item container
  * @returns {boolean} - true if the basket contains a shipment type that is not compatible with Shop Pay
  */
 function hasIneligibleShipments(basket) {
@@ -27,8 +27,8 @@ function hasIneligibleShipments(basket) {
  * Identifies the primary shipment whose address will be used in the Shop Pay payment request object.
  * This logic has been abstracted to a separate helper function to allow for split shipment customizations
  * involving e-gift cards. Note that BOPIS is not currently supported in the Shop Pay checkout modal.
- * @param {dw.order.LineItemContainer} basket - The current basket
- * @returns {dw.order.Shipment} a Shipment object
+ * @param {dw.order.LineItemContainer} basket - the current line item container
+ * @returns {dw.order.Shipment} a shipment object
  */
 function getPrimaryShipment(basket) {
     // Kristin TODO: Any special handling for EGC? Return null if any BOPIS shipments?
@@ -38,7 +38,7 @@ function getPrimaryShipment(basket) {
 /**
  * Filters the shipping methods for the current customer's basket for only those supported by the
  * Shop Pay modal. Note that BOPIS is not currently supported in the Shop Pay checkout modal.
- * @param {dw.order.Shipment} shipment - the target Shipment
+ * @param {dw.order.Shipment} shipment - the target shipment
  * @param {Object} [address] - optional address object
  * @returns {dw.util.Collection} an array of filtered dw.order.ShippingMethod objects
  */
@@ -65,8 +65,8 @@ function getApplicableShippingMethods(shipment) {
 /**
  * Generates the shipping address portion of the Shop Pay payment request object from the primary shipment.
  * Note that the payment request object accepts only one shipping address per order.
- * @param {dw.order.Shipment} shipment - The target shipment
- * @returns {Object} The shipping address portion of the Shop Pay payment request object
+ * @param {dw.order.Shipment} shipment - the target shipment
+ * @returns {Object} the shipping address portion of the Shop Pay payment request object
  */
 function getShippingAddress(shipment) {
     if (!shipment || !shipment.shippingAddress) {
@@ -92,7 +92,7 @@ function getShippingAddress(shipment) {
 
 /**
  * Plain JS object that represents the shipping line items of the dw.order.LineItemCtnr
- * @param {dw.order.LineItemCtnr} basket - The current basket
+ * @param {dw.order.LineItemCtnr} basket - the current line item container
  * @returns {Object} raw JSON representing the shipping line items
  */
 function getShippingLines(basket) {
@@ -118,9 +118,9 @@ function getShippingLines(basket) {
 
 /**
  * Plain JS object that represents the applicable shipping methods of the target dw.order.Shipment
- * @param {dw.order.Shipment} shipment - The shipment of interest
- * @param {Object} address - Plain JS object that represents the shipping address (optional)
- * @returns {Object} Plain JS object that represents the applicable shipping methods for the target shipment
+ * @param {dw.order.Shipment} shipment - the shipment of interest
+ * @param {Object} address - plain JS object that represents the shipping address (optional)
+ * @returns {Object} raw JSON that represents the applicable shipping methods for the target shipment
  */
 function getApplicableDeliveryMethods(shipment, address) {
     if (!shipment.shippingAddress) {

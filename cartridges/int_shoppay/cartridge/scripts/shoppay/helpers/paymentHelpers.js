@@ -1,5 +1,10 @@
 'use strict';
 
+/**
+ * Gets the Shop Pay payment token from the Shop Pay payment instrument, if it exists
+ * @param {dw.order.LineItemCtnr} order - the current line item container
+ * @returns {string} the Shop Pay payment token
+ */
 function getPaymentMethod(order) {
     var paymentMethod = null;
     if (order.paymentInstruments && order.paymentInstruments.length == 1) {
@@ -17,6 +22,10 @@ function getPaymentMethod(order) {
     return paymentMethod;
 }
 
+/**
+ * Gets the 2-digit language code for the current session from the site's locale
+ * @returns {string} the 2-digit language code for the customer's storefront session
+ */
 function getLocale() {
     var Locale = require('dw/util/Locale');
     var Site = require('dw/system/Site');
@@ -30,6 +39,11 @@ function getLocale() {
     return currentLocale.getLanguage();
 }
 
+/**
+ * Gets the 3-digit ISO currency code for the customer's basket
+ * @param {dw.order.LineItemCtnr} basket - the current line item container
+ * @returns {string} the 3-digit ISO currency code for the basket
+ */
 function getPresentmentCurrency(basket) {
     if (!basket) {
         return session.currency.currencyCode;
