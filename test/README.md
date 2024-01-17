@@ -31,35 +31,13 @@ BASE_URL=https://<INSTANCE>.commercecloud.salesforce.com/on/demandware.store/Sit
 
 ## Instructions
 
-- In Business Manager make sure you have added the appropriate selectors in the custom site preferences (see setup [documentation](../documentation/))
+- In Business Manager make sure you have added the appropriate selectors in the custom site preferences
 - `npm install`
 - Running tests:
 
     - SFRA E2E tests: `npm run test:sfra:e2e`
-    - SiteGen E2E tests: `npm run test:sg:e2e`
     - Unit Tests: `npm run test:unit`
 
 ## Coverage
 
 End to End (E2E) tests focus on verifying event data for the following
-
-- Viewed Product
-- Viewed Category
-- Searched Site
-- Added to Cart
-- Started Checkout
-- Order Confirmation
-- Account registration & Log in
-- Data Listener DOM property (see Event Data [documentation](../documentation/))
-
-Unit Tests verify the following
-
-- Track Event
-- Viewed Product
-- Order Confirmation
-- Added to Cart
-- Started Checkout
-
-    - Bonus Products
-    - Product Bundles
-    - Product Options
