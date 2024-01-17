@@ -1,6 +1,7 @@
 'use strict'
 
 var collections = require('*/cartridge/scripts/util/collections');
+var discountHelpers = require('*/cartridge/scripts/shoppay/helpers/discountHelpers');
 var util = require('*/cartridge/scripts/util');
 
 /**
@@ -27,29 +28,9 @@ function getTotalShippingPrice(basket) {
         return {};
     }
 
-    var originalTotal = {
-        "amount": shippingPrice.value,
-        "currencyCode": shippingPrice.currencyCode
-    };
-
+    var originalTotal = util.getPriceObject(shippingPrice);
     var finalTotal = util.getPriceObject(basket.getAdjustedShippingTotalPrice());
-
-    var discounts = [];
-    var shippingAdjustments = basket.getAllShippingPriceAdjustments();
-    if (shippingAdjustments.length > 0) {
-        collections.forEach(shippingAdjustments, function(shippingAdjustment) {
-            if (shippingAdjustment.price.isAvailable()) {
-                var discount = {
-                    "label": shippingAdjustment.lineItemText,
-                    "amount": {
-                        "amount": shippingAdjustment.price.value * -1.00,
-                        "currencyCode": shippingAdjustment.price.currencyCode
-                    }
-                };
-            }
-            discounts.push(discount);
-        });
-    }
+    var discounts = discountHelpers.getDiscountsObject(basket.getAllShippingPriceAdjustments());
 
     return {
         discounts: discounts,
