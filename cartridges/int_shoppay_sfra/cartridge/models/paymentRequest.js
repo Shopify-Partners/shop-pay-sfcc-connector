@@ -24,14 +24,14 @@ function PaymentRequest(basket) {
     if (paymentMethod != null) {
         this.paymentMethod = paymentMethod;
     }
-    this.discountCodes = discountHelpers.getDiscountCodes();
+    this.discountCodes = discountHelpers.getDiscountCodes(basket);
     this.lineItems = productLineItemHelpers.getLineItems(basket);
     this.shippingLines = shippingHelpers.getShippingLines(basket);
     this.deliveryMethods = shippingHelpers.getApplicableDeliveryMethods(mainShipment);
     this.locale = paymentHelpers.getLocale();
     this.presentmentCurrency = paymentHelpers.getPresentmentCurrency(basket);
     this.subtotal = totalsHelpers.getSubtotal(basket);
-    this.discounts = discountHelpers.getDiscounts();
+    this.discounts = discountHelpers.getDiscounts(basket);
     if (totalShippingPrice && Object.keys(totalShippingPrice).length > 0) {
         this.totalShippingPrice = totalShippingPrice;
     }
