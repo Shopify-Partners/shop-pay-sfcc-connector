@@ -7,6 +7,6 @@
 
 <isif condition="${pdict.includeShopPayJS}">
     <div class="mb-sm-3">
-        <isinclude template="cart/shopPayButton" />
+        <isinclude template="common/shopPayButton" />
     </div>
 </isif>
