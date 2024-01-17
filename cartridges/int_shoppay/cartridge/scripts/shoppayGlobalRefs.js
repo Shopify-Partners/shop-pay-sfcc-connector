@@ -19,6 +19,23 @@ var shoppayEnabled = function() {
     return (paymentMethod) ? paymentMethod.isActive() : false;
 };
 
+/**
+ * Returns ShopPay custom and hardcoded preferences
+ *
+ * @returns {Object} preferences
+ */
+function getPreferences() {
+    const site = require('dw/system/Site').current;
+
+    return {
+        shoppayPDPButtonEnabled: site.getCustomPreferenceValue('shoppayPDPButtonEnabled'),
+        shoppayCartButtonEnabled: site.getCustomPreferenceValue('shoppayCartButtonEnabled'),
+        shoppayStoreId: site.getCustomPreferenceValue('shoppayStoreId'),
+        shoppayAdminAPIToken: site.getCustomPreferenceValue('shoppayAdminAPIToken'),
+        shoppayStorefrontAPIToken: site.getCustomPreferenceValue('shoppayStorefrontAPIToken')
+    };
+}
+
 // Kristin TODO: flesh this logic out
 // core reference for if the Shop Pay payment method is valid based on
 // payment amount, country / regions, customer group, etc
@@ -54,8 +71,9 @@ var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPrefe
 var clientRefs = {
     urls: urls,
     constants: {
-        shoppayEnabled: shoppayEnabled()
-    }
+        shoppayEnabled: shoppayEnabled(),
+    },
+    preferences: getPreferences()
 }
 
 

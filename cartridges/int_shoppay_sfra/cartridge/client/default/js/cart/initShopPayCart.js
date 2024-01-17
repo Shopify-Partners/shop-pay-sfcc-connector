@@ -15,8 +15,8 @@ $(document).ready(function () {
 
 const initShopPayConfig = () => {
     window.ShopPay.PaymentRequest.configure({
-        shopId: 62164762779,
-        clientId: "79914172417",
+        shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
+        clientId: window.shoppayClientRefs.preferences.shoppayStorefrontAPIToken,
     });
 
 }
@@ -24,11 +24,7 @@ const initShopPayConfig = () => {
 const initShopPayButton = () => {
     initShopPayConfig();
 
-    //not sure I like haveing to resolve the promise like this there docs dont day anything about having to do this
-    window.ShopPay.PaymentRequest.createButton().render('#shop-pay-button-container')
-        .then((res) => 
-            document.getElementById('shop-pay-button-container').innerHTML = res.outerHTML
-        );
+    window.ShopPay.PaymentRequest.createButton().render('#shop-pay-button-container');
 }
 
 const initShopPayEmailRecognition = () => {
