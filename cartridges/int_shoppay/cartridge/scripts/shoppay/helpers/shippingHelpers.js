@@ -50,7 +50,7 @@ function getPrimaryShipment(basket) {
             var eDeliveryItems = eDeliveryHelpers.getEDeliveryItems(shipment);
             var isEDeliveryShipment = shipment.shippingMethod == null
                 ? false
-                : isEDeliveryShippingMethod(shipment.shippingMethod);
+                : eDeliveryHelpers.isEDeliveryShippingMethod(shipment.shippingMethod);
             return !isEDeliveryShipment && eDeliveryItems.length == 0;
         });
         if (homeDeliveryShipment != null) {
@@ -81,7 +81,7 @@ function getApplicableShippingMethods(shipment) {
     var filteredMethods = new ArrayList();
     collections.forEach(shippingMethods, function (shippingMethod) {
         if (!shippingMethod.custom.storePickupEnabled
-            && (!isEDeliveryApplicable && eDeliveryHelpers.isEDeliveryShippingMethod(shippingMethod))
+            && (!isEDeliveryApplicable && !eDeliveryHelpers.isEDeliveryShippingMethod(shippingMethod))
         ) {
             filteredMethods.push(shippingMethod);
         }
