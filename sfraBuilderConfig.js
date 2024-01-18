@@ -39,7 +39,7 @@ module.exports.includeConfig = {
  * Allows excluding js files for compile
  */
 module.exports.excludeJS = {
-    "": [],
+    "cartridges/int_shoppay": ['.DS_Store'],
 };
 
 /**
@@ -48,7 +48,6 @@ module.exports.excludeJS = {
 module.exports.cartridges = [
     "storefront-reference-architecture/cartridges/app_storefront_base",
     // "plugin_wishlists/cartridges/plugin_wishlists",
-    "cartridges/int_shoppay",
     "cartridges/int_shoppay_sfra",
 ];
 
