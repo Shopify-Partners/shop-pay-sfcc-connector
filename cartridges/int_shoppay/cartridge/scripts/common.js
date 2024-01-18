@@ -24,7 +24,7 @@ function getDiscountsObject(priceAdjustments) {
         var amount = priceValue != null && priceValue >= 0 ? priceAdjustment.price : priceAdjustment.price.multiply(-1.0);
         var discount = {
             "label": priceAdjustment.promotion ? priceAdjustment.promotion.name : '',
-            "amount": util.getPriceObject(amount)
+            "amount": getPriceObject(amount)
         };
         discounts.push(discount);
     });
