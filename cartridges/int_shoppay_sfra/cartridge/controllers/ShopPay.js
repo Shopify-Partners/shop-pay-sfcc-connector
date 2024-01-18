@@ -7,6 +7,7 @@
 var server = require('server');
 
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
+const shopPayApi = require('*/cartridge/scripts/shoppay/shopPayApi');
 
 /**
  * Kristin TODO: Build out helper scripts and call model to generate the response json elements dynamically
@@ -88,7 +89,7 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
  * Kristin TODO: Dynamically assign the response json elements from the GraphQL response
  * Kristin TODO: Controller JSdocs
  */
-server.post('BeginSession', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
+server.get('BeginSession', server.middleware.https, /*csrfProtection.validateAjaxRequest,*/ function (req, res, next) {
     var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');
     var currentBasket = BasketMgr.getCurrentOrNewBasket();
@@ -97,10 +98,13 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
     var sourceIdentifier = currentBasket.UUID;
     var shoppayToken = "db4eede13822684b13a607823b7ba40d";
 
+    const resonseBody = shopPayApi.shopPayPaymentRequestSessionCreate(sourceIdentifier);
+
     res.json({
         error: false,
         errorMsg: null,
         checkoutUrl: checkoutUrl,
+        resonseBody: resonseBody,
         sourceIdentifier: sourceIdentifier,
         token: shoppayToken
     });

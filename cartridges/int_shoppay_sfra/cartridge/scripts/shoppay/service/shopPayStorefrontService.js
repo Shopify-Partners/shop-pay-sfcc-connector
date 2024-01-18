@@ -4,7 +4,7 @@ const serviceName = 'shoppay.api.admin';
 const ServiceCredential = require('dw/svc/ServiceCredential');
 const LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
 const Resource = require('dw/web/Resource');
-const shopPayServiceHelper = require('*/cartridge/scripts/shopify/helpers/serviceHelpers');
+const shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
 
 /** Create service
  * @returns {dw.svc.Service} service instance
@@ -23,9 +23,10 @@ const initService = () => {
  * @returns {string} request body
  */
 const createRequest = (service, data) => {
+    const site = require('dw/system/Site').current;
     var credential = service.configuration.credential;
 
-    const token = //shoppayStorefrontAPIToken;
+    const token = site.getCustomPreferenceValue('shoppayStorefrontAPIToken');
 
     service.addHeader('Content-Type', 'application/json');
     service.setRequestMethod('POST');

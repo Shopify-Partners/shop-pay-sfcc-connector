@@ -134,7 +134,7 @@ const mockTotalTax = {
 }
 
 const buildSubmitPaymetRequest = () => {
-    var mockSubmitPaymentRequest = mockPaymentRequest;
+    var mockSubmitPaymentRequest = mockPaymentRequestObject;
     mockSubmitPaymentRequest.shippingAddress = mockShippingMethod;
     mockSubmitPaymentRequest.shippingLines = mockShippingLinesArray;
     mockSubmitPaymentRequest.deliveryMethods = mockDeliveryMethodsArray;
@@ -150,7 +150,7 @@ const mockShopPayPaymentRequestSessionCreateResponse = {
             sourceIdentfier: 'xyz123',
             token: 'db4eede13822684b13a607823b7ba40d',
             checkoutUrl: 'https://shop.app/checkout/1/spe/db4eede13822684b13a607823b7ba40d/shoppay',
-            paymentRequest: mockPaymentRequest
+            paymentRequest: mockPaymentRequestObject
         },
         userErrors: []
     }
@@ -174,7 +174,7 @@ const mockShopPayPaymentRequestSessionSubmitResponse = {
 function getMockPaymentRequest(mockType) {
     switch (mockType) {
         case 'createSession':
-            return JSON.stringify(mockPaymentRequest);
+            return JSON.stringify(mockPaymentRequestObject);
             break;
 
         case 'sessionSubmit':

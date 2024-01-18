@@ -1,6 +1,5 @@
-const shopPayStorefrontService = require('*/cartridge/scripts/service/shopPayStorefrontService');
-
-const shopPayServiceHelper = require('*/cartridge/scripts/shopify/helpers/serviceHelpers');
+const shopPayStorefrontService = require('*/cartridge/scripts/shoppay/service/shopPayStorefrontService');
+const shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
 
 /**
  * Function to create a GraphQL ShopPay payment request session
@@ -39,9 +38,9 @@ function shopPayPaymentRequestSessionSubmit() {
         const bodyObj = {
             query: 'mutation shopPayPaymentRequestSessionSubmit($token: String!, $paymentRequest: ShopPayPaymentRequest, $idempotencyKey: String!) {shopPayPaymentRequestSession(token: $token, paymentRequest: $paymentRequest, idempotencyKey: $idempotencyKey) {paymentRequestReceipt {token processingStatusType} userErrors {field message}}}',
             variables: {
-                token: 'db4eede13822684b13a607823b7ba40d', //Comes from session create response
+                token: 'db4eede13822684b13a607823b7ba40d', // TODO: pull token from session create response
                 idempotencyKey: dw.util.UUIDUtils.createUUID(),
-                paymentRequest: shopPayServiceHelper.getMockPaymentRequest('sessionSubmit')
+                paymentRequest: shopPayServiceHelper.getMockPaymentRequest('sessionSubmit') // TODO: will need to be updated to pull from BE Controller ShopPay-GetCartSummary
             }
         };
 
