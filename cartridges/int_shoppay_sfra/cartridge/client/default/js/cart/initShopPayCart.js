@@ -7,16 +7,16 @@ $(document).ready(function () {
         */
         if(document.getElementById('checkout-main')) {
             initShopPayEmailRecognition();
-        } else {
-            initShopPayButton();
         }
+        
+        initShopPayButton();
     }
 });
 
 const initShopPayConfig = () => {
     window.ShopPay.PaymentRequest.configure({
         shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
-        clientId: window.shoppayClientRefs.preferences.shoppayStorefrontAPIToken,
+        clientId: window.shoppayClientRefs.preferences.shoppayClientId,
     });
 
 }

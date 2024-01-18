@@ -19,23 +19,6 @@ var shoppayEnabled = function() {
     return (paymentMethod) ? paymentMethod.isActive() : false;
 };
 
-/**
- * Returns ShopPay custom and hardcoded preferences
- *
- * @returns {Object} preferences
- */
-function getPreferences() {
-    const site = require('dw/system/Site').current;
-
-    return {
-        shoppayPDPButtonEnabled: site.getCustomPreferenceValue('shoppayPDPButtonEnabled'),
-        shoppayCartButtonEnabled: site.getCustomPreferenceValue('shoppayCartButtonEnabled'),
-        shoppayStoreId: site.getCustomPreferenceValue('shoppayStoreId'),
-        shoppayAdminAPIToken: site.getCustomPreferenceValue('shoppayAdminAPIToken'),
-        shoppayStorefrontAPIToken: site.getCustomPreferenceValue('shoppayStorefrontAPIToken')
-    };
-}
-
 // Kristin TODO: flesh this logic out
 // core reference for if the Shop Pay payment method is valid based on
 // payment amount, country / regions, customer group, etc
@@ -55,6 +38,7 @@ function shoppayApplicable() { // req, currentBasket
 var isShoppayPDPButtonEnabled   = function() { return currentSite.getCustomPreferenceValue('shoppayPDPButtonEnabled'); }
 var isShoppayCartButtonEnabled  = function() { return currentSite.getCustomPreferenceValue('shoppayCartButtonEnabled'); }
 var shoppayStoreId              = function() { return currentSite.getCustomPreferenceValue('shoppayStoreId'); }
+var shoppayClientId              = function() { return currentSite.getCustomPreferenceValue('shoppayClientId'); }
 var shoppayAdminAPIVersion      = function() { return currentSite.getCustomPreferenceValue('shoppayAdminAPIVersion'); }
 var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPreferenceValue('shoppayStorefrontAPIVersion'); }
 
@@ -73,7 +57,14 @@ var clientRefs = {
     constants: {
         shoppayEnabled: shoppayEnabled(),
     },
-    preferences: getPreferences()
+    preferences: {
+        shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(),
+        shoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
+        shoppayStoreId: shoppayStoreId(),
+        shoppayClientId: shoppayClientId(),
+        shoppayAdminAPIToken: shoppayAdminAPIVersion(),
+        shoppayStorefrontAPIToken: shoppayStorefrontAPIVersion()
+    }
 }
 
 
