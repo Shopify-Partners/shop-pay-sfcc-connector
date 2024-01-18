@@ -23,8 +23,12 @@ exports.BasePage = class BasePage {
     }
 
     async acceptCookies() {
-        await this.acceptCookiesButton.click()
-        return
+        try {
+            await this.acceptCookiesButton.click()
+            return
+        } catch {
+            return
+        }
     }
 
     async getLogs() {
