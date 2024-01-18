@@ -11,8 +11,16 @@ var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 
 /**
- * Kristin TODO: Build out helper scripts and call model to generate the response json elements dynamically
- * Kristin TODO: Controller JSdocs
+ * The ShopPay-GetCartSummary controller generates the payment request object for use with Shop Pay checkout and
+ * payments
+ * @name Base/ShopPay-GetCartSummary
+ * @function
+ * @memberOf ShopPay
+ * @param {middleware} - server.middleware.https
+ * @param {middleware} - csrfProtection.validateAjaxRequest
+ * @param {category} - sensitive
+ * @param {renders} - json
+ * @param {serverfunction} - get
  */
 server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
