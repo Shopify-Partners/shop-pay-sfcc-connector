@@ -13,10 +13,16 @@ var totalsHelpers = require('*/cartridge/scripts/shoppay/helpers/totalsHelpers')
  * @param {dw.order.LineItemCtnr} basket - the current line item container
  */
 function PaymentRequest(basket) {
+    if (!basket) {
+        return;
+    }
 
-    // Kristin TODO: Add basket check and return... {}?
-
+    // The home delivery shipment or the first e-delivery shipment if only digital items in the basket
     var mainShipment = shippingHelpers.getPrimaryShipment(basket);
+    if (!mainShipment) {
+        return;
+    }
+
     var paymentMethod = paymentHelpers.getPaymentMethod(basket);
     var totalShippingPrice = totalsHelpers.getTotalShippingPrice(basket);
 
@@ -26,7 +32,7 @@ function PaymentRequest(basket) {
     }
     this.discountCodes = discountHelpers.getDiscountCodes(basket);
     this.lineItems = productLineItemHelpers.getLineItems(basket);
-    this.shippingLines = shippingHelpers.getShippingLines(basket);
+    this.shippingLines = shippingHelpers.getShippingLines(mainShipment);
     this.deliveryMethods = shippingHelpers.getApplicableDeliveryMethods(mainShipment);
     this.locale = paymentHelpers.getLocale();
     this.presentmentCurrency = paymentHelpers.getPresentmentCurrency(basket);

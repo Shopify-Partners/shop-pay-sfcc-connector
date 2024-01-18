@@ -50,12 +50,8 @@ function shoppayApplicable(req, currentBasket) {
     var message = null;
     var shippingHelpers = require('*/cartridge/scripts/shoppay/helpers/shippingHelpers');
     var hasIneligibleShipments = shippingHelpers.hasIneligibleShipments(currentBasket);
-    var usingMultiShipping = req.session.privacyCache.get('usingMultiShipping') === true;
-    if (usingMultiShipping && currentBasket.shipments.length < 2) {
-        usingMultiShipping = false;
-    }
 
-    return !hasIneligibleShipments && applicablePaymentMethods.contains(shoppayPaymentMethod) && !usingMultiShipping;
+    return !hasIneligibleShipments && applicablePaymentMethods.contains(shoppayPaymentMethod);
 }
 
 /**

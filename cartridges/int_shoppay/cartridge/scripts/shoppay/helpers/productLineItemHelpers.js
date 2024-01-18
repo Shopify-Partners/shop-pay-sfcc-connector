@@ -4,6 +4,7 @@ var collections = require('*/cartridge/scripts/util/collections');
 var ImageModel = require('*/cartridge/models/product/productImages');
 var priceFactory = require('*/cartridge/scripts/factories/price');
 var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHelpers');
 var common = require('*/cartridge/scripts/common');
 
 /**
@@ -116,14 +117,14 @@ function getItemPricing(pli) {
 function getLineItems(basket) {
     var lineItems = [];
     var viewType = shoppayGlobalRefs.shoppayModalImageViewType;
+    // Product Line Items
     collections.forEach(basket.productLineItems, function (pli) {
         var lineItem = {};
         var product = pli.product;
         lineItem.label = product.name;
         lineItem.quantity = pli.quantityValue;
         lineItem.sku = pli.productID;
-        // Kristin TODO: Add handling for e-delivery
-        lineItem.requiresShipping = true;
+        lineItem.requiresShipping = eDeliveryHelpers.isEDeliveryItem(lineItem) == true ? false : true;
         lineItem.image = getProductImage(product, viewType);
 
         // line item prices and discounts
@@ -136,9 +137,23 @@ function getLineItems(basket) {
 
         lineItems.push(lineItem);
     });
+
+    // Gift Certificate Line Items
+    collections.forEach(basket.giftCertificateLineItems, function (gcli) {
+        var lineItem = {};
+        lineItem.label = gcli.lineItemText;
+        lineItem.quantity = 1;
+        lineItem.requiresShipping = false;
+        // discounts and multi-quantity are not applicable to Gift Certificate Line Items
+        lineItem.finalItemPrice = common.getPriceObject(gcli.netPrice);
+        lineItem.finalLinePrice = common.getPriceObject(gcli.netPrice);
+
+        lineItems.push(lineItem);
+    })
+
     return lineItems;
 }
 
 module.exports = {
     getLineItems: getLineItems
-}
+};

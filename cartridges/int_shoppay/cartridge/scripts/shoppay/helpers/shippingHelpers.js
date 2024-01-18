@@ -3,20 +3,28 @@
 var ShippingMgr = require('dw/order/ShippingMgr');
 var collections = require('*/cartridge/scripts/util/collections');
 var common = require('*/cartridge/scripts/common');
+var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHelpers');
 
 /**
  * Checks the current cart or order for any BOPIS shipments. Note that BOPIS is not currently
- * supported in the Shop Pay checkout modal.
+ * supported in the Shop Pay checkout modal. More than 1 home delivery shipment is also not supported.
  * @param {dw.order.LineItemCtnr} basket - the current line item container
  * @returns {boolean} - true if the basket contains a shipment type that is not compatible with Shop Pay
  */
 function hasIneligibleShipments(basket) {
+    var usingMultiShipping = session.privacy.usingMultiShipping === true;
+    if (usingMultiShipping && basket.shipments.length < 2) {
+        usingMultiShipping = false;
+    }
+    if (usingMultiShipping) {
+        return true;
+    }
+
     var ineligibleShipments = collections.find(basket.shipments, function (shipment) {
         var shippingMethod = shipment.shippingMethod;
         var isBOPIS = shippingMethod != null && shippingMethod.custom.storePickupEnabled ? true : false;
-        // Kristin TODO: Any special handling for EGC? Multiple home delivery shipments?
         return isBOPIS === true;
-    })
+    });
     if (ineligibleShipments) {
         return true;
     }
@@ -31,8 +39,25 @@ function hasIneligibleShipments(basket) {
  * @returns {dw.order.Shipment} a shipment object
  */
 function getPrimaryShipment(basket) {
-    // Kristin TODO: Any special handling for EGC? Return null if any BOPIS shipments?
-    return basket.getDefaultShipment();
+    if (hasIneligibleShipments(basket)) {
+        return null;
+    }
+    var shipments = basket.getShipments();
+    // use default shipment if only 1 shipment or if all shipments contain e-delivery items
+    var primaryShipment = basket.getDefaultShipment();
+    if (shipments.length > 1) {
+        var homeDeliveryShipment = collections.find(shipments, function (shipment) {
+            var eDeliveryItems = eDeliveryHelpers.getEDeliveryItems(shipment);
+            var isEDeliveryShipment = shipment.shippingMethod == null
+                ? false
+                : isEDeliveryShippingMethod(shipment.shippingMethod);
+            return !isEDeliveryShipment && eDeliveryItems.length == 0;
+        });
+        if (homeDeliveryShipment != null) {
+            primaryShipment = homeDeliveryShipment;
+        }
+    }
+    return primaryShipment;
 }
 
 /**
@@ -43,21 +68,24 @@ function getPrimaryShipment(basket) {
  * @returns {dw.util.Collection} an array of filtered dw.order.ShippingMethod objects
  */
 function getApplicableShippingMethods(shipment) {
-    if (!shipment) return null;
+    if (!shipment) {
+        return null;
+    }
 
     var shipmentShippingModel = ShippingMgr.getShipmentShippingModel(shipment);
     var shippingMethods = shipmentShippingModel.getApplicableShippingMethods();
+    var isEDeliveryApplicable = eDeliveryHelpers.getEDeliveryItems(shipment).length > 0;
 
-    // Filter out whatever the method associated with in store pickup
+    // Filter out whatever the method associated with in store pickup and e-delivery if no digital items
     var ArrayList = require('dw/util/ArrayList');
     var filteredMethods = new ArrayList();
     collections.forEach(shippingMethods, function (shippingMethod) {
-        if (!shippingMethod.custom.storePickupEnabled) {
+        if (!shippingMethod.custom.storePickupEnabled
+            && (!isEDeliveryApplicable && eDeliveryHelpers.isEDeliveryShippingMethod(shippingMethod))
+        ) {
             filteredMethods.push(shippingMethod);
         }
     });
-
-    // Kristin TODO: Any special handling for e-delivery shipping method?
 
     return filteredMethods;
 }
@@ -77,7 +105,6 @@ function getShippingAddress(shipment) {
     var shippingAddressObj = {};
     shippingAddressObj.firstName = shippingAddress.firstName;
     shippingAddressObj.lastName = shippingAddress.lastName;
-    shippingAddressObj.email = null; // Kristin TODO: get this from the basket?
     shippingAddressObj.phone = shippingAddress.phone;
     shippingAddressObj.companyName = shippingAddress.companyName;
     shippingAddressObj.address1 = shippingAddress.address1;
@@ -91,25 +118,22 @@ function getShippingAddress(shipment) {
 }
 
 /**
- * Plain JS object that represents the shipping line items of the dw.order.LineItemCtnr
- * @param {dw.order.LineItemCtnr} basket - the current line item container
+ * Plain JS object that represents the shipping costs of the primary Shipment, which is the
+ * home delivery shipment or the first e-delivery shipment if the basket contains only e-delivery
+ * shipments
+ * @param {dw.order.LineItemCtnr} primaryShipment - the home delivery shipment or the first
+ * e-delivery shipment if the basket contains only e-delivery shipments
  * @returns {Object} raw JSON representing the shipping line items
  */
-function getShippingLines(basket) {
-    if (hasIneligibleShipments(basket)) {
+function getShippingLines(primaryShipment) {
+    if (!primaryShipment || !primaryShipment.shippingMethod) {
         return [];
     }
 
-    // Kristin TODO: Any special handling for e-delivery shipment exclusion in mixed cart?
-
-    var defaultShipment = basket.getDefaultShipment();
-    if (!basket.defaultShipment.shippingMethod) {
-        return [];
-    }
-    var shippingMethod = basket.defaultShipment.shippingMethod;
+    var shippingMethod = primaryShipment.shippingMethod;
     var shippingLine = {
         "label": shippingMethod.displayName,
-        "amount": common.getPriceObject(basket.defaultShipment.getShippingTotalPrice()),
+        "amount": common.getPriceObject(primaryShipment.getShippingTotalPrice()),
         "code": shippingMethod.ID
     };
 
