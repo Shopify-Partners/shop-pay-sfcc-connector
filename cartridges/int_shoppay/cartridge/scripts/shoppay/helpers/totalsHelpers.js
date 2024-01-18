@@ -1,8 +1,7 @@
 'use strict'
 
 var collections = require('*/cartridge/scripts/util/collections');
-var discountHelpers = require('*/cartridge/scripts/shoppay/helpers/discountHelpers');
-var util = require('*/cartridge/scripts/util');
+var common = require('*/cartridge/scripts/common');
 
 /**
  * Plain JS object that represents the discounted merchandize subtotal of the dw.order.LineItemCtnr
@@ -10,7 +9,7 @@ var util = require('*/cartridge/scripts/util');
  * @returns {Object} raw JSON representing the discounted merchandize subtotal
  */
 function getSubtotal(basket) {
-    return util.getPriceObject(basket.getAdjustedMerchandizeTotalPrice(false));
+    return common.getPriceObject(basket.getAdjustedMerchandizeTotalPrice(false));
 }
 
 /**
@@ -25,9 +24,9 @@ function getTotalShippingPrice(basket) {
         return {};
     }
 
-    var originalTotal = util.getPriceObject(shippingPrice);
-    var finalTotal = util.getPriceObject(basket.getAdjustedShippingTotalPrice());
-    var discounts = discountHelpers.getDiscountsObject(basket.getAllShippingPriceAdjustments());
+    var originalTotal = common.getPriceObject(shippingPrice);
+    var finalTotal = common.getPriceObject(basket.getAdjustedShippingTotalPrice());
+    var discounts = common.getDiscountsObject(basket.getAllShippingPriceAdjustments());
 
     return {
         discounts: discounts,
@@ -42,7 +41,7 @@ function getTotalShippingPrice(basket) {
  * @returns {Object} raw JSON representing the order total tax
  */
 function getTotalTax(basket) {
-    return util.getPriceObject(basket.getTotalTax());
+    return common.getPriceObject(basket.getTotalTax());
 }
 
 /**
@@ -51,7 +50,7 @@ function getTotalTax(basket) {
  * @returns {Object} raw JSON representing the order total price
  */
 function getTotal(basket) {
-    return util.getPriceObject(basket.getTotalGrossPrice());
+    return common.getPriceObject(basket.getTotalGrossPrice());
 }
 
 module.exports = {

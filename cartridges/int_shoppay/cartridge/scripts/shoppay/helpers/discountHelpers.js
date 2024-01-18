@@ -1,26 +1,7 @@
 'use strict'
 
 var collections = require('*/cartridge/scripts/util/collections');
-var util = require('*/cartridge/scripts/util');
-
-/**
- * Plain JS object that represents the price adjustments in a container
- * @param {dw.util.Collection<dw.order.PriceAdjustment>} priceAdjustments - a collection of a container's price adjustments
- * @returns {Object} raw JSON representing a collection of price adjustments
- */
-function getDiscountsObject(priceAdjustments) {
-    var discounts = [];
-    collections.forEach(priceAdjustments, function(priceAdjustment) {
-        var priceValue = priceAdjustment.price.valueOrNull;
-        var amount = priceValue != null && priceValue >= 0 ? priceAdjustment.price : priceAdjustment.price.multiply(-1.0);
-        var discount = {
-            "label": priceAdjustment.promotion ? priceAdjustment.promotion.name : '',
-            "amount": util.getPriceObject(amount)
-        };
-        discounts.push(discount);
-    });
-    return discounts;
-}
+var common = require('*/cartridge/scripts/common');
 
 /**
  * An array of coupon codes applied to a cart or order
@@ -45,11 +26,10 @@ function getDiscountCodes(basket) {
  * @returns {Object} raw JSON representing the order level price adjustments in the basket
  */
 function getOrderDiscounts(basket) {
-    return getDiscountsObject(basket.getPriceAdjustments());
+    return common.getDiscountsObject(basket.getPriceAdjustments());
 }
 
 module.exports = {
-    getDiscountsObject: getDiscountsObject,
     getDiscountCodes: getDiscountCodes,
     getOrderDiscounts: getOrderDiscounts
 };

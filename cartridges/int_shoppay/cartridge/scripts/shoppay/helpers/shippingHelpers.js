@@ -2,7 +2,7 @@
 
 var ShippingMgr = require('dw/order/ShippingMgr');
 var collections = require('*/cartridge/scripts/util/collections');
-var util = require('*/cartridge/scripts/util');
+var common = require('*/cartridge/scripts/common');
 
 /**
  * Checks the current cart or order for any BOPIS shipments. Note that BOPIS is not currently
@@ -109,7 +109,7 @@ function getShippingLines(basket) {
     var shippingMethod = basket.defaultShipment.shippingMethod;
     var shippingLine = {
         "label": shippingMethod.displayName,
-        "amount": util.getPriceObject(basket.defaultShipment.getShippingTotalPrice()),
+        "amount": common.getPriceObject(basket.defaultShipment.getShippingTotalPrice()),
         "code": shippingMethod.ID
     };
 
@@ -146,7 +146,7 @@ function getApplicableDeliveryMethods(shipment, address) {
             }
             var shipmentShippingModel = ShippingMgr.getShipmentShippingModel(shipment);
             var shippingCost = shipmentShippingModel.getShippingCost(shippingMethod);
-            method.amount = util.getPriceObject(shippingCost.getAmount());
+            method.amount = common.getPriceObject(shippingCost.getAmount());
             deliveryMethods.push(method);
         });
     }
