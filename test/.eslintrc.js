@@ -4,12 +4,13 @@ module.exports = {
     root: true,
     extends: "eslint:recommended",
     env: {
-        commonjs: true,
-        es6: true
+        "commonjs": true,
+        "mocha": true,
+        "es6": true
     },
-    // parserOptions: {
-    //     ecmaVersion: "latest",
-    // },
+    parserOptions: {
+        ecmaVersion: 11,
+    },
     globals: {
         dw: true,
         customer: true,

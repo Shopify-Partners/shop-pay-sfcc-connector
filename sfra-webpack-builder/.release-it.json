@@ -1,0 +1,16 @@
+{
+  "npm": {
+    "publish": false
+  },
+  "git": {
+    "requireCommits": true
+  },
+  "github": {
+    "release": true
+  },
+  "plugins": {
+    "@release-it/bumper": {
+      "out": "README.md"
+    }
+  }
+}
