@@ -1,5 +1,7 @@
 'use strict'
 
+var collections = require('*/cartridge/scripts/util/collections');
+
 function getPriceObject(price) {
     if (!price || !price.isAvailable()) {
         return {};

@@ -1,6 +1,5 @@
 'use strict'
 
-var collections = require('*/cartridge/scripts/util/collections');
 var common = require('*/cartridge/scripts/common');
 
 /**
