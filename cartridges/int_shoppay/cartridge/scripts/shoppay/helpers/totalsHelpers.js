@@ -1,6 +1,7 @@
 'use strict'
 
 var common = require('*/cartridge/scripts/common');
+var collections = require('*/cartridge/scripts/util/collections');
 
 /**
  * Plain JS object that represents the discounted merchandize subtotal of the dw.order.LineItemCtnr
@@ -8,7 +9,11 @@ var common = require('*/cartridge/scripts/common');
  * @returns {Object} raw JSON representing the discounted merchandize subtotal
  */
 function getSubtotal(basket) {
-    return common.getPriceObject(basket.getAdjustedMerchandizeTotalPrice(false));
+    var subTotal = basket.getAdjustedMerchandizeTotalPrice(false);
+    collections.forEach(basket.giftCertificateLineItems, function (gcli) {
+        subTotal = subTotal.add(gcli.getNetPrice());
+    });
+    return common.getPriceObject(subTotal);
 }
 
 /**

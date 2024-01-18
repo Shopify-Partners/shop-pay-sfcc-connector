@@ -80,8 +80,9 @@ function getApplicableShippingMethods(shipment) {
     var ArrayList = require('dw/util/ArrayList');
     var filteredMethods = new ArrayList();
     collections.forEach(shippingMethods, function (shippingMethod) {
+        var isEDeliveryMethod = eDeliveryHelpers.isEDeliveryShippingMethod(shippingMethod);
         if (!shippingMethod.custom.storePickupEnabled
-            && (!isEDeliveryApplicable && !eDeliveryHelpers.isEDeliveryShippingMethod(shippingMethod))
+            && ((!isEDeliveryApplicable && !isEDeliveryMethod) || (isEDeliveryApplicable && isEDeliveryMethod))
         ) {
             filteredMethods.push(shippingMethod);
         }

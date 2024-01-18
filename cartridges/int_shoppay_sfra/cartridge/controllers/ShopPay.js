@@ -28,7 +28,10 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     var Resource = require('dw/web/Resource');
 
     var currentBasket = BasketMgr.getCurrentBasket();
-    if (!currentBasket || currentBasket.productLineItems.length == 0) {
+
+    if (!currentBasket
+        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
+    ) {
         res.json({
             error: true,
             errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null),
