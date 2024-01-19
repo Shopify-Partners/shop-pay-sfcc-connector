@@ -92,21 +92,25 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
 server.get('BeginSession', server.middleware.https, /*csrfProtection.validateAjaxRequest,*/ function (req, res, next) {
     var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');
-    var currentBasket = BasketMgr.getCurrentOrNewBasket();
+    var currentBasket = BasketMgr.getCurrentBasket();
+    // if (!currentBasket) {
+    //     res.json({
+    //         error: true,
+    //         errorMsg: 'Kristin TODO'
+    //     });
+    //     return next();
+    // }
 
-    var checkoutUrl = URLUtils.https('Checkout-Begin').toString();
-    var sourceIdentifier = currentBasket.UUID;
-    var shoppayToken = "db4eede13822684b13a607823b7ba40d";
-
-    const resonseBody = shopPayApi.shopPayPaymentRequestSessionCreate(sourceIdentifier);
+    var response = shopPayApi.shopPayPaymentRequestSessionCreate(currentBasket);
+    // Kristin TODO: Error handling
+    var paymentRequestSession = response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession;
 
     res.json({
         error: false,
         errorMsg: null,
-        checkoutUrl: checkoutUrl,
-        resonseBody: resonseBody,
-        sourceIdentifier: sourceIdentifier,
-        token: shoppayToken
+        checkoutUrl: paymentRequestSession.checkoutUrl,
+        sourceIdentifier: paymentRequestSession.sourceIdentifier,
+        token: paymentRequestSession.token
     });
     next();
 });

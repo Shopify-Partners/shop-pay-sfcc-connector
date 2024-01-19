@@ -133,7 +133,7 @@ const mockTotalTax = {
     currencyCode: 'USD'
 }
 
-const buildSubmitPaymetRequest = () => {
+const buildSubmitPaymentRequest = () => {
     var mockSubmitPaymentRequest = mockPaymentRequestObject;
     mockSubmitPaymentRequest.shippingAddress = mockShippingMethod;
     mockSubmitPaymentRequest.shippingLines = mockShippingLinesArray;
@@ -147,7 +147,7 @@ const buildSubmitPaymetRequest = () => {
 const mockShopPayPaymentRequestSessionCreateResponse = {
     shopPayPaymentRequestSessionCreate: {
         shopPayPaymentRequestSession: {
-            sourceIdentfier: 'xyz123',
+            sourceIdentifier: 'xyz123',
             token: 'db4eede13822684b13a607823b7ba40d',
             checkoutUrl: 'https://shop.app/checkout/1/spe/db4eede13822684b13a607823b7ba40d/shoppay',
             paymentRequest: mockPaymentRequestObject
@@ -168,47 +168,49 @@ const mockShopPayPaymentRequestSessionSubmitResponse = {
 
 /**
  * return mock payment request
- * @param  {string} mockType type of mock payment request to be recieved
- * @returns {object} payment request
+ * @param {string} mockType type of mock payment request to be recieved
+ * @returns {Object} payment request
  */
 function getMockPaymentRequest(mockType) {
+    var request = {};
     switch (mockType) {
         case 'createSession':
-            return JSON.stringify(mockPaymentRequestObject);
+            request = mockPaymentRequestObject;
             break;
 
         case 'sessionSubmit':
-            return JSON.stringify(buildSubmitPaymetRequest());
+            request = buildSubmitPaymentRequest();
             break;
-    
+
         default:
-            return {};
             break;
     }
+    return request;
 }
 
 /**
  * return mock response
- * @param  {string} mockType type of mock responce to be recieved
- * @returns {object} response
+ * @param {string} mockType type of mock response to be received
+ * @returns {Object} response
  */
-const getMockResopnse = (mockType) => {
+function getMockResponse (mockType) {
+    var response = {};
     switch (mockType) {
         case 'createSession':
-            return JSON.stringify(mockShopPayPaymentRequestSessionCreateResponse);
+            response = mockShopPayPaymentRequestSessionCreateResponse;
             break;
 
         case 'sessionSubmit':
-            return JSON.stringify(mockShopPayPaymentRequestSessionSubmitResponse);
+            response = mockShopPayPaymentRequestSessionSubmitResponse;
             break;
-    
+
         default:
-            return {};
             break;
     }
+    return response;
 }
 
 module.exports = {
     getMockPaymentRequest: getMockPaymentRequest,
-    getMockResopnse: getMockResopnse
+    getMockResponse: getMockResponse
 };
