@@ -55,8 +55,12 @@ function shopPayPaymentRequestSessionSubmit() {
         return {
             response: response
         };
-    } catch (err) {
-        return { err: err.message };
+    } catch (e) {
+        logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        return {
+            error: true,
+            errorMsg: e.message
+        };
     }
 }
 

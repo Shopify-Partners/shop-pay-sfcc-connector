@@ -7,6 +7,7 @@
 var server = require('server');
 
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
+var Resource = require('dw/web/Resource');
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 
@@ -25,7 +26,6 @@ var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    var Resource = require('dw/web/Resource');
 
     var currentBasket = BasketMgr.getCurrentBasket();
 
@@ -92,8 +92,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
     ) {
         res.json({
             error: true,
-            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null),
-            paymentRequest: null
+            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null)
         });
         return next();
     }
@@ -102,8 +101,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
     if (!shoppayEligible) {
         res.json({
             error: true,
-            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null),
-            paymentRequest: null
+            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null)
         });
         return next();
     }
@@ -118,7 +116,17 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
 
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
     var response = storefrontAPI.shopPayPaymentRequestSessionCreate(currentBasket, paymentRequest);
-    // Kristin TODO: Error handling
+    if (!response
+        || response.error
+        || !response.shopPayPaymentRequestSessionCreate
+        || response.shopPayPaymentRequestSessionCreate.userErrors.length > 0
+    ) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('shoppay.service.error', 'shoppay', null),
+        });
+        return next();
+    }
     var paymentRequestSession = response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession;
 
     res.json({
