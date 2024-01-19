@@ -55,7 +55,7 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     } catch (e) {
         logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
         res.json({
-            error: false,
+            error: true,
             errorMsg: e.message,
             paymentRequest: paymentRequestModel
         });
