@@ -5,8 +5,10 @@
     </a>
 </div>
 
+<!-- BEGIN SHOPPAY -->
 <isif condition="${pdict.includeShopPayJS}">
     <div class="mb-sm-3">
         <isinclude template="common/shopPayButton" />
     </div>
 </isif>
+<!-- END SHOPPAY -->

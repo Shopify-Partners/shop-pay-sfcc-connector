@@ -15,13 +15,17 @@
                         <label class="form-control-label">
                             ${Resource.msg('field.customer.email','checkout',null)}
                         </label>
+                        <!-- BEGIN SHOPPAY -->
                         <div class="shop-pay-container" data-csrf-name="${pdict.csrf.tokenName}" data-csrf-token="${pdict.csrf.token}">
+                        <!-- END SHOPPAY -->
                             <div id="shop-pay-login-container">
                                 <input type="text" class="form-control email" id="email-guest"
                                             value="${(pdict.customer.registeredUser && pdict.customer.profile && pdict.customer.profile.email) ? pdict.customer.profile.email : ''}" <isprint value=${pdict.forms.guestCustomerForm.email.attributes} encoding="off"/>
                                             aria-describedby="guestEmailInvalidMessage" >
                             </div>
+                        <!-- BEGIN SHOPPAY -->
                         </div>
+                        <!-- END SHOPPAY -->
                         <div class="invalid-feedback" id="guestEmailInvalidMessage"></div>
                     </div>
                 </div>
@@ -31,10 +35,12 @@
                     ${Resource.msg('button.guest.customer.continue', 'checkout', null)}
                 </button>
             </isif>
+            <!-- BEGIN SHOPPAY -->
             <isif condition="${pdict.includeShopPayJS}">
                 <isinclude template="common/shopPayButton" />
             </isif>
-             <strong>${Resource.msg('msg.guest.customer.exists', 'checkout', null)} <button type="button" class="btn btn-link js-login-customer">${Resource.msg('action.customer.login', 'checkout', null)}</button></strong>
+            <!-- END SHOPPAY -->
+            <strong>${Resource.msg('msg.guest.customer.exists', 'checkout', null)} <button type="button" class="btn btn-link js-login-customer">${Resource.msg('action.customer.login', 'checkout', null)}</button></strong>
         </fieldset>
         <input type="hidden" name="${pdict.csrf.tokenName}" value="${pdict.csrf.token}"/>
     </form>

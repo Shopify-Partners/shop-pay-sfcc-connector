@@ -52,18 +52,26 @@ var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPrefe
         window.shoppayClientRefs = JSON.parse('<isprint encoding="jsonvalue" value="${pdict.shoppayClientRefs}" />');
     </script>
 */
-var clientRefs = {
-    urls: urls,
-    constants: {
-        shoppayEnabled: shoppayEnabled(),
-    },
-    preferences: {
-        shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(),
-        shoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
-        shoppayStoreId: shoppayStoreId(),
-        shoppayClientId: shoppayClientId(),
-        shoppayAdminAPIToken: shoppayAdminAPIVersion(),
-        shoppayStorefrontAPIToken: shoppayStorefrontAPIVersion()
+/**
+ * Add csrf token param to url
+ * @param {boolean || undefined} initShopPayEmailRecognition - should email recognition be initialized
+ * @returns {object} - js client refs
+ */
+var getClientRefs = function(initShopPayEmailRecognition) {
+    return {
+        urls: urls,
+        constants: {
+            shoppayEnabled: shoppayEnabled(),
+            initShopPayEmailRecognition: initShopPayEmailRecognition || false
+        },
+        preferences: {
+            shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(),
+            shoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
+            shoppayStoreId: shoppayStoreId(),
+            shoppayClientId: shoppayClientId(),
+            shoppayAdminAPIToken: shoppayAdminAPIVersion(),
+            shoppayStorefrontAPIToken: shoppayStorefrontAPIVersion()
+        }
     }
 }
 
@@ -76,5 +84,5 @@ module.exports = {
     shoppayStoreId: shoppayStoreId(),
     shoppayAdminAPIVersion: shoppayAdminAPIVersion(),
     shoppayStorefrontAPIVersion: shoppayStorefrontAPIVersion(),
-    clientRefs: clientRefs
+    getClientRefs: getClientRefs
 };
