@@ -12,11 +12,11 @@
         <isinclude template="product/components/addToCartButtonExtension"/>
     </div>
 
-    <!-- BEGIN SHOPPAY -->
+    <iscomment>BEGIN SHOPPAY</iscomment>
     <isif condition="${pdict.includeShopPayJS}">
         <div class="col-sm-12">
             <isinclude template="common/shopPayButton" />
         </div>
     </isif>
-    <!-- END SHOPPAY -->
+    <iscomment>END SHOPPAY</iscomment>
 </div>
