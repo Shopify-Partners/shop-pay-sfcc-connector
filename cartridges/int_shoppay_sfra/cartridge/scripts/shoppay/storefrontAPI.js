@@ -1,4 +1,5 @@
-var shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
+'use strict'
+
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 /**
@@ -10,7 +11,7 @@ var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
     try {
         const bodyObj = {
-            query: 'mutation shopPayPaymentRequestSessionCreate($sourceIdentifier: String!, $paymentRequest: ShopPayPaymentRequestInput!) {shopPayPaymentRequestSessionCreate(sourceIdentifier: $sourceIdentifier, paymentRequest: $paymentRequest) {shopPayPaymentRequestSession {token sourceIdentifier checkoutUrl paymentRequest {total ...}} userErrors{field message}}}',
+            query: 'mutation shopPayPaymentRequestSessionCreate($sourceIdentifier: String!, $paymentRequest: ShopPayPaymentRequestInput!) {shopPayPaymentRequestSessionCreate(sourceIdentifier: $sourceIdentifier, paymentRequest: $paymentRequest) {shopPayPaymentRequestSession {token sourceIdentifier checkoutUrl paymentRequest {total}} userErrors{field message}}}',
             variables: {
                 sourceIdentifier: basket.UUID,
                 paymentRequest: paymentRequest
@@ -36,6 +37,7 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
  * @returns {Object} The GraphQL service response body
  */
 function shopPayPaymentRequestSessionSubmit() {
+    var shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
     try {
         const bodyObj = {
             query: 'mutation shopPayPaymentRequestSessionSubmit($token: String!, $paymentRequest: ShopPayPaymentRequest, $idempotencyKey: String!) {shopPayPaymentRequestSession(token: $token, paymentRequest: $paymentRequest, idempotencyKey: $idempotencyKey) {paymentRequestReceipt {token processingStatusType} userErrors {field message}}}',

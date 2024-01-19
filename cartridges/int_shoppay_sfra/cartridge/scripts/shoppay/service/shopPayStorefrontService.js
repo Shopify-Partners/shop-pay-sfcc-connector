@@ -23,7 +23,7 @@ function createRequest(service, data) {
 
     service.addHeader('Content-Type', 'application/json');
     service.setRequestMethod('POST');
-    service.addHeader('X-Shopify-Access-Token', token);
+    service.addHeader('X-Shopify-Storefront-Access-Token', token);
     service.setURL(serviceURL);
 
     return data.body ? JSON.stringify(data.body) : '';

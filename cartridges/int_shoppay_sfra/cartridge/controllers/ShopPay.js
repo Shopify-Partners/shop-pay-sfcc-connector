@@ -87,13 +87,33 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
     var BasketMgr = require('dw/order/BasketMgr');
     var currentBasket = BasketMgr.getCurrentBasket();
 
-    // Kristin TODO: Applicability checks
-    var paymentRequestInput = req.httpParameterMap.paymentRequest;
-    var paymentRequest = JSON.parse(paymentRequestInput);
-    // Kristin TODO: replace this with error handling for the missing payment request input and/or basket
-    if (!paymentRequestInput) {
-        var serviceHelpers = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
-        paymentRequest = serviceHelpers.getMockPaymentRequest('createSession');
+    if (!currentBasket
+        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
+    ) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null),
+            paymentRequest: null
+        });
+        return next();
+    }
+
+    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
+    if (!shoppayEligible) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null),
+            paymentRequest: null
+        });
+        return next();
+    }
+
+    var paymentRequestInput = req.httpParameterMap['paymentRequest'];
+    var paymentRequest = paymentRequestInput.empty? null : JSON.parse(paymentRequestInput.value);
+    if (!paymentRequest) {
+        // Kristin TODO: replace this with error handling for the missing payment request input and/or basket
+        var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+        paymentRequest = new PaymentRequestModel(currentBasket);
     }
 
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
@@ -107,7 +127,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         checkoutUrl: paymentRequestSession.checkoutUrl,
         sourceIdentifier: paymentRequestSession.sourceIdentifier,
         token: paymentRequestSession.token,
-        paymentRequest: JSON.stringify(paymentRequest) /* Kristin TODO: remove this - used for testing only */
+        paymentRequest: paymentRequest /* Kristin TODO: remove this - used for testing only */
     });
     next();
 });
