@@ -11,76 +11,61 @@ var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 
 /**
- * Kristin TODO: Build out helper scripts and call model to generate the response json elements dynamically
- * Kristin TODO: Controller JSdocs
+ * The ShopPay-GetCartSummary controller generates the payment request object for use with Shop Pay checkout and
+ * payments
+ * @name Base/ShopPay-GetCartSummary
+ * @function
+ * @memberOf ShopPay
+ * @param {middleware} - server.middleware.https
+ * @param {middleware} - csrfProtection.validateAjaxRequest
+ * @param {category} - sensitive
+ * @param {renders} - json
+ * @param {serverfunction} - get
  */
 server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var paymentRequestObj = {
-        "shippingAddress": null,
-        "discountCodes": [
-            "LOYALTY15"
-        ],
-        "lineItems": [
-            {
-                "label": "T-Shirt",
-                "quantity": 2,
-                "sku": "M1234",
-                "requiresShipping": true,
-                "image": {
-                    "url": "https://example.com/myshirtimage.jpg",
-                    "alt": "Red T-Shirt"
-                },
-                "originalItemPrice": {
-                    "amount": 10.00,
-                    "currencyCode": "USD"
-                },
-                "itemDiscounts": [],
-                "finalItemPrice": {
-                    "amount": 10.00,
-                    "currencyCode": "USD"
-                },
-                "originalLinePrice": {
-                    "amount": 20.00,
-                    "currencyCode": "USD"
-                },
-                "lineDiscounts": [],
-                "finalLinePrice": {
-                    "amount": 20.00,
-                    "currencyCode": "USD"
-                }
-            }
-        ],
-        "shippingLines": [],
-        "deliveryMethods": [],
-        "locale": "en",
-        "presentmentCurrency": "USD",
-        "subtotal": {
-            "amount": 20.00,
-            "currencyCode": "USD"
-        },
-        "discounts": [
-            {
-                "label": "15% off",
-                "amount": {
-                    "amount": 3.00,
-                    "currencyCode": "USD"
-                }
-            }
-        ],
-        "totalTax": {
-            "amount": 1.06,
-            "currencyCode": "USD"
-        },
-        "total": {
-            "amount": 18.06,
-            "currencyCode": "USD"
-        }
-    };
+    var BasketMgr = require('dw/order/BasketMgr');
+    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+    var Resource = require('dw/web/Resource');
+
+    var currentBasket = BasketMgr.getCurrentBasket();
+
+    if (!currentBasket
+        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
+    ) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null),
+            paymentRequest: null
+        });
+        return next();
+    }
+
+    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
+    if (!shoppayEligible) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null),
+            paymentRequest: null
+        });
+        return next();
+    }
+
+    try {
+        var paymentRequestModel = new PaymentRequestModel(currentBasket);
+    } catch (e) {
+        logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
+        res.json({
+            error: true,
+            errorMsg: e.message,
+            paymentRequest: paymentRequestModel
+        });
+        return next();
+    }
 
     res.json({
         error: false,
         errorMsg: null,
-        paymentRequest: paymentRequestObj
+        paymentRequest: paymentRequestModel
     });
     next();
 });
