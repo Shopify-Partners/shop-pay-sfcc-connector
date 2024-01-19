@@ -8,7 +8,7 @@ $(document).ready(function () {
     }
 });
 
-const initShopPayConfig = () => {
+function initShopPayConfig() {
     window.ShopPay.PaymentRequest.configure({
         shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
         clientId: window.shoppayClientRefs.preferences.shoppayClientId,
@@ -16,13 +16,13 @@ const initShopPayConfig = () => {
 
 }
 
-const initShopPayButton = () => {
+function initShopPayButton() {
     initShopPayConfig();
 
     window.ShopPay.PaymentRequest.createButton().render('#shop-pay-button-container');
 }
 
-const initShopPayEmailRecognition = () => {
+function initShopPayEmailRecognition() {
     initShopPayConfig();
 
     /*
