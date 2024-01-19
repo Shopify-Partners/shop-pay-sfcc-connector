@@ -1,17 +1,19 @@
-const shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
+var shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
+var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 /**
  * Function to create a GraphQL ShopPay payment request session
  * @param {dw.order.LineItemCtnr} basket - the customer's current basket
- * @returns {Object} The QraphQL service response body
+ * @param {Object} paymentRequest - the Shop Pay payment request object representing the customer's basket
+ * @returns {Object} The GraphQL service response body
  */
-function shopPayPaymentRequestSessionCreate(basket) {
+function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
     try {
         const bodyObj = {
             query: 'mutation shopPayPaymentRequestSessionCreate($sourceIdentifier: String!, $paymentRequest: ShopPayPaymentRequestInput!) {shopPayPaymentRequestSessionCreate(sourceIdentifier: $sourceIdentifier, paymentRequest: $paymentRequest) {shopPayPaymentRequestSession {token sourceIdentifier checkoutUrl paymentRequest {total ...}} userErrors{field message}}}',
             variables: {
                 sourceIdentifier: basket.UUID,
-                paymentRequest: shopPayServiceHelper.getMockPaymentRequest('createSession')
+                paymentRequest: paymentRequest
             }
         };
         var shopPayStorefrontService = require('*/cartridge/scripts/shoppay/service/shopPayStorefrontService')();
@@ -20,14 +22,18 @@ function shopPayPaymentRequestSessionCreate(basket) {
         });
 
         return response.object;
-    } catch (err) {
-        return { err: err.message };
+    } catch (e) {
+        logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        return {
+            error: true,
+            errorMsg: e.message
+        };
     }
 }
 
 /**
  * Function to create a GraphQL ShopPay payment request session
- * @returns {Object} The QraphQL service response body
+ * @returns {Object} The GraphQL service response body
  */
 function shopPayPaymentRequestSessionSubmit() {
     try {
