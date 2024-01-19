@@ -5,7 +5,11 @@ module.exports = {
     extends: "eslint:recommended",
     env: {
         commonjs: true,
+        es6: true
     },
+    // parserOptions: {
+    //     ecmaVersion: "latest",
+    // },
     globals: {
         dw: true,
         customer: true,
