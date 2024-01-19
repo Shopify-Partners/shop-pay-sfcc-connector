@@ -39,7 +39,7 @@ function shopPayPaymentRequestSessionSubmit() {
                 paymentRequest: shopPayServiceHelper.getMockPaymentRequest('sessionSubmit') // TODO: will need to be updated to pull from BE Controller ShopPay-GetCartSummary
             }
         };
-        var shopPayStorefrontService = require('*/cartridge/scripts/shoppay/service/shopPayStorefrontService');
+        var shopPayStorefrontService = require('*/cartridge/scripts/shoppay/service/shopPayStorefrontService')();
         var response = shopPayStorefrontService.call({
             body: bodyObj || {}
         });
