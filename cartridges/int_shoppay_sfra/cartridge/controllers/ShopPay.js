@@ -97,25 +97,21 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
  * @param {renders} - json
  * @param {serverfunction} - post
  */
-server.get('BeginSession', server.middleware.https, /*csrfProtection.validateAjaxRequest,*/ function (req, res, next) {
+server.post('BeginSession', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');
-    // Kristin TODO: remove "OrNew"
-    var currentBasket = BasketMgr.getCurrentOrNewBasket();
-    // if (!currentBasket
-    //     || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
-    // ) {
-    //     res.json({
-    //         error: true,
-    //         errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null)
-    //     });
-    //     return next();
-    // }
+    var currentBasket = BasketMgr.getCurrentBasket();
 
-    // Kristin TODO: replace the mock payment request with http input
+    // Kristin TODO: Applicability checks
+    var paymentRequestInput = req.httpParameterMap.paymentRequest;
+    var paymentRequest = JSON.parse(paymentRequestInput);
+    // Kristin TODO: replace this with error handling for the missing payment request input and/or basket
+    if (!paymentRequestInput) {
+        var serviceHelpers = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
+        paymentRequest = serviceHelpers.getMockPaymentRequest('createSession');
+    }
+
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
-    var serviceHelpers = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
-    var paymentRequest = serviceHelpers.getMockPaymentRequest('createSession');
     var response = storefrontAPI.shopPayPaymentRequestSessionCreate(currentBasket, paymentRequest);
     // Kristin TODO: Error handling
     var paymentRequestSession = response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession;
@@ -125,7 +121,8 @@ server.get('BeginSession', server.middleware.https, /*csrfProtection.validateAja
         errorMsg: null,
         checkoutUrl: paymentRequestSession.checkoutUrl,
         sourceIdentifier: paymentRequestSession.sourceIdentifier,
-        token: paymentRequestSession.token
+        token: paymentRequestSession.token,
+        paymentRequest: JSON.stringify(paymentRequest) /* Kristin TODO: remove this - used for testing only */
     });
     next();
 });
