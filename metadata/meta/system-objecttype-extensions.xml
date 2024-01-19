@@ -99,9 +99,25 @@
                 <externally-managed-flag>false</externally-managed-flag>
                 <default-value>false</default-value>
             </attribute-definition>
+            <attribute-definition attribute-id="shoppayClientId">
+                <display-name xml:lang="x-default">Shopify Client ID</display-name>
+                <description xml:lang="x-default">Provided by Shop Pay team</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayStoreName">
+                <display-name xml:lang="x-default">Shopify Store Name</display-name>
+                <description xml:lang="x-default">https://admin.shopify.com/store/&lt;Shopify Store Name&gt;/</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
             <attribute-definition attribute-id="shoppayStoreId">
                 <display-name xml:lang="x-default">Shopify Store ID</display-name>
-                <description xml:lang="x-default">https://admin.shopify.com/store/&lt;Shopify Store ID&gt;/</description>
+                <description xml:lang="x-default">Provided by Shop Pay team</description>
                 <type>string</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
@@ -121,7 +137,9 @@
                 <display-name xml:lang="x-default">Shop Pay</display-name>
                 <attribute attribute-id="shoppayPDPButtonEnabled"/>
                 <attribute attribute-id="shoppayCartButtonEnabled"/>
+                <attribute attribute-id="shoppayStoreName"/>
                 <attribute attribute-id="shoppayStoreId"/>
+                <attribute attribute-id="shoppayClientId"/>
                 <attribute attribute-id="shoppayAdminAPIToken"/>
                 <attribute attribute-id="shoppayStorefrontAPIToken"/>
                 <attribute attribute-id="shoppayAdminAPIVersion"/>

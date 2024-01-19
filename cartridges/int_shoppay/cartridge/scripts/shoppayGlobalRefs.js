@@ -38,6 +38,7 @@ function shoppayApplicable() { // req, currentBasket
 var isShoppayPDPButtonEnabled   = function() { return currentSite.getCustomPreferenceValue('shoppayPDPButtonEnabled'); }
 var isShoppayCartButtonEnabled  = function() { return currentSite.getCustomPreferenceValue('shoppayCartButtonEnabled'); }
 var shoppayStoreId              = function() { return currentSite.getCustomPreferenceValue('shoppayStoreId'); }
+var shoppayClientId              = function() { return currentSite.getCustomPreferenceValue('shoppayClientId'); }
 var shoppayAdminAPIVersion      = function() { return currentSite.getCustomPreferenceValue('shoppayAdminAPIVersion'); }
 var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPreferenceValue('shoppayStorefrontAPIVersion'); }
 
@@ -51,10 +52,26 @@ var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPrefe
         window.shoppayClientRefs = JSON.parse('<isprint encoding="jsonvalue" value="${pdict.shoppayClientRefs}" />');
     </script>
 */
-var clientRefs = {
-    urls: urls,
-    constants: {
-        shoppayEnabled: shoppayEnabled()
+/**
+ * Add csrf token param to url
+ * @param {boolean || undefined} initShopPayEmailRecognition - should email recognition be initialized
+ * @returns {object} - js client refs
+ */
+var getClientRefs = function(initShopPayEmailRecognition) {
+    return {
+        urls: urls,
+        constants: {
+            shoppayEnabled: shoppayEnabled(),
+            initShopPayEmailRecognition: initShopPayEmailRecognition || false
+        },
+        preferences: {
+            shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(),
+            shoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
+            shoppayStoreId: shoppayStoreId(),
+            shoppayClientId: shoppayClientId(),
+            shoppayAdminAPIToken: shoppayAdminAPIVersion(),
+            shoppayStorefrontAPIToken: shoppayStorefrontAPIVersion()
+        }
     }
 }
 
@@ -67,5 +84,5 @@ module.exports = {
     shoppayStoreId: shoppayStoreId(),
     shoppayAdminAPIVersion: shoppayAdminAPIVersion(),
     shoppayStorefrontAPIVersion: shoppayStorefrontAPIVersion(),
-    clientRefs: clientRefs
+    getClientRefs: getClientRefs
 };
