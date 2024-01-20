@@ -7,7 +7,7 @@ on:
 jobs:
   build:
 
-    name: Test artifact storage
+    name: Test cache or artifact actions
     runs-on: ubuntu-latest
 
     steps:
