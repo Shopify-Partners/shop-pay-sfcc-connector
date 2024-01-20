@@ -35,7 +35,7 @@ jobs:
           node-version-file: '.nvmrc'
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
       - run: |
-          npm ci --ignore-scripts
+          npm ci
           npm run sfra:install
 
       - name: Compile static files
