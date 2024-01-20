@@ -1,0 +1,38 @@
+name: For testing workflows
+
+on:
+  push:
+    branches: [ SSPSC-33_devops_enhance ]
+
+jobs:
+  build:
+
+    name: Test artifact storage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Initialize git config & install dependencies
+        run: |
+          git config --global user.name "$(git log HEAD --pretty='%aN')"
+          git config --global user.email "$(git log HEAD --pretty='%aE')"
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+
+      - run: |
+          npm ci
+          npm run sfra:install
+
+      - name: Compile static files
+        run: |
+          npm run dev
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sfra
+          path: storefront-reference-architecture
