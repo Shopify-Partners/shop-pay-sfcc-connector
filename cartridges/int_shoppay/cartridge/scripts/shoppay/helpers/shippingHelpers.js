@@ -4,6 +4,7 @@ var ShippingMgr = require('dw/order/ShippingMgr');
 var collections = require('*/cartridge/scripts/util/collections');
 var common = require('*/cartridge/scripts/common');
 var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHelpers');
+var deliveryDateHelpers = require('*/cartridge/scripts/shoppay/helpers/deliveryDateHelpers');
 
 /**
  * Checks the current cart or order for any BOPIS shipments. Note that BOPIS is not currently
@@ -107,6 +108,7 @@ function getShippingAddress(shipment) {
     shippingAddressObj.firstName = shippingAddress.firstName;
     shippingAddressObj.lastName = shippingAddress.lastName;
     shippingAddressObj.phone = shippingAddress.phone;
+    shippingAddressObj.email = null;
     shippingAddressObj.companyName = shippingAddress.companyName;
     shippingAddressObj.address1 = shippingAddress.address1;
     shippingAddressObj.address2 = shippingAddress.address2;
@@ -162,12 +164,17 @@ function getApplicableDeliveryMethods(shipment, address) {
                 "label": shippingMethod.displayName,
                 "code": shippingMethod.ID,
                 "detail": shippingMethod.displayName,
-                "deliveryExpectation": null
+                "deliveryExpectationLabel": null,
+                "minDeliveryDate": deliveryDateHelpers.getMinDeliveryDate(shippingMethod),
+                "maxDeliveryDate": deliveryDateHelpers.getMaxDeliveryDate(shippingMethod)
             };
+            /* Kristin TODO: Update the min/max delivery date after discussion with Shop Pay team.
+               Note minDeliveryDate and maxDeliveryDate are required for each delivery method by GraphQL,
+               but are not OOTB calculations/attributes in SFCC. */
             if (shippingMethod.custom.estimatedArrivalTime) {
-                method.deliveryExpectation = shippingMethod.custom.estimatedArrivalTime;
+                method.deliveryExpectationLabel = shippingMethod.custom.estimatedArrivalTime;
             } else if (shippingMethod.description) {
-                method.deliveryExpectation = shippingMethod.description;
+                method.deliveryExpectationLabel = shippingMethod.description;
             }
             var shipmentShippingModel = ShippingMgr.getShipmentShippingModel(shipment);
             var shippingCost = shipmentShippingModel.getShippingCost(shippingMethod);
