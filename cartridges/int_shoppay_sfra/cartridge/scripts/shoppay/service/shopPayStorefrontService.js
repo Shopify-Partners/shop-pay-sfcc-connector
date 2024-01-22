@@ -35,6 +35,12 @@ module.exports = function () {
         parseResponse: function (service, response) {
             return JSON.parse(response.text);
         },
+        getRequestLogMessage: function (request) {
+            return (shopPayServiceHelper.getStorefrontRequestLogMessage(request));
+        },
+        getResponseLogMessage: function (response) {
+            return (shopPayServiceHelper.getStorefrontResponseLogMessage(response));
+        },
         mockCall: function (service, params) {
             var data = JSON.parse(params);
             const mockResponse = shopPayServiceHelper.getMockResponse(data.variables.token ? 'sessionSubmit' : 'createSession');
@@ -43,6 +49,6 @@ module.exports = function () {
                 statusMessage: 'success',
                 text: JSON.stringify(mockResponse)
             }
-        },
+        }
     });
 };

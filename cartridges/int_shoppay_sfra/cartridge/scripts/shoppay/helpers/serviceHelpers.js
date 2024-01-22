@@ -92,7 +92,7 @@ const mockDeliveryMethodsArray = [
         detail: 'Ground Shipping',
         minDeliveryDate: '2024-01-01',
         maxDeliveryDate: '2026-01-01',
-        deliveryExpectation: 'Orders ship within 2 business days'
+        deliveryExpectationLabel: 'Orders ship within 2 business days'
     },
     {
         label: 'Express',
@@ -104,7 +104,7 @@ const mockDeliveryMethodsArray = [
         detail: '2-day Shipping',
         minDeliveryDate: '2024-01-01',
         maxDeliveryDate: '2025-01-01',
-        deliveryExpectation: 'Order ships same business day if order placed before 12pm EST'
+        deliveryExpectationLabel: 'Order ships same business day if order placed before 12pm EST'
     }
 ];
 
@@ -210,7 +210,62 @@ function getMockResponse (mockType) {
     return response;
 }
 
+/**
+ * Filters the HTTP service response to remove sensitive information before logging the request
+ * @param {Object} request
+ * @returns {string} the filtered log message
+ */
+function getStorefrontRequestLogMessage(request) {
+    try {
+        var jsonBody = JSON.parse(request);
+        if (jsonBody.variables && jsonBody.variables.paymentRequest) {
+            var paymentRequest = jsonBody.variables.paymentRequest;
+            if (paymentRequest != null && paymentRequest.shippingAddress != null) {
+                // replace shipping address object with string to remove customer info
+                paymentRequest.shippingAddress = "****";
+            }
+        }
+        return JSON.stringify(jsonBody);
+    } catch (e) {
+        // no action - log request as is
+    }
+    return request;
+}
+
+/**
+ * Filters the HTTP service response to remove sensitive information before logging the response
+ * @param {Object} response
+ * @returns {string} the filtered log message
+ */
+function getStorefrontResponseLogMessage(response) {
+    try {
+        var responseBody = response.text;
+        var jsonBody = JSON.parse(responseBody);
+        // Session Create
+        if (jsonBody.data
+            && jsonBody.data.shopPayPaymentRequestSessionCreate
+            && jsonBody.data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession
+        ) {
+            // mask session token
+            jsonBody.data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token = "****";
+        // Session Submit
+        } else if (jsonBody.data
+            && jsonBody.data.shopPaySessionSubmit
+            && jsonBody.data.shopPaySessionSubmit.paymentRequestReceipt
+        ) {
+            // mask payment token
+            jsonBody.data.shopPaySessionSubmit.token = "****";
+        }
+        return JSON.stringify(jsonBody);
+    } catch (e) {
+        // no action - log response as is
+    }
+    return response.text;
+}
+
 module.exports = {
     getMockPaymentRequest: getMockPaymentRequest,
-    getMockResponse: getMockResponse
+    getMockResponse: getMockResponse,
+    getStorefrontRequestLogMessage: getStorefrontRequestLogMessage,
+    getStorefrontResponseLogMessage: getStorefrontResponseLogMessage
 };

@@ -109,9 +109,11 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
     var paymentRequestInput = req.httpParameterMap['paymentRequest'];
     var paymentRequest = paymentRequestInput.empty? null : JSON.parse(paymentRequestInput.value);
     if (!paymentRequest) {
-        // Kristin TODO: replace this with error handling for the missing payment request input and/or basket
-        var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-        paymentRequest = new PaymentRequestModel(currentBasket);
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('shoppay.input.error.missing', 'shoppay', null),
+        });
+        return next();
     }
 
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');

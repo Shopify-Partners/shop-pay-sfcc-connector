@@ -11,7 +11,7 @@ var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
     try {
         const bodyObj = {
-            query: 'mutation shopPayPaymentRequestSessionCreate($sourceIdentifier: String!, $paymentRequest: ShopPayPaymentRequestInput!) {shopPayPaymentRequestSessionCreate(sourceIdentifier: $sourceIdentifier, paymentRequest: $paymentRequest) {shopPayPaymentRequestSession {token sourceIdentifier checkoutUrl paymentRequest {total}} userErrors{field message}}}',
+            query: 'mutation shopPayPaymentRequestSessionCreate($sourceIdentifier: String!, $paymentRequest: ShopPayPaymentRequestInput!) {shopPayPaymentRequestSessionCreate(sourceIdentifier: $sourceIdentifier, paymentRequest: $paymentRequest) {shopPayPaymentRequestSession {token sourceIdentifier checkoutUrl paymentRequest {total {amount currencyCode}}} userErrors{field message}}}',
             variables: {
                 sourceIdentifier: basket.UUID,
                 paymentRequest: paymentRequest
@@ -22,7 +22,16 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
             body: bodyObj || {}
         });
 
-        return response.object;
+        if (!response.ok
+            || !response.object
+            || (response.object.errors && response.object.errors.length > 0)
+            || !response.object.data) {
+            return {
+                error: true,
+                errorMsg: response.errorMessage
+            }
+        }
+        return response.object.data;
     } catch (e) {
         logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return {
@@ -52,9 +61,16 @@ function shopPayPaymentRequestSessionSubmit() {
             body: bodyObj || {}
         });
 
-        return {
-            response: response
-        };
+        if (!response.ok
+            || !response.object
+            || (response.object.errors && response.object.errors.length > 0)
+            || !response.object.data) {
+            return {
+                error: true,
+                errorMsg: response.errorMessage
+            }
+        }
+        return response.object.data;
     } catch (e) {
         logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return {
