@@ -136,8 +136,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         errorMsg: null,
         checkoutUrl: paymentRequestSession.checkoutUrl,
         sourceIdentifier: paymentRequestSession.sourceIdentifier,
-        token: paymentRequestSession.token,
-        paymentRequest: paymentRequest /* Kristin TODO: remove this - used for testing only */
+        token: paymentRequestSession.token
     });
     next();
 });
