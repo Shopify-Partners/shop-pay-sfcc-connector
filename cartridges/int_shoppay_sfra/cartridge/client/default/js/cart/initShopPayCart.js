@@ -1,4 +1,4 @@
-const helper = require('../helpers/helper');
+const helper = require('../helpers/shoppayHelper');
 
 $(document).ready(function () {
     if(window.ShopPay) {
