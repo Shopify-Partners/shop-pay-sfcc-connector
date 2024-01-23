@@ -1,6 +1,9 @@
 const helper = require('../helpers/shoppayHelper');
 
+let session;
+
 $(document).ready(function () {
+    console.log("RUNNING!!!!!")
     if(window.ShopPay) {
         if(window.shoppayClientRefs.constants.initShopPayEmailRecognition) {
             initShopPayEmailRecognition();
@@ -8,7 +11,7 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-        const session = initShopPaySession();
+        // const session = initShopPaySession();
     }
 });
 
@@ -37,18 +40,48 @@ function initShopPayEmailRecognition() {
         .render('#shop-pay-login-container');
 }
 
+$('body').on('cart:update, product:afterAddToCart', function () {
+    // updateMiniCart = true;
+
+    // CHECK TO ENSURE THE CART ISN'T EMPTY BEFORE CALLING THIS!!!
+    // ALSO CONSIDER CHECKING IF THERE"S A SESSIOn
+
+    if (!window.ShopPay || !session) {
+        session = initShopPaySession();
+        // initShopPaySession();
+    } else {
+        const paymentRequestResponse = $.ajax({
+            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+            type: 'GET',
+            contentType: 'application/json',
+            async: false
+        }) || {};
+
+        if (paymentRequestResponse.responseJSON.paymentRequest !== null) {
+            session.completeDiscountCodeChange(paymentRequestResponse.responseJSON.paymentRequest);
+        }
+    }
+});
+
+
 function initShopPaySession() {
+    // ====== CONSIDER EXTERNALIZING THIS INTO SEPARATE FUNC!
     const paymentRequestResponse = $.ajax({
         url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
         type: 'GET',
         contentType: 'application/json',
         async: false
     }) || {};
+    // ======
 
-    var paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
-    const initialPaymentRequest = window.ShopPay.PaymentRequest.build(paymentRequest);
+    var paymentRequest = paymentRequestResponse.responseJSON;
 
-    return window.ShopPay.PaymentRequest.createSession({
-        paymentRequest: initialPaymentRequest
-    });
+    // checkfor error...and be sure the payment request isn't null!
+    if (!paymentRequest.error && paymentRequest.paymentRequest !== null) {
+        const initialPaymentRequest = window.ShopPay.PaymentRequest.build(paymentRequest);
+
+        return window.ShopPay.PaymentRequest.createSession({
+            paymentRequest: initialPaymentRequest
+        });
+    }
 }
