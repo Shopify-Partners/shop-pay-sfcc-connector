@@ -11,7 +11,7 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-        // const session = initShopPaySession();
+        session = initShopPaySession();
     }
 });
 
@@ -41,24 +41,25 @@ function initShopPayEmailRecognition() {
 }
 
 $('body').on('cart:update, product:afterAddToCart', function () {
-    // updateMiniCart = true;
 
     // CHECK TO ENSURE THE CART ISN'T EMPTY BEFORE CALLING THIS!!!
     // ALSO CONSIDER CHECKING IF THERE"S A SESSIOn
+    if (window.ShopPay) {
+        if (!session) {
+            session = initShopPaySession();
+        } else {
+            const paymentRequestResponse = $.ajax({
+                url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+                type: 'GET',
+                contentType: 'application/json',
+                async: false
+            }) || {};
 
-    if (!window.ShopPay || !session) {
-        session = initShopPaySession();
-        // initShopPaySession();
-    } else {
-        const paymentRequestResponse = $.ajax({
-            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
-            type: 'GET',
-            contentType: 'application/json',
-            async: false
-        }) || {};
+            var responseJSON = paymentRequestResponse.responseJSON;
 
-        if (paymentRequestResponse.responseJSON.paymentRequest !== null) {
-            session.completeDiscountCodeChange(paymentRequestResponse.responseJSON.paymentRequest);
+            if (!responseJSON.error && responseJSON.paymentRequest !== null) {
+                session.completeDiscountCodeChange(responseJSON.paymentRequest);
+            }
         }
     }
 });
@@ -74,11 +75,12 @@ function initShopPaySession() {
     }) || {};
     // ======
 
-    var paymentRequest = paymentRequestResponse.responseJSON;
+    var responseJSON = paymentRequestResponse.responseJSON;
+    console.log(JSON.stringify(responseJSON.paymentRequest))
 
     // checkfor error...and be sure the payment request isn't null!
-    if (!paymentRequest.error && paymentRequest.paymentRequest !== null) {
-        const initialPaymentRequest = window.ShopPay.PaymentRequest.build(paymentRequest);
+    if (!responseJSON.error && responseJSON.paymentRequest !== null) {
+        const initialPaymentRequest = window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest);
 
         return window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
