@@ -61,7 +61,7 @@ function shoppayApplicable(req, currentBasket) {
  * Note that these elements may be needed on a page such as PDP or cart where a customer's
  * eligibility for Shop Pay may change as the cart is updated via Ajax, so the code to support
  * Shop Pay should still need to be included.
- * @param {String} context - A string representing the page context ['pdp', 'cart', 'checkout']
+ * @param {string} context - A string representing the page context ['pdp', 'cart', 'checkout']
  * @returns {boolean} true if Shop Pay elements should be included on the page, otherwise false
  */
 function shoppayElementsApplicable(context) {
