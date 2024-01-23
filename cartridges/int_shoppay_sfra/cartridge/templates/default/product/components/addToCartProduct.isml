@@ -1,5 +1,4 @@
 <div class="row cart-and-ipay">
-UPDATEja;sdfkD???
     <div class="col-sm-12">
         <input type="hidden" class="add-to-cart-url" value="${pdict.addToCartUrl}">
         <button class="add-to-cart btn btn-primary"
