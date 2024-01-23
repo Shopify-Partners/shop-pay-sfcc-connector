@@ -40,7 +40,7 @@ function initShopPayEmailRecognition() {
         .render('#shop-pay-login-container');
 }
 
-$('body').on('cart:update, product:afterAddToCart', function () {
+$('body').on('cart:update product:afterAddToCart', function () {
 
     // CHECK TO ENSURE THE CART ISN'T EMPTY BEFORE CALLING THIS!!!
     // ALSO CONSIDER CHECKING IF THERE"S A SESSIOn
