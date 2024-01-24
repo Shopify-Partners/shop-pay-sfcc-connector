@@ -126,7 +126,7 @@ server.get('BuyNow', server.middleware.https, function (req, res, next) {
                         numberOfLineItems: '*'
                     };
                     var currentLocale = Locale.getLocale(req.locale.id);
-                    var orderModel = new OrderModel(
+                    orderModel = new OrderModel(
                         order,
                         { config: config, countryCode: currentLocale.country, containerView: 'order' }
                     );
