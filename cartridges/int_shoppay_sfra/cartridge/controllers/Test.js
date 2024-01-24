@@ -22,6 +22,7 @@ server.get('BuyNow', server.middleware.https, function (req, res, next) {
         var isBuyNow = req.httpParameterMap['buynow'] && req.httpParameterMap['buynow'].value == "true";
         var currentBasket = BasketMgr.getCurrentBasket();
         var orderModel = null;
+        var cartModel = null;
 
         if (isBuyNow) {
             function createBuyNowBasket() {
@@ -101,7 +102,6 @@ server.get('BuyNow', server.middleware.https, function (req, res, next) {
                         );
                     }
 
-                    //cartModel = new CartModel(tempBasket);
                     var order = OrderMgr.createOrder(tempBasket);
                     var paymentInstrument = order.paymentInstruments[0];
                     var paymentProcessor = PaymentMgr.getPaymentMethod(paymentInstrument.paymentMethod).paymentProcessor;
@@ -133,6 +133,8 @@ server.get('BuyNow', server.middleware.https, function (req, res, next) {
                 }
             });
         }
+        currentBasket = BasketMgr.getCurrentBasket();
+        cartModel = new CartModel(currentBasket);
     } catch (e) {
         res.json({
             success: false,
@@ -143,7 +145,8 @@ server.get('BuyNow', server.middleware.https, function (req, res, next) {
     res.json({
         success: true,
         errorMsg: null,
-        orderModel: orderModel
+        orderModel: orderModel,
+        cartModel: cartModel
     });
     next();
 });
