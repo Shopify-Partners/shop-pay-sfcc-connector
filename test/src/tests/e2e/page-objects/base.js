@@ -8,8 +8,9 @@ dotenv.config({ path: path.join('..', '.env') })
 const { BASE_URL } = process.env
 
 exports.BasePage = class BasePage {
-    constructor(page, isMobile) {
+    constructor(page, browser, isMobile) {
         this.page = page
+        this.browser = browser
         this.isMobile = isMobile
         this.baseUrl = BASE_URL
 
