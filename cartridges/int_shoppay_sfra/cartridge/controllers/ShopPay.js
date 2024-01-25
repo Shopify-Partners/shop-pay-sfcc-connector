@@ -83,7 +83,6 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
  * @param {serverfunction} - post
  */
 server.post('BeginSession', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');
     var currentBasket = BasketMgr.getCurrentBasket();
 
@@ -138,6 +137,81 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         sourceIdentifier: paymentRequestSession.sourceIdentifier,
         token: paymentRequestSession.token
     });
+    next();
+});
+
+server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
+    var URLUtils = require('dw/web/URLUtils');
+    var BasketMgr = require('dw/order/BasketMgr');
+    var HookMgr = require('dw/system/HookMgr');
+    var PaymentMgr = require('dw/order/PaymentMgr');
+    var currentBasket = BasketMgr.getCurrentBasket();
+    if (!currentBasket
+        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
+    ) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null)
+        });
+        return next();
+    }
+
+    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
+    if (!shoppayEligible) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null)
+        });
+        return next();
+    }
+
+    var paymentRequestInput = req.httpParameterMap['paymentRequest'];
+    var tokenInput = req.httpParameterMap['token'];
+    var paymentRequest = paymentRequestInput.empty ? null : JSON.parse(paymentRequestInput.value);
+    var token = tokenInput.empty ? null : tokenInput.value;
+    if (!paymentRequest || !token) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('shoppay.input.error.missing', 'shoppay', null),
+        });
+        return next();
+    }
+
+    // Kristin TODO: Add missing place order logic, etc. and flesh out the logic below
+    var paymentMethodId = shoppayGlobalRefs.shoppayPaymentMethodId;
+    var paymentProcessor = PaymentMgr.getPaymentMethod(paymentMethodId).paymentProcessor;
+    var authorizationResult;
+
+    if (HookMgr.hasHook('app.payment.processor.' + paymentProcessor.ID.toLowerCase())) {
+        authorizationResult = HookMgr.callHook(
+            'app.payment.processor.' + paymentProcessor.ID.toLowerCase(),
+            'Authorize',
+            paymentRequest,
+            token
+        );
+    } else {
+        authorizationResult = HookMgr.callHook(
+            'app.payment.processor.default',
+            'Authorize'
+        );
+    }
+    if (authorizationResult.error) {
+        res.json({
+            error: true,
+            errorMsg: authorizationResult.serverErrors.length > 0 ? authorizationResult.serverErrors[0] : authorizationResults.fieldErrors[0]
+        });
+        return next();
+    }
+    // Kristin TODO: Add missing place order logic
+
+    // Kristin TODO: Update payment response to use dynamic order attributes
+    res.json({
+        error: false,
+        errorMsg: null,
+        orderID: "ABC123",
+        orderToken: "CBA321",
+        continueUrl: URLUtils.url('Order-Confirm').toString(),
+    })
     next();
 });
 

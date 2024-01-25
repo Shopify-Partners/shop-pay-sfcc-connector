@@ -145,24 +145,28 @@ const buildSubmitPaymentRequest = () => {
 }
 
 const mockShopPayPaymentRequestSessionCreateResponse = {
-    shopPayPaymentRequestSessionCreate: {
-        shopPayPaymentRequestSession: {
-            sourceIdentifier: 'xyz123',
-            token: 'db4eede13822684b13a607823b7ba40d',
-            checkoutUrl: 'https://shop.app/checkout/1/spe/db4eede13822684b13a607823b7ba40d/shoppay',
-            paymentRequest: mockPaymentRequestObject
-        },
-        userErrors: []
+    data: {
+        shopPayPaymentRequestSessionCreate: {
+            shopPayPaymentRequestSession: {
+                sourceIdentifier: 'xyz123',
+                token: 'db4eede13822684b13a607823b7ba40d',
+                checkoutUrl: 'https://shop.app/checkout/1/spe/db4eede13822684b13a607823b7ba40d/shoppay',
+                paymentRequest: mockPaymentRequestObject
+            },
+            userErrors: []
+        }
     }
 }
 
 const mockShopPayPaymentRequestSessionSubmitResponse = {
-    shopPaySessionSubmit: {
-        paymentRequestReceipt: {
-            token: 'a607823b7ba40ddb4eede13822684b13',
-            processingStatusType: 'ready'
-        },
-        userErrors: []
+    data: {
+        shopPaySessionSubmit: {
+            paymentRequestReceipt: {
+                token: 'a607823b7ba40ddb4eede13822684b13',
+                processingStatusType: 'ready'
+            },
+            userErrors: []
+        }
     }
 }
 
@@ -241,20 +245,24 @@ function getStorefrontResponseLogMessage(response) {
     try {
         var responseBody = response.text;
         var jsonBody = JSON.parse(responseBody);
+        if (!jsonBody.data) {
+            return response.text;
+        }
+        var data = jsonBody.data;
         // Session Create
-        if (jsonBody.data
-            && jsonBody.data.shopPayPaymentRequestSessionCreate
-            && jsonBody.data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession
+        if (data.shopPayPaymentRequestSessionCreate
+            && data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession
+            && data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token
         ) {
             // mask session token
-            jsonBody.data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token = "****";
+            data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token = "****";
         // Session Submit
-        } else if (jsonBody.data
-            && jsonBody.data.shopPaySessionSubmit
-            && jsonBody.data.shopPaySessionSubmit.paymentRequestReceipt
+        } else if (data.shopPayPaymentRequestSessionSubmit
+            && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt
+            && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token
         ) {
             // mask payment token
-            jsonBody.data.shopPaySessionSubmit.token = "****";
+            jsonBody.data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
         }
         return JSON.stringify(jsonBody);
     } catch (e) {

@@ -4,7 +4,6 @@ var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 /**
  * Function to create a GraphQL ShopPay payment request session
- * @param {dw.order.LineItemCtnr} basket - the customer's current basket
  * @param {Object} paymentRequest - the Shop Pay payment request object representing the customer's basket
  * @returns {Object} The GraphQL service response body
  */
@@ -43,17 +42,21 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
 
 /**
  * Function to create a GraphQL ShopPay payment request session
+ * @param {Object} paymentRequest - the Shop Pay payment request object representing the customer's basket
+ * @param {String} token - the Shop Pay session token returned in the session create GraphQL response
  * @returns {Object} The GraphQL service response body
  */
-function shopPayPaymentRequestSessionSubmit() {
+function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
     var shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
+    /* Kristin TODO: Verify that the paymentRequest.paymentMethod is passed in from the client-side JS here
+       when the modal flows are implemented. */
     try {
         const bodyObj = {
-            query: 'mutation shopPayPaymentRequestSessionSubmit($token: String!, $paymentRequest: ShopPayPaymentRequest, $idempotencyKey: String!) {shopPayPaymentRequestSession(token: $token, paymentRequest: $paymentRequest, idempotencyKey: $idempotencyKey) {paymentRequestReceipt {token processingStatusType} userErrors {field message}}}',
+            query: 'mutation shopPayPaymentRequestSessionSubmit($token: String!, $paymentRequest: ShopPayPaymentRequestInput!, $idempotencyKey: String!) {shopPayPaymentRequestSessionSubmit(token: $token, paymentRequest: $paymentRequest, idempotencyKey: $idempotencyKey) {paymentRequestReceipt {token processingStatusType} userErrors {field message}}}',
             variables: {
-                token: 'db4eede13822684b13a607823b7ba40d', // TODO: pull token from session create response
-                idempotencyKey: dw.util.UUIDUtils.createUUID(),
-                paymentRequest: shopPayServiceHelper.getMockPaymentRequest('sessionSubmit') // TODO: will need to be updated to pull from BE Controller ShopPay-GetCartSummary
+                token: token,
+                idempotencyKey: dw.util.UUIDUtils.createUUID(), // Kristin TODO: Do we need to store and reuse within session?
+                paymentRequest: paymentRequest
             }
         };
         var shopPayStorefrontService = require('*/cartridge/scripts/shoppay/service/shopPayStorefrontService')();
