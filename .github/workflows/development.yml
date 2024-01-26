@@ -18,16 +18,31 @@ jobs:
         run: |
           git config --global user.name "$(git log HEAD --pretty='%aN')"
           git config --global user.email "$(git log HEAD --pretty='%aE')"
+
+      - name: Cache node modules
+        id: cache-nodemodules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
       - uses: actions/setup-node@v3
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
-          cache-dependency-path: |
-            package-lock.json
-            sfra-webpack-builder/package-lock.json
-            storefront-reference-architecture/package-lock.json
+          if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+          # cache-dependency-path: |
+          #   package-lock.json
+          #   sfra-webpack-builder/package-lock.json
+          #   storefront-reference-architecture/package-lock.json
       - run: |
           npm ci
+
           npm run sfra:install
 
       - name: Compile static files
