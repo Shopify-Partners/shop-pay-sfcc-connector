@@ -8,8 +8,60 @@ var server = require('server');
 
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 var Resource = require('dw/web/Resource');
+var Transaction = require('dw/system/Transaction');
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
+
+function validateInputs(req, currentBasket, inputParams) {
+    if (!currentBasket
+        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
+    ) {
+        return {
+            error: true,
+            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null)
+        };
+    }
+
+    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
+    if (!shoppayEligible) {
+        return {
+            error: true,
+            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null)
+        };
+    }
+
+    var missingInput;
+
+    switch (req.httpMethod) {
+        case 'GET':
+            missingInput = inputParams.find(function (param){
+                return req.httpParameterMap[param].empty;
+            });
+            break;
+        case 'POST':
+            const body = JSON.parse(req.body);
+            missingInput = inputParams.find(function (param){
+                return body[param] === undefined;
+            });
+            break;
+
+        default:
+            break;
+    }
+
+    if (missingInput) {
+        return {
+            error: true,
+            errorMsg: Resource.msg('shoppay.input.error.missing', 'shoppay', null)
+        }
+    }
+
+    return {
+        error: false,
+        errorMsg: null
+    }
+}
 
 /**
  * The ShopPay-GetCartSummary controller generates the payment request object for use with Shop Pay checkout and
@@ -26,32 +78,28 @@ var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-
-    var currentBasket = BasketMgr.getCurrentBasket();
-
-    if (!currentBasket
-        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
-    ) {
-        res.json({
-            error: true,
-            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null),
-            paymentRequest: null
-        });
-        return next();
+    var currentBasket;
+    var paymentRequestModel;
+    var httpParameterMap = req.httpParameterMap;
+    if (req.httpParameterMap.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(req.httpParameterMap.basketId.value);
+    }
+    else {
+        currentBasket = BasketMgr.getCurrentBasket();
     }
 
-    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
-    if (!shoppayEligible) {
+    var inputValidation = validateInputs(req, currentBasket, []);
+    if (!inputValidation || inputValidation.error) {
         res.json({
             error: true,
-            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null),
+            errorMsg: inputValidation.errorMsg,
             paymentRequest: null
         });
         return next();
     }
 
     try {
-        var paymentRequestModel = new PaymentRequestModel(currentBasket);
+        paymentRequestModel = new PaymentRequestModel(currentBasket);
     } catch (e) {
         logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
         res.json({
@@ -70,6 +118,98 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     next();
 });
 
+server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
+    var ProductMgr = require('dw/catalog/ProductMgr');
+    var ShippingMgr = require('dw/order/ShippingMgr');
+    var Transaction = require('dw/system/Transaction');
+
+    var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
+    var cartHelper = require('*/cartridge/scripts/cart/cartHelpers');
+    var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
+    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
+    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+    var paymentRequestModel;
+    var currentBasket;
+
+    var data = JSON.parse(req.body);
+
+    if (!data.pid) {
+        // Missing product SKU
+        res.json({
+            error: true,
+            errorMsg: 'sku missing'
+        });
+        return next();
+    }
+
+    // Get product to add to the basket
+    var product = ProductMgr.getProduct(data.pid);
+
+    if (!product) {
+        // Product doesn't exist
+        res.json({
+            error: true,
+            errorMsg: 'invalid product'
+        });
+        return next();
+    }
+
+    // Get product option model
+    var optionModel = product.getOptionModel();
+    if (data.options) {
+        data.options.forEach(function (option) {
+            var productOption = optionModel.getOption(option.id);
+            if (productOption) {
+                var productOptionValue = optionModel.getOptionValue(productOption, option.valueId);
+                if (productOptionValue) {
+                    // Update selected value for product option
+                    optionModel.setSelectedOptionValue(productOption, productOptionValue);
+                }
+            }
+        });
+    }
+
+    Transaction.wrap(function () {
+        // Create a temporary basket for Buy Now
+        currentBasket = shoppayCheckoutHelpers.createBuyNowBasket();
+        var shipment = currentBasket.defaultShipment;
+
+        // Clear any existing line items out of the basket
+        currentBasket.productLineItems.toArray().forEach(function (pli) {
+            currentBasket.removeProductLineItem(pli);
+        });
+
+        // Create a product line item for the product, option model, and quantity
+        var pli = currentBasket.createProductLineItem(product, optionModel, shipment);
+        pli.setQuantityValue(data.quantity || 1);
+
+        // Calculate basket
+        cartHelper.ensureAllShipmentsHaveMethods(currentBasket);
+        basketCalculationHelpers.calculateTotals(currentBasket);
+    });
+
+    try {
+        paymentRequestModel = new PaymentRequestModel(currentBasket);
+    } catch (e) {
+        logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
+        res.json({
+            error: true,
+            errorMsg: e.message,
+            paymentRequest: paymentRequestModel
+        });
+        return next();
+    }
+
+    res.json({
+        error: false,
+        errorMsg: null,
+        basketId: currentBasket.UUID,
+        paymentRequest: paymentRequestModel
+    });
+
+    return next();
+});
+
 /**
  * The ShopPay-BeginSession controller initializes the Shop Pay payment request session with the
  * Shop Pay GraphQL API and returns the data needed to verify the Shop Pay session client-side.
@@ -84,36 +224,26 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
  */
 server.post('BeginSession', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
-    var currentBasket = BasketMgr.getCurrentBasket();
+    var currentBasket;
+    var inputs = JSON.parse(req.body);
 
-    if (!currentBasket
-        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
-    ) {
+    if (inputs.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(inputs.basketId);
+    }
+    else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
+
+    var inputValidation = validateInputs(req, currentBasket, ['paymentRequest']);
+    if (!inputValidation || inputValidation.error) {
         res.json({
             error: true,
-            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null)
+            errorMsg: inputValidation.errorMsg
         });
         return next();
     }
 
-    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
-    if (!shoppayEligible) {
-        res.json({
-            error: true,
-            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null)
-        });
-        return next();
-    }
-
-    var paymentRequestInput = req.httpParameterMap['paymentRequest'];
-    var paymentRequest = paymentRequestInput.empty? null : JSON.parse(paymentRequestInput.value);
-    if (!paymentRequest) {
-        res.json({
-            error: true,
-            errorMsg: Resource.msg('shoppay.input.error.missing', 'shoppay', null),
-        });
-        return next();
-    }
+    var paymentRequest = inputs.paymentRequest;
 
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
     var response = storefrontAPI.shopPayPaymentRequestSessionCreate(currentBasket, paymentRequest);

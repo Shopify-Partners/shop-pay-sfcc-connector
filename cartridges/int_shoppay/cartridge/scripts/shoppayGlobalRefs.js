@@ -8,6 +8,7 @@ const shoppayPaymentMethodId = 'ShopPay';
 
 var urls = {
     GetCartSummary: URLUtils.https('ShopPay-GetCartSummary').toString(),
+    PrepareBasket: URLUtils.https('ShopPay-PrepareBasket').toString(),
     BeginSession: URLUtils.https('ShopPay-BeginSession').toString(),
     DiscountCodeChanged: URLUtils.https('ShopPay-DiscountCodeChanged').toString(),
     DeliveryMethodChanged: URLUtils.https('ShopPay-DeliveryMethodChanged').toString(),
@@ -39,6 +40,8 @@ var shoppayModalImageViewType   = function() { return currentSite.getCustomPrefe
  */
 function shoppayApplicable(req, currentBasket) {
     var shoppayPaymentMethod = PaymentMgr.getPaymentMethod(shoppayPaymentMethodId);
+    /* TODO: Consider changing this to check merchanidise + gift certificate total in case shipping is not
+    yet assigned. OOTB assigns shipping method at add to cart, but customer may have customized? */
     var paymentAmount = currentBasket.totalGrossPrice.value;
     var countryCode = req.geolocation.countryCode;
     var currentCustomer = req.currentCustomer.raw;
@@ -109,7 +112,7 @@ var getClientRefs = function(context) {
         constants: {
             shoppayEnabled: shoppayEnabled(),
             initShopPayEmailRecognition: context === 'checkout',
-            isBuyNow: context === 'cart'
+            isBuyNow: context === 'pdp'
         },
         preferences: {
             shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(),
