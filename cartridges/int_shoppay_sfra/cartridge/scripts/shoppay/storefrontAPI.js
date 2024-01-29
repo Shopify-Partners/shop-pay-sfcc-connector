@@ -43,7 +43,7 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
 /**
  * Function to create a GraphQL ShopPay payment request session
  * @param {Object} paymentRequest - the Shop Pay payment request object representing the customer's basket
- * @param {String} token - the Shop Pay session token returned in the session create GraphQL response
+ * @param {string} token - the Shop Pay session token returned in the session create GraphQL response
  * @returns {Object} The GraphQL service response body
  */
 function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {

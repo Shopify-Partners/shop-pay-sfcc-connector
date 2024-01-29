@@ -100,15 +100,16 @@ function shoppayElementsApplicable(context) {
 */
 /**
  * Add csrf token param to url
- * @param {boolean || undefined} initShopPayEmailRecognition - should email recognition be initialized
- * @returns {object} - js client refs
+ * @param {string} context - 'pdp', 'cart', or 'checkout' - used to set global constants in the window
+ * @returns {Object} - js client refs
  */
-var getClientRefs = function(initShopPayEmailRecognition) {
+var getClientRefs = function(context) {
     return {
         urls: urls,
         constants: {
             shoppayEnabled: shoppayEnabled(),
-            initShopPayEmailRecognition: initShopPayEmailRecognition || false
+            initShopPayEmailRecognition: context === 'checkout',
+            isBuyNow: context === 'cart'
         },
         preferences: {
             shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(),

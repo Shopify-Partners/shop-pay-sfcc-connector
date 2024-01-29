@@ -14,7 +14,7 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
  */
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
     res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('cart');
-    res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs());
+    res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs('cart'));
     next();
 });
 
