@@ -18,4 +18,17 @@ server.append('Show', csrfProtection.generateToken, function (req, res, next) {
     next();
 });
 
+server.append('Variation', function (req, res, next) {
+    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
+    var viewData = res.getViewData();
+    var product = viewData.product;
+
+    var buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(product.id, product.selectedQuantity, product.options);
+
+    viewData.product.buyNow = buyNowPaymentRequest;
+    res.setViewData(viewData);
+
+    next();
+});
+
 module.exports = server.exports();

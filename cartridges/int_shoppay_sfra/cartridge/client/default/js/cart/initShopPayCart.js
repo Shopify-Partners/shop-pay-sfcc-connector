@@ -1,7 +1,8 @@
 const helper = require('../helpers/shoppayHelper');
+var sourceIdentifier = null;
+var productData = {};
 
 $(document).ready(function () {
-    var basketId;
     if(window.ShopPay) {
         if(window.shoppayClientRefs.constants.initShopPayEmailRecognition) {
             initShopPayEmailRecognition();
@@ -9,39 +10,25 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-        // TODO: Revert and fix Cart/Checkout init
-        //const session = initShopPaySession();
-        //console.log(session.paymentRequest);
-
-        if(window.shoppayClientRefs.constants.isBuyNow) {
-            $('body').on('product:updateAddToCart', function (e, response) {
-                var requestData = {
-                    pid: response.product.id,
-                    quantity: response.product.selectedQuantity,
-                    options: response.product.options
-                };
-                $.ajax({
-                    url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.PrepareBasket),
-                    method: 'POST',
-                    async: false,
-                    data: JSON.stringify(requestData),
-                    contentType: 'application/json',
-                    success: function (response) {
-                        if (!response.error) {
-                            basketId = response.basketId;
-                            initShopPaySession(basketId);
-                        } else {
-                            console.log(response.errorMsg);
-                        }
-                    },
-                    error: function () {
-                        // TODO
-                    }
-                });
-            });
+        if (window.shoppayClientRefs.constants.isBuyNow) {
+            $('body').on('product:updateAddToCart', initBuyNow);
+        } else {
+            initShopPaySession();
         }
     }
 });
+
+function initBuyNow(e, response) {
+    if (response.product && response.product.buyNow) {
+        var product = response.product;
+        initShopPaySession(product.buyNow);
+        productData = {
+            pid: product.id,
+            quantity: product.selectedQuantity,
+            options: product.options
+        };
+    }
+}
 
 function initShopPayConfig() {
     window.ShopPay.PaymentRequest.configure({
@@ -67,32 +54,39 @@ function initShopPayEmailRecognition() {
         .render('#shop-pay-login-container');
 }
 
-function initShopPaySession(basketId) {
-
-    const paymentRequestResponse = $.ajax({
-        url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary, basketId),
-        type: 'GET',
-        contentType: 'application/json',
-        async: false
-    }) || {};
-
-    var paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
-    const initialPaymentRequest = window.ShopPay.PaymentRequest.build(paymentRequest);
-
-    session =  window.ShopPay.PaymentRequest.createSession({
-        paymentRequest: initialPaymentRequest
-    });
-
+function addEventListeners(session) {
     session.addEventListener("sessionrequested", function (ev) {
         // Shop Pay Payment Request Session on your server
         console.log(ev);
-        var requestData = {
-            paymentRequest: session.paymentRequest
-        };
-        // TODO: only passing basketId for temp baskets right now.... try to add to all for robustness
-        if (basketId) {
-            requestData.basketId = basketId;
+        var paymentRequest;
+        if (window.shoppayClientRefs.constants.isBuyNow) {
+            $.ajax({
+                url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.PrepareBasket),
+                method: 'POST',
+                async: false,
+                data: JSON.stringify(productData),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (!data.error) {
+                        paymentRequest = data.paymentRequest;
+                        sourceIdentifier = data.basketId;
+                    } else {
+                        console.log(data.errorMsg);
+                    }
+                },
+                error: function () {
+                    // TODO
+                }
+            });
+        } else {
+            paymentRequest = session.paymentRequest
         }
+        // TODO: only passing basketId for temp baskets right now.... try to add to all for robustness
+        var requestData = {
+            paymentRequest: paymentRequest,
+            basketId: sourceIdentifier
+        };
+
         $.ajax({
             url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
             method: 'POST',
@@ -208,4 +202,71 @@ function initShopPaySession(basketId) {
     session.addEventListener("paymentcomplete", function(ev) {
         console.log(ev);
     });
+}
+
+function initShopPaySession(paymentRequestInput) {
+    const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
+    var paymentRequest;
+    if (isBuyNow) {
+        paymentRequest = paymentRequestInput;
+    } else {
+        paymentRequestResponse = $.ajax({
+            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+            type: 'GET',
+            contentType: 'application/json',
+            async: false
+        }) || {};
+        paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
+    }
+
+    const initialPaymentRequest = window.ShopPay.PaymentRequest.build(paymentRequest);
+
+    var session = window.ShopPay.PaymentRequest.createSession({
+        paymentRequest: initialPaymentRequest
+    });
+    addEventListeners(session);
+    console.log(session.paymentRequest);
+
+    $('body').off('product:updateAddToCart', initBuyNow);
+
+    $('body').on('product:updateAddToCart', function(e, response) {
+        if (window.shoppayClientRefs.constants.isBuyNow && response.product.buyNow) {
+            if (session) {
+                session.close();
+            }
+            var PR = window.ShopPay.PaymentRequest.build(response.product.buyNow);
+            session = window.ShopPay.PaymentRequest.createSession({
+                paymentRequest: PR
+            });
+            productData = {
+                pid: response.product.id,
+                quantity: response.product.selectedQuantity,
+                options: response.product.options
+            };
+        } else {
+            $.ajax({
+                url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+                type: 'GET',
+                contentType: 'application/json',
+                async: false,
+                success: function (data) {
+                    if (!data.error) {
+                        window.ShopPay.PaymentRequest.build(data.paymentRequest);
+                        session.completeDiscountCodeChange(data.paymentRequest);
+                        sourceIdentifier = data.basketId;
+                        console.log(session.paymentRequest);
+                    } else {
+                        console.log(data.errorMsg);
+                    }
+                },
+                error: function () {
+                    // TODO
+                }
+            });
+        }
+        addEventListeners(session);
+        console.log(session.paymentRequest);
+    });
+
+
 }
