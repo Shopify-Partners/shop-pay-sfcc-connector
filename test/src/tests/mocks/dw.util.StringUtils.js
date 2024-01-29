@@ -1,17 +1,14 @@
-const formatMoney = (money) => {
-    return money;
-};
-
-const pad = (str, length) => {
-    return str + Array(length).join(' ');
-};
-
-const encodeBase64 = (value) => {
-    return value;
-};
-
 module.exports = {
-    formatMoney,
-    pad,
-    encodeBase64
+    stringToHtml: function (str) {
+        return str;
+    },
+    encodeBase64: function (str) {
+        return str;
+    },
+    format: function (format) {
+        return format;
+    },
+    formatCalendar(calendar, format) {
+        return calendar.formatDate()
+    }
 };
