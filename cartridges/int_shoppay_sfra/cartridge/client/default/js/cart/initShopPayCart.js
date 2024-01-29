@@ -181,7 +181,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         error: function (err) {
                             if (err.responseJSON || err.status !== 200) {
                                 session.close();
-                                window.location.reload()
+                                window.location.reload();
                                 return;
                             }
                         }

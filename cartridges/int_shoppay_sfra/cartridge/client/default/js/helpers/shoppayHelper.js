@@ -63,7 +63,9 @@ function setInitProductData(data) {
  * @param {Object} session - Accepts the Shop Pay session object and establishes necessary event listeners on the session.
  */
 function setSessionListeners(session) {
+    /* eslint-disable no-unused-vars */
     session.addEventListener("sessionrequested", function (ev) {
+        /* eslint-enable no-unused-vars */
         let sessionPaymentRequest;
 
         if (window.shoppayClientRefs.constants.isBuyNow) {
@@ -161,6 +163,7 @@ function setSessionListeners(session) {
         session.completeDiscountCodeChange({ updatedPaymentRequest: updatedPaymentRequest });
     });
 
+    /* eslint-disable no-unused-vars */
     session.addEventListener("deliverymethodchanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
         let requestData = {
@@ -261,7 +264,7 @@ function setSessionListeners(session) {
         let redirect = $('<form>').appendTo(document.body).attr({
             method: 'POST',
             action: data.continueUrl
-            });
+        });
         $('<input>').appendTo(redirect).attr({
             name: 'orderID',
             value: data.orderID
@@ -272,6 +275,7 @@ function setSessionListeners(session) {
         });
         redirect.submit();
     });
+    /* eslint-enable no-unused-vars */
 }
 
 /**
@@ -333,7 +337,7 @@ function createResponse (requestObj, controllerURL) {
         contentType: 'application/json',
         success: function(data) {
             responseJSON = data;
-            responseJSON.exception = false
+            responseJSON.exception = false;
         },
         error: function (err) {
             responseJSON = err.responseJSON ? err.responseJSON : {};

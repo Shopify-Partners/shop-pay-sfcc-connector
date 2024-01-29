@@ -211,10 +211,10 @@ class WebpackBundle {
      */
     static bundleCartridge(env = {}, cartridge, fileType) {
         let entryFiles = this.scanEntryPoints(cartridge, fileType);
-        console.log(chalk.yellow.bold(`    ${fileType}:`), `${cartridge}`);
+        console.log(chalk.green.bold(`    ${fileType}:`), `${cartridge}`);
         if (fileType !== "clean" && fileType !== "copy" && Object.keys(entryFiles).length === 0) {
-            console.error(
-                `Entry not found - please check if ${fileType} folder exist in your cartridge : ${cartridge}`,
+            console.warn(
+                chalk.yellow.bold('    Entry not found'), `- please check if ${fileType} folder exist in your cartridge : ${cartridge}`,
             );
             return null;
         }
