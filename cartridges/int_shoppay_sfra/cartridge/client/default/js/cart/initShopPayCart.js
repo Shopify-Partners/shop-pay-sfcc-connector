@@ -1,5 +1,7 @@
 const helper = require('../helpers/shoppayHelper');
 var sourceIdentifier = null;
+var token = null;
+var checkoutUrl = null;
 var productData = {};
 
 $(document).ready(function () {
@@ -94,7 +96,9 @@ function addEventListeners(session) {
             data: JSON.stringify(requestData),
             contentType: 'application/json',
             success: function (data) {
-                const {token, checkoutUrl, sourceIdentifier} = data;
+                token = data.token;
+                checkoutUrl = data.checkoutUrl;
+                sourceIdentifier = data.sourceIdentifier;
                 session.completeSessionRequest({token, checkoutUrl, sourceIdentifier});
             },
             error: function (err) {
@@ -109,63 +113,27 @@ function addEventListeners(session) {
     });
 
     session.addEventListener("shippingaddresschanged", function(ev) {
-        console.log(ev);
+        //console.log(ev);
         const currentPaymentRequest = session.paymentRequest;
         const selectedAddress = ev.shippingAddress;
+        var requestData = {
+            selectedAddress: selectedAddress,
+            paymentRequest: currentPaymentRequest,
+            basketId: sourceIdentifier
+        };
+
+        var responseJSON = $.ajax({
+            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.ShippingAddressChanged),
+            method: 'POST',
+            async: false,
+            data: JSON.stringify(requestData),
+            contentType: 'application/json'
+        }).responseJSON;
 
         // Update the payment request based on the shipping address change
         const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
             ...currentPaymentRequest,
-            deliveryMethods: [
-                {
-                    "amount": {
-                        "amount": 5.99,
-                        "currencyCode": "USD"
-                    },
-                    "code": "001",
-                    "deliveryExpectationLabel": "7-10 Business Days",
-                    "detail": "Ground",
-                    "label": "Ground",
-                    "maxDeliveryDate": "2024-02-05",
-                    "minDeliveryDate": "2024-01-30"
-                },
-                {
-                    "amount": {
-                        "amount": 9.99,
-                        "currencyCode": "USD"
-                    },
-                    "code": "002",
-                    "deliveryExpectationLabel": "2 Business Days",
-                    "detail": "2-Day Express",
-                    "label": "2-Day Express",
-                    "maxDeliveryDate": "2024-02-05",
-                    "minDeliveryDate": "2024-01-30"
-                },
-                {
-                    "amount": {
-                        "amount": 15.99,
-                        "currencyCode": "USD"
-                    },
-                    "code": "003",
-                    "deliveryExpectationLabel": "Next Day",
-                    "detail": "Overnight",
-                    "label": "Overnight",
-                    "maxDeliveryDate": "2024-02-05",
-                    "minDeliveryDate": "2024-01-30"
-                },
-                {
-                    "amount": {
-                        "amount": 0,
-                        "currencyCode": "USD"
-                    },
-                    "code": "101",
-                    "deliveryExpectationLabel": "1 Business Day",
-                    "detail": "E-Delivery",
-                    "label": "E-Delivery",
-                    "maxDeliveryDate": "2024-02-05",
-                    "minDeliveryDate": "2024-01-30"
-                }
-            ]
+            deliveryMethods: responseJSON.paymentRequest.deliveryMethods
         });
 
         session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
@@ -173,23 +141,31 @@ function addEventListeners(session) {
     });
 
     session.addEventListener("deliverymethodchanged", function(ev) {
-        console.log(ev);
+        //console.log(ev);
         const currentPaymentRequest = session.paymentRequest;
         const selectedDeliveryMethod = ev.deliveryMethod;
+        var requestData = {
+            selectedDeliveryMethod: selectedDeliveryMethod,
+            paymentRequest: currentPaymentRequest,
+            basketId: sourceIdentifier
+        };
+
+        var responseJSON = $.ajax({
+            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.DeliveryMethodChanged),
+            method: 'POST',
+            async: false,
+            data: JSON.stringify(requestData),
+            contentType: 'application/json'
+        }).responseJSON;
 
         // Update the payment request based on the delivery method change
         // and update the total accordingly
         const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
             ...currentPaymentRequest,
-            shippingLines: [{
-                label: selectedDeliveryMethod.label,
-                amount: selectedDeliveryMethod.amount,
-                code: selectedDeliveryMethod.code
-            }],
-            total: {
-                amount: 56.68, // TODO: Get real dynamic total
-                currencyCode: "USD"
-            }
+            shippingLines: responseJSON.paymentRequest.shippingLines,
+            totalShippingPrice: responseJSON.paymentRequest.totalShippingPrice,
+            totalTax: responseJSON.paymentRequest.totalTax,
+            total: responseJSON.paymentRequest.total
         });
 
         session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
@@ -238,6 +214,15 @@ function initShopPaySession(paymentRequestInput) {
             session = window.ShopPay.PaymentRequest.createSession({
                 paymentRequest: PR
             });
+            addEventListeners(session);
+
+            // var updatedPR = window.ShopPay.PaymentRequest.build({
+            //     ...session.paymentRequest,
+            //     paymentRequest: response.product.buyNow
+            // });
+            // session.completeDiscountCodeChange({updatedPaymentRequest: updatedPR});
+
+            console.log(session.paymentRequest);
             productData = {
                 pid: response.product.id,
                 quantity: response.product.selectedQuantity,
@@ -251,9 +236,21 @@ function initShopPaySession(paymentRequestInput) {
                 async: false,
                 success: function (data) {
                     if (!data.error) {
-                        window.ShopPay.PaymentRequest.build(data.paymentRequest);
-                        session.completeDiscountCodeChange(data.paymentRequest);
-                        sourceIdentifier = data.basketId;
+                        if (session) {
+                            session.close();
+                        }
+                        var PR = window.ShopPay.PaymentRequest.build(response.product.buyNow);
+                        session = window.ShopPay.PaymentRequest.createSession({
+                            paymentRequest: PR
+                        });
+                        addEventListeners(session);
+
+                        // var updatedPR = window.ShopPay.PaymentRequest.build({
+                        //     ...session.paymentRequest,
+                        //     paymentRequest: data.paymentRequest
+                        // });
+                        // session.completeDiscountCodeChange({updatedPaymentRequest: updatedPR});
+
                         console.log(session.paymentRequest);
                     } else {
                         console.log(data.errorMsg);
@@ -264,8 +261,6 @@ function initShopPaySession(paymentRequestInput) {
                 }
             });
         }
-        addEventListeners(session);
-        console.log(session.paymentRequest);
     });
 
 

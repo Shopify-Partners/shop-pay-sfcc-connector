@@ -270,6 +270,104 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
     next();
 });
 
+server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
+    var BasketMgr = require('dw/order/BasketMgr');
+    var Transaction = require('dw/system/Transaction');
+    var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
+    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+    var currentBasket;
+    var inputs = JSON.parse(req.body);
+
+    if (inputs.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(inputs.basketId);
+    }
+    else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
+
+    var inputValidation = validateInputs(req, currentBasket, ['selectedAddress']);
+    if (!inputValidation || inputValidation.error) {
+        res.json({
+            error: true,
+            errorMsg: inputValidation.errorMsg
+        });
+        return next();
+    }
+    var inputAddress = inputs.selectedAddress;
+    Transaction.wrap(function () {
+        var shipment = currentBasket.defaultShipment;
+        if (!shipment.shippingAddress) {
+            shipment.createShippingAddress();
+        }
+        var address = shipment.shippingAddress;
+        address.firstName = inputAddress.firstName;
+        address.lastName = inputAddress.lastName;
+        address.address1 = inputAddress.address1;
+        address.city = inputAddress.city;
+        address.stateCode = inputAddress.provinceCode;
+        address.postalCode = inputAddress.postalCode;
+        address.countryCode = inputAddress.postalCode;
+        address.phone = inputAddress.phone;
+        address.companyName = inputAddress.companyName;
+
+        currentBasket.customerEmail = inputAddress.email;
+        basketCalculationHelpers.calculateTotals(currentBasket);
+    });
+
+    var paymentRequest = new PaymentRequestModel(currentBasket);
+
+    res.json({
+        error: false,
+        errorMsg: null,
+        paymentRequest: paymentRequest
+    });
+    next();
+});
+
+server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
+    var BasketMgr = require('dw/order/BasketMgr');
+    var ShippingMgr = require('dw/order/ShippingMgr');
+    var Transaction = require('dw/system/Transaction');
+    var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
+    var collections = require('*/cartridge/scripts/util/collections');
+    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+    var currentBasket;
+    var inputs = JSON.parse(req.body);
+
+    if (inputs.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(inputs.basketId);
+    }
+    else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
+
+    var inputValidation = validateInputs(req, currentBasket, ['selectedDeliveryMethod']);
+    if (!inputValidation || inputValidation.error) {
+        res.json({
+            error: true,
+            errorMsg: inputValidation.errorMsg
+        });
+        return next();
+    }
+    var deliveryMethodInput = inputs.selectedDeliveryMethod;
+    var shippingMethods = ShippingMgr.getAllShippingMethods();
+    var newShippingMethod = collections.find(shippingMethods, function (shippingMethod) {
+        return shippingMethod.ID === deliveryMethodInput.code;
+    });
+    Transaction.wrap(function() {
+        currentBasket.defaultShipment.setShippingMethod(newShippingMethod);
+        basketCalculationHelpers.calculateTotals(currentBasket);
+    });
+
+    var paymentRequest = new PaymentRequestModel(currentBasket);
+    res.json({
+        error: false,
+        errorMsg: null,
+        paymentRequest: paymentRequest
+    });
+    next();
+});
+
 server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');

@@ -11,6 +11,7 @@ var urls = {
     PrepareBasket: URLUtils.https('ShopPay-PrepareBasket').toString(),
     BeginSession: URLUtils.https('ShopPay-BeginSession').toString(),
     DiscountCodeChanged: URLUtils.https('ShopPay-DiscountCodeChanged').toString(),
+    ShippingAddressChanged: URLUtils.https('ShopPay-ShippingAddressChanged').toString(),
     DeliveryMethodChanged: URLUtils.https('ShopPay-DeliveryMethodChanged').toString(),
     SubmitPayment: URLUtils.https('ShopPay-SubmitPayment').toString()
 };
