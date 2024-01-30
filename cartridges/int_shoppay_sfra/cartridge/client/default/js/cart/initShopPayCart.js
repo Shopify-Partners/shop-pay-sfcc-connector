@@ -3,6 +3,7 @@ var sourceIdentifier = null;
 var token = null;
 var checkoutUrl = null;
 var productData = {};
+var orderConfirmationData = {};
 
 $(document).ready(function () {
     if(window.ShopPay) {
@@ -61,7 +62,6 @@ function initShopPayEmailRecognition() {
 
 function addEventListeners(session) {
     session.addEventListener("sessionrequested", function (ev) {
-        // Shop Pay Payment Request Session on your server
         console.log(ev);
         var paymentRequest;
         if (window.shoppayClientRefs.constants.isBuyNow) {
@@ -176,10 +176,42 @@ function addEventListeners(session) {
 
     session.addEventListener("paymentconfirmationrequested", function(ev) {
         console.log(ev);
+        var requestData = {
+            paymentRequest: session.paymentRequest,
+            token: token
+        };
+        var responseJSON = $.ajax({
+            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.SubmitPayment),
+            method: 'POST',
+            async: false,
+            data: JSON.stringify(requestData),
+            contentType: 'application/json'
+        }).responseJSON;
+        orderConfirmationData = {
+            orderID: responseJSON.orderID,
+            orderToken: responseJSON.orderToken,
+            continueUrl: responseJSON.continueUrl
+        };
+        session.completePaymentConfirmationRequest();
     });
 
     session.addEventListener("paymentcomplete", function(ev) {
         console.log(ev);
+        session.close();
+        var data = orderConfirmationData;
+        var redirect = $('<form>').appendTo(document.body).attr({
+            method: 'POST',
+            action: data.continueUrl
+          });
+        $('<input>').appendTo(redirect).attr({
+            name: 'orderID',
+            value: data.orderID
+        });
+        $('<input>').appendTo(redirect).attr({
+            name: 'orderToken',
+            value: data.orderToken
+        });
+        redirect.submit();
     });
 }
 
@@ -206,7 +238,6 @@ function initShopPaySession(paymentRequestInput) {
     addEventListeners(session);
     console.log(session.paymentRequest);
 
-    // Kristin TODO: Figure out right approach for product.readyToOrder handling
     $('body').off('product:updateAddToCart', initBuyNow);
 
     $('body').on('product:updateAddToCart', function(e, response) {

@@ -374,40 +374,58 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
     var HookMgr = require('dw/system/HookMgr');
     var PaymentMgr = require('dw/order/PaymentMgr');
     var currentBasket = BasketMgr.getCurrentBasket();
-    if (!currentBasket
-        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
-    ) {
+    var inputs = JSON.parse(req.body);
+
+    if (inputs.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(inputs.basketId);
+    }
+    else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
+
+    var inputValidation = validateInputs(req, currentBasket, ['paymentRequest', 'token']);
+    if (!inputValidation || inputValidation.error) {
         res.json({
             error: true,
-            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null)
+            errorMsg: inputValidation.errorMsg
         });
         return next();
     }
 
-    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
-    if (!shoppayEligible) {
-        res.json({
-            error: true,
-            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null)
-        });
-        return next();
-    }
+    var paymentRequest = inputs.paymentRequest;
+    var tokenInput = inputs.token;
+    Transaction.wrap(function() {
+        if (!currentBasket.billingAddress) {
+            currentBasket.createBillingAddress();
+        }
+        currentBasket.customerEmail = paymentRequest.shippingAddress.email;
+    });
 
-    var paymentRequestInput = req.httpParameterMap['paymentRequest'];
-    var tokenInput = req.httpParameterMap['token'];
-    var paymentRequest = paymentRequestInput.empty ? null : JSON.parse(paymentRequestInput.value);
-    var token = tokenInput.empty ? null : tokenInput.value;
-    if (!paymentRequest || !token) {
-        res.json({
-            error: true,
-            errorMsg: Resource.msg('shoppay.input.error.missing', 'shoppay', null),
-        });
-        return next();
-    }
-
-    // Kristin TODO: Add missing place order logic, etc. and flesh out the logic below
     var paymentMethodId = shoppayGlobalRefs.shoppayPaymentMethodId;
     var paymentProcessor = PaymentMgr.getPaymentMethod(paymentMethodId).paymentProcessor;
+    if (HookMgr.hasHook('app.payment.processor' + paymentProcessor.ID.toLowerCase())) {
+        var handleResult = HookMgr.callHook(
+            'app.payment.processor' + paymentProcessor.ID.toLowerCase(),
+            'Handle',
+            currentBasket,
+            paymentInformation,
+            paymentMethodID,
+            req
+        );
+    }
+
+    var order = OrderMgr.createOrder(currentBasket);
+    var paymentInstrument = order.paymentInstruments[0];
+    if (HookMgr.hasHook('app.payment.processor' + paymentProcessor.ID.toLowerCase())) {
+        var authorizationResult = HookMgr.callHook(
+            'app.payment.processor' + paymentProcessor.ID.toLowerCase(),
+            'Authorize',
+            order.orderNo,
+            paymentInstrument,
+            paymentProcessor
+        );
+    };
+
     var authorizationResult;
 
     if (HookMgr.hasHook('app.payment.processor.' + paymentProcessor.ID.toLowerCase())) {
@@ -430,16 +448,20 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
         });
         return next();
     }
-    // Kristin TODO: Add missing place order logic
+    var fraudDetectionStatus = {
+        status: 'success',
+        errorCode: null,
+        errorMessage: null
+    };
+    var placeOrderResult = COHelpers.placeOrder(order, fraudDetectionStatus);
 
-    // Kristin TODO: Update payment response to use dynamic order attributes
     res.json({
         error: false,
         errorMsg: null,
-        orderID: "ABC123",
-        orderToken: "CBA321",
-        continueUrl: URLUtils.url('Order-Confirm').toString(),
-    })
+        orderID: order.orderNo,
+        orderToken: order.orderToken,
+        continueUrl: URLUtils.url('Order-Confirm').toString()
+    });
     next();
 });
 
