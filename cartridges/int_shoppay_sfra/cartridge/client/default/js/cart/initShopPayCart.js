@@ -22,13 +22,16 @@ $(document).ready(function () {
 
 function initBuyNow(e, response) {
     if (response.product && response.product.buyNow) {
-        var product = response.product;
-        initShopPaySession(product.buyNow);
-        productData = {
-            pid: product.id,
-            quantity: product.selectedQuantity,
-            options: product.options
-        };
+        var readyToOrder = response.product.readyToOrder;
+        if (readyToOrder) {
+            var product = response.product;
+            initShopPaySession(product.buyNow);
+            productData = {
+                pid: product.id,
+                quantity: product.selectedQuantity,
+                options: product.options
+            };
+        }
     }
 }
 
@@ -203,6 +206,7 @@ function initShopPaySession(paymentRequestInput) {
     addEventListeners(session);
     console.log(session.paymentRequest);
 
+    // Kristin TODO: Figure out right approach for product.readyToOrder handling
     $('body').off('product:updateAddToCart', initBuyNow);
 
     $('body').on('product:updateAddToCart', function(e, response) {
