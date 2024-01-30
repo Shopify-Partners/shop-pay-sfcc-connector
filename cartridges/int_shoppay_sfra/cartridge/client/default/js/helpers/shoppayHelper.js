@@ -29,7 +29,27 @@ function getCsrfToken() {
     return '';
 }
 
+function isReadyToOrder() {
+    let readyToOrder = false;
+    let $element = document.querySelector('[data-ready-to-order]');
+    if ($element && $element.attributes['data-ready-to-order'] && $element.attributes['data-ready-to-order'].value) {
+        readyToOrder = $element.attributes['data-ready-to-order'].value === "true";
+    }
+    return readyToOrder;
+}
+
+function getInitProductData() {
+    let productData = null;
+    let $element = document.querySelector('[data-buy-now-init]');
+    if ($element && $element.attributes['data-buy-now-init'] && $element.attributes['data-buy-now-init'].value) {
+        productData = JSON.parse($element.attributes['data-buy-now-init'].value);
+    }
+    return productData;
+}
+
 export {
     getCsrfToken,
-    getUrlWithCsrfToken
+    getUrlWithCsrfToken,
+    isReadyToOrder,
+    getInitProductData
 };

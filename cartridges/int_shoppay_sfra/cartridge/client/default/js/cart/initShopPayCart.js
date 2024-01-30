@@ -12,8 +12,8 @@ $(document).ready(function () {
         }
 
         initShopPayButton();
-
-        if (window.shoppayClientRefs.constants.isBuyNow) {
+        var readyToOrder = helper.isReadyToOrder();
+        if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
             $('body').on('product:updateAddToCart', initBuyNow);
         } else {
             initShopPaySession();
@@ -218,10 +218,20 @@ function addEventListeners(session) {
 function initShopPaySession(paymentRequestInput) {
     const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
     var paymentRequest;
-    if (isBuyNow) {
+    if (isBuyNow && paymentRequestInput) {
         paymentRequest = paymentRequestInput;
+    } else if (isBuyNow && !paymentRequestInput) {
+        var productData = helper.getInitProductData();
+        var paymentRequestResponse = $.ajax({
+            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
+            type: 'POST',
+            data: JSON.stringify(productData),
+            contentType: 'application/json',
+            async: false
+        }) || {};
+        paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
     } else {
-        paymentRequestResponse = $.ajax({
+        var paymentRequestResponse = $.ajax({
             url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
             type: 'GET',
             contentType: 'application/json',

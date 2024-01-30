@@ -9,6 +9,7 @@ const shoppayPaymentMethodId = 'ShopPay';
 var urls = {
     GetCartSummary: URLUtils.https('ShopPay-GetCartSummary').toString(),
     PrepareBasket: URLUtils.https('ShopPay-PrepareBasket').toString(),
+    BuyNowData: URLUtils.https('ShopPay-BuyNowData').toString(),
     BeginSession: URLUtils.https('ShopPay-BeginSession').toString(),
     DiscountCodeChanged: URLUtils.https('ShopPay-DiscountCodeChanged').toString(),
     ShippingAddressChanged: URLUtils.https('ShopPay-ShippingAddressChanged').toString(),

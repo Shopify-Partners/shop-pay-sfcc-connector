@@ -118,6 +118,29 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     next();
 });
 
+server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
+    var data = JSON.parse(req.body);
+    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
+
+    var buyNowPaymentRequest;
+    if (data.pidsObj) {
+        collections.forEach(data.pidsObj, function(pidObj) {
+            // Kristin TODO: Product set add to cart
+        });
+    } else if (data.childPids) {
+        // Kristin TODO: Bundle add to cart
+    } else {
+        buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(data.pid, data.quantity, data.options);
+    }
+
+    res.json({
+        error: false,
+        errorMsg: null,
+        paymentRequest: buyNowPaymentRequest
+    })
+    next();
+});
+
 server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var ProductMgr = require('dw/catalog/ProductMgr');
     var ShippingMgr = require('dw/order/ShippingMgr');

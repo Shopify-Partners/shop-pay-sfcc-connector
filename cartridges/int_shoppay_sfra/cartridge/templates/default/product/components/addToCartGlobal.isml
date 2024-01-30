@@ -1,0 +1,35 @@
+<style>
+ /* Placeholder styles. Any styles developed during this ticket likely to be moved into scss file within cartridge.  */
+    .pdp-actions--shoppay-atc {
+        text-align: -webkit-center;
+
+        button {
+            margin-bottom: 16px;
+        }
+    }
+</style>
+
+<div class="row cart-and-ipay  ${pdict.includeShopPayJS ? 'pdp-actions--shoppay-atc' : ''}">
+    <div class="col-sm-12">
+        <input type="hidden" class="add-to-cart-url" value="${pdict.addToCartUrl}">
+        <button class="add-to-cart-global btn btn-primary"
+                data-pid="${product.id}"
+                ${!product.available ? "disabled" : ""}>
+            <i class="fa fa-shopping-bag"></i>
+            <isif condition="${product.productType === 'set' || product.productType === 'bundle'}">
+                ${Resource.msg('button.addalltocart', 'common', null)}
+            <iselse>
+                ${Resource.msg('button.addtocart', 'common', null)}
+            </isif>
+        </button>
+    </div>
+
+
+    <iscomment>BEGIN SHOPPAY (PRODUCT BUNDLES & PRODUCT SETS)</iscomment>
+    <isif condition="${pdict.includeShopPayJS && (pdict.product.productType === 'set' || pdict.product.productType === 'bundle')}">
+        <div class="col-sm-12">
+            <isinclude template="common/shopPayButton" />
+        </div>
+    </isif>
+    <iscomment>END SHOPPAY</iscomment>
+</div>

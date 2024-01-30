@@ -12,8 +12,8 @@
         <isinclude template="product/components/addToCartButtonExtension"/>
     </div>
 
-    <iscomment>BEGIN SHOPPAY</iscomment>
-    <isif condition="${pdict.includeShopPayJS}">
+    <iscomment>BEGIN SHOPPAY (VARIANT PRODUCTS & MASTER PRODUCTS)</iscomment>
+    <isif condition="${pdict.includeShopPayJS && pdict.product.productType !== 'set' && !pdict.product.productType !== 'bundle'}">
         <div class="col-sm-12">
             <isinclude template="common/shopPayButton" />
         </div>
