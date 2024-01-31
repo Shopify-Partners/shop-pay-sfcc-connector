@@ -48,8 +48,10 @@ $('body').on('cart:update product:afterAddToCart product:updateAddToCart', funct
     if (window.ShopPay) {
         if (!session) {
             session = initShopPaySession();
-            // TODO: remove this debugging line before final delivery
-            console.log('SESSION Obj >>>> ', session.paymentRequest)
+            // TODO: remove this conditional / debugging line before final delivery
+            if (session) {
+                console.log('SESSION Obj >>>> ', session.paymentRequest);
+            }
         } else {
             const paymentRequestResponse = buildPaymentRequest();
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
