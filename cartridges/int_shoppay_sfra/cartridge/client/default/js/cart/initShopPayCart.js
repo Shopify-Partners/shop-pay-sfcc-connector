@@ -12,6 +12,9 @@ $(document).ready(function () {
         initShopPayButton();
 
         session = initShopPaySession();
+
+        // set up shopPay listeners ?????
+        // helper.setShopPaySessionListeners(session);
     }
 });
 
@@ -50,6 +53,9 @@ $('body').on('cart:update product:afterAddToCart product:updateAddToCart', funct
             session = initShopPaySession();
             // TODO: remove this debugging line before final delivery
             console.log('SESSION Obj >>>> ', session.paymentRequest)
+
+            // // set up shopPay listeners???
+            // helper.setShopPaySessionListeners(session);
         } else {
             const paymentRequestResponse = buildPaymentRequest();
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
@@ -67,6 +73,9 @@ $('body').on('cart:update product:afterAddToCart product:updateAddToCart', funct
                 // TODO: remove these debugging lines before final delivery
                 console.log('RESPONSE JSON >>>> ', responseJSON.paymentRequest)
                 console.log('SESSION Obj >>>> ', session.paymentRequest)
+
+                // // set up shopPay listeners (WOULD THIS STILL GO HERE IF NEW METHOD FROM SHOPPAY IS CREATED)???
+                // helper.setShopPaySessionListeners(session);
             }
         }
     }
@@ -83,9 +92,16 @@ function initShopPaySession() {
         const initialPaymentRequest = window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest);
         utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), responseJSON.error) // basket NOT empty. Update btn styles (remove opacity)
 
-        return window.ShopPay.PaymentRequest.createSession({
+        const shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
         });
+
+        helper.setShopPaySessionListeners(shopPaySession);
+        return shopPaySession;
+
+        // return window.ShopPay.PaymentRequest.createSession({
+        //     paymentRequest: initialPaymentRequest
+        // });
     }
 }
 
