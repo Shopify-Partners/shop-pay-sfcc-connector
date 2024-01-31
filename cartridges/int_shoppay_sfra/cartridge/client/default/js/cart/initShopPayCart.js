@@ -32,6 +32,10 @@ function initBuyNow(e, response) {
                 quantity: product.selectedQuantity,
                 options: product.options
             };
+            if (product.childProducts) {
+                productData.childProducts = product.childProducts;
+            }
+            // TODO: Handle sets if supported
         }
     }
 }
@@ -225,7 +229,7 @@ function initShopPaySession(paymentRequestInput) {
     if (isBuyNow && paymentRequestInput) {
         paymentRequest = paymentRequestInput;
     } else if (isBuyNow && !paymentRequestInput) {
-        var productData = helper.getInitProductData();
+        productData = helper.getInitProductData();
         var paymentRequestResponse = $.ajax({
             url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
             type: 'POST',

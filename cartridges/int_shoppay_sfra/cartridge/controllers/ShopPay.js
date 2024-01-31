@@ -119,19 +119,10 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
 });
 
 server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var data = JSON.parse(req.body);
+    var product = JSON.parse(req.body);
     var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
 
-    var buyNowPaymentRequest;
-    if (data.pidsObj) {
-        collections.forEach(data.pidsObj, function(pidObj) {
-            // Kristin TODO: Product set add to cart
-        });
-    } else if (data.childPids) {
-        // Kristin TODO: Bundle add to cart
-    } else {
-        buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(data.pid, data.quantity, data.options);
-    }
+    var buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(product);
 
     res.json({
         error: false,
@@ -142,6 +133,7 @@ server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRe
 });
 
 server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
+    var BasketMgr = require('dw/order/BasketMgr');
     var ProductMgr = require('dw/catalog/ProductMgr');
     var ShippingMgr = require('dw/order/ShippingMgr');
     var Transaction = require('dw/system/Transaction');
@@ -151,74 +143,69 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
     var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
     var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+    var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
     var paymentRequestModel;
     var currentBasket;
 
-    var data = JSON.parse(req.body);
+    var product = JSON.parse(req.body);
 
-    if (!data.pid) {
-        // Missing product SKU
-        res.json({
-            error: true,
-            errorMsg: 'sku missing'
-        });
-        return next();
-    }
+    var basket = Transaction.wrap(shoppayCheckoutHelpers.createBuyNowBasket);
+    var shippingMethod = ShippingMgr.defaultShippingMethod;
 
-    // Get product to add to the basket
-    var product = ProductMgr.getProduct(data.pid);
-
-    if (!product) {
-        // Product doesn't exist
-        res.json({
-            error: true,
-            errorMsg: 'invalid product'
-        });
-        return next();
-    }
-
-    // Get product option model
-    var optionModel = product.getOptionModel();
-    if (data.options) {
-        data.options.forEach(function (option) {
-            var productOption = optionModel.getOption(option.id);
-            if (productOption) {
-                var productOptionValue = optionModel.getOptionValue(productOption, option.valueId);
-                if (productOptionValue) {
-                    // Update selected value for product option
-                    optionModel.setSelectedOptionValue(productOption, productOptionValue);
-                }
+    // Kristin TODO: Consider using OOTB cartHelper.js: addProductToCart for final version
+    var result;
+    var paymentRequestModel;
+    if (product.pidsObj && product.pidsObj.length > 0) {
+        pidsObj.forEach(function (PIDObj) {
+            var PIDObjResult = shoppayCheckoutHelpers.addProductToTempBasket(product, basket);
+            if (PIDObjResult.error) {
+                result.error = PIDObjResult.error;
+                result.errorMsg = PIDObjResult.message;
             }
         });
+    } else {
+        result = shoppayCheckoutHelpers.addProductToTempBasket(product, basket);
+    }
+
+    if (result.error) {
+        Transaction.wrap(function() {
+            BasketMgr.deleteTemporaryBasket(basket);
+        });
+        res.json({
+            error: true,
+            errorMsg: result.errorMsg,
+            paymentRequest: null
+        });
+        return next();
     }
 
     Transaction.wrap(function () {
-        // Create a temporary basket for Buy Now
-        currentBasket = shoppayCheckoutHelpers.createBuyNowBasket();
-        var shipment = currentBasket.defaultShipment;
+        try {
+            // Set shipment shipping method
+            var test = basket;
+            shippingHelpers.selectShippingMethod(basket.defaultShipment, shippingMethod.ID);
 
-        // Clear any existing line items out of the basket
-        currentBasket.productLineItems.toArray().forEach(function (pli) {
-            currentBasket.removeProductLineItem(pli);
-        });
-
-        // Create a product line item for the product, option model, and quantity
-        var pli = currentBasket.createProductLineItem(product, optionModel, shipment);
-        pli.setQuantityValue(data.quantity || 1);
-
-        // Calculate basket
-        cartHelper.ensureAllShipmentsHaveMethods(currentBasket);
-        basketCalculationHelpers.calculateTotals(currentBasket);
+            // Calculate basket
+            basketCalculationHelpers.calculateTotals(basket);
+        } catch (e) {
+            BasketMgr.deleteTemporaryBasket(basket);
+            res.json({
+                error: true,
+                errorMsg: e.message,
+                paymentRequest: null
+            });
+            return next();
+        }
     });
 
     try {
-        paymentRequestModel = new PaymentRequestModel(currentBasket);
+        paymentRequestModel = new PaymentRequestModel(basket);
     } catch (e) {
         logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
         res.json({
             error: true,
             errorMsg: e.message,
-            paymentRequest: paymentRequestModel
+            paymentRequest: null
         });
         return next();
     }
@@ -226,7 +213,7 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
     res.json({
         error: false,
         errorMsg: null,
-        basketId: currentBasket.UUID,
+        basketId: basket.UUID,
         paymentRequest: paymentRequestModel
     });
 

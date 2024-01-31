@@ -22,26 +22,24 @@ function createBuyNowBasket() {
     return BasketMgr.createTemporaryBasket();
 }
 
-function getBuyNowData(sku, quantity, options) {
-    var shippingMethod = ShippingMgr.defaultShippingMethod;
-
+function addProductToTempBasket(product, basket) {
+    var sku = product.pid;
+    var options = product.options;
+    var quantity = product.quantity;
+    var childProducts = product.childProducts;
     var optionsArray;
-    if (options) {
-        optionsArray = options.map(function (option) {
-            return {
-                id: option.id,
-                valueId: option.selectedValueId
-            };
-        });
-    } else {
-        optionsArray = [];
-    }
-
-    // Create a temporary basket for payment request options calculation
-    var basket = Transaction.wrap(BasketMgr.createTemporaryBasket);
-
-    var paymentRequest = Transaction.wrap(function () {
-        try {
+    try {
+        if (options && options.length > 0) {
+            optionsArray = options.map(function (option) {
+                return {
+                    id: option.id,
+                    valueId: option.selectedValueId
+                };
+            });
+        } else {
+            optionsArray = [];
+        }
+        var result = Transaction.wrap(function () {
             // Add product line item
             var pli = basket.createProductLineItem(sku, basket.defaultShipment);
             pli.setQuantityValue(quantity);
@@ -58,15 +56,49 @@ function getBuyNowData(sku, quantity, options) {
                     }
                 }
             });
+        });
+    } catch (e) {
+        var test = e;
+        dw.system.Logger.error(e.message);
+        return {
+            error: true,
+            errorMsg: e.message
+        };
+    }
+    return {
+        success: true,
+        errorMsg: null
+    };
+}
 
+function getBuyNowData(product) {
+    // Create a temporary basket for payment request options calculation
+    var basket = Transaction.wrap(createBuyNowBasket);
+    var shippingMethod = ShippingMgr.defaultShippingMethod;
+
+    // Kristin TODO: Consider using OOTB cartHelper.js: addProductToCart for final version
+    var result;
+    var paymentRequest;
+    if (product.pidsObj && product.pidsObj.length > 0) {
+        pidsObj.forEach(function (PIDObj) {
+            var PIDObjResult = addProductToTempBasket(product, basket);
+            if (PIDObjResult.error) {
+                result.error = PIDObjResult.error;
+                result.message = PIDObjResult.message;
+            }
+        });
+    } else {
+        result = addProductToTempBasket(product, basket);
+    }
+
+    Transaction.wrap(function () {
+        try {
             // Set shipment shipping method
             shippingHelpers.selectShippingMethod(basket.defaultShipment, shippingMethod.ID);
 
             // Calculate basket
             basketCalculationHelpers.calculateTotals(basket);
-
-            // Calculate the payment request options for the basket
-            return new PaymentRequestModel(basket);
+            paymentRequest = new PaymentRequestModel(basket);
         } catch (e) {
             var test = e;
             dw.system.Logger.error(e.message);
@@ -79,6 +111,7 @@ function getBuyNowData(sku, quantity, options) {
 }
 
 module.exports = {
+    addProductToTempBasket: addProductToTempBasket,
     createBuyNowBasket: createBuyNowBasket,
     getBuyNowData: getBuyNowData
 }
