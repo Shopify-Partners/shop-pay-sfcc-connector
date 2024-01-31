@@ -9,22 +9,24 @@
     }
 </style>
 
-<div class="row cart-and-ipay ${pdict.includeShopPayJS ? 'pdp-actions--shoppay-atc' : ''}">
+<div class="row cart-and-ipay  ${pdict.includeShopPayJS ? 'pdp-actions--shoppay-atc' : ''}">
     <div class="col-sm-12">
         <input type="hidden" class="add-to-cart-url" value="${pdict.addToCartUrl}">
-        <button class="add-to-cart btn btn-primary"
-                data-toggle="modal" data-target="#chooseBonusProductModal"
+        <button class="add-to-cart-global btn btn-primary"
                 data-pid="${product.id}"
-                ${!product.readyToOrder || !product.available ? "disabled" : ""}>
+                ${!product.available ? "disabled" : ""}>
             <i class="fa fa-shopping-bag"></i>
-            ${Resource.msg('button.addtocart', 'common', null)}
+            <isif condition="${product.productType === 'set' || product.productType === 'bundle'}">
+                ${Resource.msg('button.addalltocart', 'common', null)}
+            <iselse>
+                ${Resource.msg('button.addtocart', 'common', null)}
+            </isif>
         </button>
-
-        <isinclude template="product/components/addToCartButtonExtension"/>
     </div>
 
-    <iscomment>BEGIN SHOPPAY (VARIANT PRODUCTS & MASTER PRODUCTS)</iscomment>
-    <isif condition="${pdict.includeShopPayJS && pdict.product.productType !== 'set' && !pdict.product.productType !== 'bundle'}">
+
+    <iscomment>BEGIN SHOPPAY (PRODUCT BUNDLES & PRODUCT SETS)</iscomment>
+    <isif condition="${pdict.includeShopPayJS && (pdict.product.productType === 'set' || pdict.product.productType === 'bundle')}">
         <div class="col-sm-12">
             <isinclude template="common/shopPayButton" />
         </div>
