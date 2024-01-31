@@ -175,10 +175,13 @@ function addEventListeners(session) {
     });
 
     session.addEventListener("paymentconfirmationrequested", function(ev) {
+        console.log('paymentconfirmationrequested:');
         console.log(ev);
+        console.log(session.paymentRequest);
         var requestData = {
             paymentRequest: session.paymentRequest,
-            token: token
+            token: token,
+            basketId: sourceIdentifier
         };
         var responseJSON = $.ajax({
             url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.SubmitPayment),
@@ -196,6 +199,7 @@ function addEventListeners(session) {
     });
 
     session.addEventListener("paymentcomplete", function(ev) {
+        console.log('paymentcomplete:');
         console.log(ev);
         session.close();
         var data = orderConfirmationData;

@@ -395,6 +395,7 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
     var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');
     var HookMgr = require('dw/system/HookMgr');
+    var OrderMgr = require('dw/order/OrderMgr');
     var PaymentMgr = require('dw/order/PaymentMgr');
     var currentBasket = BasketMgr.getCurrentBasket();
     var inputs = JSON.parse(req.body);
@@ -416,54 +417,52 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
     }
 
     var paymentRequest = inputs.paymentRequest;
-    var tokenInput = inputs.token;
+    /* shippingAddress.id is not a valid input for the GraphQL request, but is included in the payment request object
+       from client-side */
+    if (paymentRequest.shippingAddress.id) {
+        delete paymentRequest.shippingAddress.id;
+    }
+    var token = inputs.token;
     Transaction.wrap(function() {
         if (!currentBasket.billingAddress) {
             currentBasket.createBillingAddress();
         }
         currentBasket.customerEmail = paymentRequest.shippingAddress.email;
+        /* Customer name is required for order creation. Billing address is unavailable in paymentRequest
+           object during checkout, so placeholder from shipping address is used for unregistered customers
+           until ORDERS_CREATE webhook is received with billing information. */
+        if (req.currentCustomer.profile) {
+            currentBasket.billingAddress.firstName = req.currentCustomer.profile.firstName;
+            currentBasket.billingAddress.lastName = req.currentCustomer.profile.lastName;
+        } else {
+            currentBasket.billingAddress.firstName = paymentRequest.shippingAddress.firstName;
+            currentBasket.billingAddress.lastName = paymentRequest.shippingAddress.lastName;
+        }
     });
 
-    var paymentMethodId = shoppayGlobalRefs.shoppayPaymentMethodId;
-    var paymentProcessor = PaymentMgr.getPaymentMethod(paymentMethodId).paymentProcessor;
-    if (HookMgr.hasHook('app.payment.processor' + paymentProcessor.ID.toLowerCase())) {
+    var paymentMethodID = shoppayGlobalRefs.shoppayPaymentMethodId;
+    var paymentProcessor = PaymentMgr.getPaymentMethod(paymentMethodID).paymentProcessor;
+    if (HookMgr.hasHook('app.payment.processor.' + paymentProcessor.ID.toLowerCase())) {
         var handleResult = HookMgr.callHook(
-            'app.payment.processor' + paymentProcessor.ID.toLowerCase(),
+            'app.payment.processor.' + paymentProcessor.ID.toLowerCase(),
             'Handle',
-            currentBasket,
-            paymentInformation,
-            paymentMethodID,
-            req
+            currentBasket
         );
     }
 
     var order = OrderMgr.createOrder(currentBasket);
     var paymentInstrument = order.paymentInstruments[0];
-    if (HookMgr.hasHook('app.payment.processor' + paymentProcessor.ID.toLowerCase())) {
-        var authorizationResult = HookMgr.callHook(
-            'app.payment.processor' + paymentProcessor.ID.toLowerCase(),
-            'Authorize',
-            order.orderNo,
-            paymentInstrument,
-            paymentProcessor
-        );
-    };
-
     var authorizationResult;
-
     if (HookMgr.hasHook('app.payment.processor.' + paymentProcessor.ID.toLowerCase())) {
         authorizationResult = HookMgr.callHook(
             'app.payment.processor.' + paymentProcessor.ID.toLowerCase(),
             'Authorize',
             paymentRequest,
-            token
+            token,
+            paymentInstrument
         );
-    } else {
-        authorizationResult = HookMgr.callHook(
-            'app.payment.processor.default',
-            'Authorize'
-        );
-    }
+    };
+
     if (authorizationResult.error) {
         res.json({
             error: true,
@@ -471,12 +470,6 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
         });
         return next();
     }
-    var fraudDetectionStatus = {
-        status: 'success',
-        errorCode: null,
-        errorMessage: null
-    };
-    var placeOrderResult = COHelpers.placeOrder(order, fraudDetectionStatus);
 
     res.json({
         error: false,
