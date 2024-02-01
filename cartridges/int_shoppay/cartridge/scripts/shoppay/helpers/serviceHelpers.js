@@ -160,7 +160,7 @@ const mockShopPayPaymentRequestSessionCreateResponse = {
 
 const mockShopPayPaymentRequestSessionSubmitResponse = {
     data: {
-        shopPaySessionSubmit: {
+        shopPayPaymentRequestSessionSubmit: {
             paymentRequestReceipt: {
                 token: 'a607823b7ba40ddb4eede13822684b13',
                 processingStatusType: 'ready'

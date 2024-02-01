@@ -1,0 +1,11 @@
+<div class="payment-details">
+    <isloop items="${pdict.order.billing.payment.selectedPaymentInstruments}" var="payment">
+        <isif condition="${payment.paymentMethod === 'CREDIT_CARD'}">
+            <isinclude template="checkout/billing/paymentOptions/creditCardSummary" />
+        <iscomment>BEGIN SHOPPAY (Display Shop Pay payment method in payment summary)</iscomment>
+        <iselseif condition="${payment.paymentMethod === 'ShopPay'}">
+            ${Resource.msg('shoppay.payment.type', 'shoppay', null)}
+        <iscomment>END SHOPPAY</iscomment>
+        </isif>
+    </isloop>
+</div>

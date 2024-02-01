@@ -11,6 +11,7 @@ var Resource = require('dw/web/Resource');
 var Transaction = require('dw/system/Transaction');
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
 var collections = require('*/cartridge/scripts/util/collections');
 
 function validateInputs(req, currentBasket, inputParams) {
@@ -45,7 +46,6 @@ function validateInputs(req, currentBasket, inputParams) {
                 return body[param] === undefined;
             });
             break;
-    
         default:
             break;
     }
@@ -81,22 +81,11 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
 
     var currentBasket = BasketMgr.getCurrentBasket();
 
-    if (!currentBasket
-        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
-    ) {
+    var inputValidation = validateInputs(req, currentBasket, []);
+    if (!inputValidation || inputValidation.error) {
         res.json({
             error: true,
-            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null),
-            paymentRequest: null
-        });
-        return next();
-    }
-
-    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
-    if (!shoppayEligible) {
-        res.json({
-            error: true,
-            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null),
+            errorMsg: inputValidation.errorMsg,
             paymentRequest: null
         });
         return next();
@@ -147,35 +136,8 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         return next();
     }
 
-    var data = JSON.parse(req.body);
-
-    if (!currentBasket
-        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
-    ) {
-        res.json({
-            error: true,
-            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null)
-        });
-        return next();
-    }
-
-    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
-    if (!shoppayEligible) {
-        res.json({
-            error: true,
-            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null)
-        });
-        return next();
-    }
-
-    var paymentRequest = data.paymentRequest;
-    if (!paymentRequest) {
-        res.json({
-            error: true,
-            errorMsg: Resource.msg('shoppay.input.error.missing', 'shoppay', null),
-        });
-        return next();
-    }
+    var inputs = JSON.parse(req.body);
+    var paymentRequest = inputs.paymentRequest;
 
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
     var response = storefrontAPI.shopPayPaymentRequestSessionCreate(currentBasket, paymentRequest);
@@ -183,6 +145,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         || response.error
         || !response.shopPayPaymentRequestSessionCreate
         || response.shopPayPaymentRequestSessionCreate.userErrors.length > 0
+        || response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession == null
     ) {
         res.json({
             error: true,
@@ -269,8 +232,9 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
         });
     }
 
+    COHelpers.recalculateBasket(currentBasket);
     var paymentRequestModel = new PaymentRequestModel(currentBasket);
-     
+
     res.json({
         error: false,
         errorMsg: null,
@@ -312,7 +276,8 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
     if (!shipment) {
         // Shipment required to complete express checkout
         res.json({
-            status: 'fail'
+            error: true,
+            errorMsg: Resource.msg('shoppay.error.shipping', 'shoppay', null),
         });
         return next();
     }
@@ -328,22 +293,25 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
         if (name) {
             // Update shopper name in basket
             currentBasket.customerName = name;
-
-            shippingAddress.firstName = data.shippingAddress.firstName;
-            shippingAddress.lastName = data.shippingAddress.lastName;
+        }
+        if (data.shippingAddress.email) {
+            currentBasket.customerEmail = data.shippingAddress.email;
         }
 
         // Copy shipping contact information to shipping address
+        shippingAddress.firstName = data.shippingAddress.firstName;
+        shippingAddress.lastName = data.shippingAddress.lastName;
         shippingAddress.address1 = data.shippingAddress.address1;
         shippingAddress.address2 = data.shippingAddress.address2;
         shippingAddress.city = data.shippingAddress.city;
         shippingAddress.stateCode = data.shippingAddress.provinceCode;
         shippingAddress.postalCode = data.shippingAddress.postalCode;
-        shippingAddress.countryCode = data.shippingAddress.country;
+        shippingAddress.countryCode = data.shippingAddress.countryCode;
     });
 
+    COHelpers.recalculateBasket(currentBasket);
     var paymentRequestModel = new PaymentRequestModel(currentBasket);
-     
+
     res.json({
         error: false,
         errorMsg: null,
@@ -370,7 +338,7 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
     var Transaction = require('dw/system/Transaction');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
     var currentBasket = BasketMgr.getCurrentBasket();
-    var shoppayHelper = require('*/cartridge/scripts/shoppay/helpers/shoppayHelpers.js');
+    var array = require('*/cartridge/scripts/util/array');
     var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
 
     var data = JSON.parse(req.body);
@@ -388,19 +356,23 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
     if (!shipment) {
         // Shipment required to complete express checkout
         res.json({
-            status: 'fail'
+            error: true,
+            errorMsg: Resource.msg('shoppay.error.shipping', 'shoppay', null),
         });
         return next();
     }
 
     // Find shipping method for selected shipping option
     var applicableShippingMethods = shippingHelpers.getApplicableShippingMethods(shipment);
-    var shippingMethod = shoppayHelper.findShippingMethod(applicableShippingMethods, data.shippingLines[0].code);
+    var shippingMethod = array.find(applicableShippingMethods, function(shippingMethod) {
+        return shippingMethod.ID === data.shippingLines[0].code;
+    });
 
     if (!shippingMethod) {
         // Shopper selected a shipping method that is not applicable
         res.json({
-            status: 'fail'
+            error: true,
+            errorMsg: Resource.msg('shoppay.error.shipping', 'shoppay', null),
         });
         return next();
     }
@@ -410,6 +382,7 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
         shippingHelpers.selectShippingMethod(shipment, shippingMethod.ID);
     });
 
+    COHelpers.recalculateBasket(currentBasket);
     var paymentRequestModel = new PaymentRequestModel(currentBasket);
 
     res.json({
@@ -420,77 +393,180 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
     next();
 });
 
+/**
+ * The ShopPay-SubmitPayment controller finalizes the Shop Pay payment request session with the
+ * Shop Pay GraphQL API to complete the modal flow, receives the payment token in response,
+ * and creates the SFCC order. The session completion in Shop Pay is asynchronous so the SFCC order
+ * will be finalized and placed when the ORDERS_CREATE webhook is received from Shop Pay.
+ * @function
+ * @memberOf ShopPay
+ * @param {middleware} - server.middleware.https
+ * @param {middleware} - csrfProtection.validateAjaxRequest
+ * @param {category} - sensitive
+ * @param {renders} - json
+ * @param {serverfunction} - post
+ */
 server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');
     var HookMgr = require('dw/system/HookMgr');
+    var OrderMgr = require('dw/order/OrderMgr');
     var PaymentMgr = require('dw/order/PaymentMgr');
+    var hooksHelper = require('*/cartridge/scripts/helpers/hooks');
+    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
+    var validationHelpers = require('*/cartridge/scripts/helpers/basketValidationHelpers');
+
     var currentBasket = BasketMgr.getCurrentBasket();
-    if (!currentBasket
-        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
-    ) {
+
+    var inputValidation = validateInputs(req, currentBasket, ['paymentRequest','token']);
+    if (!inputValidation || inputValidation.error) {
         res.json({
             error: true,
-            errorMsg: Resource.msg('info.cart.empty.msg', 'cart', null)
+            errorMsg: inputValidation.errorMsg
         });
         return next();
     }
 
-    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
-    if (!shoppayEligible) {
+    var inputs = JSON.parse(req.body);
+    var paymentRequest = inputs['paymentRequest'];
+    var token = inputs['token'];
+
+    shoppayCheckoutHelpers.ensureNoEmptyShipments(currentBasket, req);
+    COHelpers.recalculateBasket(currentBasket);
+    var regeneratedPaymentRequest = new PaymentRequestModel(currentBasket);
+    /* Compare the input payment request to a freshly regenerated payment request object to ensure the SFCC
+       cart still matches the Shop Pay modal session */
+    var validPaymentRequest = shoppayCheckoutHelpers.validatePaymentRequest(paymentRequest, regeneratedPaymentRequest);
+    if (!validPaymentRequest) {
         res.json({
             error: true,
-            errorMsg: Resource.msg('shoppay.cart.ineligible', 'shoppay', null)
+            errorMsg: Resource.msg('shoppay.input.error.mismatch', 'shoppay', null),
+            paymentRequest: regeneratedPaymentRequest
         });
         return next();
     }
 
-    var paymentRequestInput = req.httpParameterMap['paymentRequest'];
-    var tokenInput = req.httpParameterMap['token'];
-    var paymentRequest = paymentRequestInput.empty ? null : JSON.parse(paymentRequestInput.value);
-    var token = tokenInput.empty ? null : tokenInput.value;
-    if (!paymentRequest || !token) {
+    var validShipments = shoppayCheckoutHelpers.validateShippingMethods(currentBasket);
+    if (!validShipments) {
         res.json({
             error: true,
-            errorMsg: Resource.msg('shoppay.input.error.missing', 'shoppay', null),
+            errorMsg: Resource.msg('shoppay.error.shipping', 'shoppay', null)
         });
         return next();
     }
 
-    // Kristin TODO: Add missing place order logic, etc. and flesh out the logic below
+    var validationOrderStatus = hooksHelper('app.validate.order', 'validateOrder', currentBasket, require('*/cartridge/scripts/hooks/validateOrder').validateOrder);
+    if (validationOrderStatus.error) {
+        res.json({
+            error: true,
+            errorMsg: validationOrderStatus.message
+        });
+        return next();
+    }
+
+    shoppayCheckoutHelpers.handleBillingAddress(currentBasket, paymentRequest);
+
     var paymentMethodId = shoppayGlobalRefs.shoppayPaymentMethodId;
     var paymentProcessor = PaymentMgr.getPaymentMethod(paymentMethodId).paymentProcessor;
-    var authorizationResult;
-
     if (HookMgr.hasHook('app.payment.processor.' + paymentProcessor.ID.toLowerCase())) {
-        authorizationResult = HookMgr.callHook(
+        var handleResult = HookMgr.callHook('app.payment.processor.' + paymentProcessor.ID.toLowerCase(),
+            'Handle',
+            currentBasket
+        );
+        if (handleResult.error) {
+            res.json({
+                error: true,
+                errorMsg: handleResult.serverErrors.length > 0 ? handleResult.serverErrors[0] : handleResult.fieldErrors[0]
+            });
+            return next();
+        }
+    }
+
+    if (req.session.privacyCache.get('fraudDetectionStatus')) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('error.technical', 'checkout', null)
+        });
+        return next();
+    }
+
+    // Creates a new order.
+    var order = COHelpers.createOrder(currentBasket);
+    if (!order) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('error.technical', 'checkout', null)
+        });
+        return next();
+    }
+
+    var shoppayPaymentInstruments = order.getPaymentInstruments(paymentMethodId);
+    if (order.paymentInstruments.length === 0
+        || order.paymentInstruments.length > 1
+        || shoppayPaymentInstruments.length != 1
+    ) {
+        shoppayCheckoutHelpers.failOrder(order);
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('error.technical', 'checkout', null)
+        });
+        return next();
+    }
+
+    var paymentInstrument = shoppayPaymentInstruments[0];
+    if (HookMgr.hasHook('app.payment.processor.' + paymentProcessor.ID.toLowerCase())) {
+        var authorizationResult = HookMgr.callHook(
             'app.payment.processor.' + paymentProcessor.ID.toLowerCase(),
             'Authorize',
             paymentRequest,
-            token
+            token,
+            paymentInstrument
         );
-    } else {
-        authorizationResult = HookMgr.callHook(
-            'app.payment.processor.default',
-            'Authorize'
-        );
+        if (authorizationResult.error) {
+            shoppayCheckoutHelpers.failOrder(order);
+            res.json({
+                error: true,
+                errorMsg: Resource.msg('error.technical', 'checkout', null)
+            });
+            return next();
+        }
     }
-    if (authorizationResult.error) {
+
+    // Handle custom processing post authorization
+    var options = {
+        req: req,
+        res: res
+    };
+    var postAuthCustomizations = hooksHelper('app.post.auth', 'postAuthorization', authorizationResult, order, options, require('*/cartridge/scripts/hooks/postAuthorizationHandling').postAuthorization);
+    if (postAuthCustomizations && Object.prototype.hasOwnProperty.call(postAuthCustomizations, 'error')) {
+        res.json(postAuthCustomizations);
+        return next();
+    }
+
+    var fraudDetectionStatus = hooksHelper('app.fraud.detection', 'fraudDetection', currentBasket, require('*/cartridge/scripts/hooks/fraudDetection').fraudDetection);
+    if (fraudDetectionStatus.status === 'fail') {
+        shoppayCheckoutHelpers.failOrder(order);
+
+        // fraud detection failed
+        req.session.privacyCache.set('fraudDetectionStatus', true);
         res.json({
             error: true,
-            errorMsg: authorizationResult.serverErrors.length > 0 ? authorizationResult.serverErrors[0] : authorizationResults.fieldErrors[0]
+            errorMsg: Resource.msg('error.technical', 'checkout', null)
         });
         return next();
     }
-    // Kristin TODO: Add missing place order logic
 
-    // Kristin TODO: Update payment response to use dynamic order attributes
+    Transaction.wrap(function() {
+        order.custom.shoppayOrder = true;
+    });
+
     res.json({
         error: false,
         errorMsg: null,
-        orderID: "ABC123",
-        orderToken: "CBA321",
-        continueUrl: URLUtils.url('Order-Confirm').toString(),
+        orderID: order.orderNo,
+        orderToken: order.orderToken,
+        continueUrl: URLUtils.url('Order-Confirm').toString()
     })
     next();
 });

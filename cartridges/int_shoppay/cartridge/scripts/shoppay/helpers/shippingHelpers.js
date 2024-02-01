@@ -13,6 +13,9 @@ var deliveryDateHelpers = require('*/cartridge/scripts/shoppay/helpers/deliveryD
  * @returns {boolean} - true if the basket contains a shipment type that is not compatible with Shop Pay
  */
 function hasIneligibleShipments(basket) {
+    /* Kristin TODO: Update this to skip the multishipping check if Buy Now (temporary basket).
+       Compare basket.UUID to BasketMgr.getCurrentBasket().UUID to make this determination. Consider
+       putting this check in a helper function in shoppayGlobalRefs for multiple use cases. */
     var usingMultiShipping = session.privacy.usingMultiShipping === true;
     if (usingMultiShipping && basket.shipments.length < 2) {
         usingMultiShipping = false;
@@ -96,9 +99,10 @@ function getApplicableShippingMethods(shipment) {
  * Generates the shipping address portion of the Shop Pay payment request object from the primary shipment.
  * Note that the payment request object accepts only one shipping address per order.
  * @param {dw.order.Shipment} shipment - the target shipment
+ * @param {dw.order.LineItemCtnr} basket - the target basket
  * @returns {Object} the shipping address portion of the Shop Pay payment request object
  */
-function getShippingAddress(shipment) {
+function getShippingAddress(shipment, basket) {
     if (!shipment || !shipment.shippingAddress) {
         return null;
     }
@@ -108,7 +112,7 @@ function getShippingAddress(shipment) {
     shippingAddressObj.firstName = shippingAddress.firstName;
     shippingAddressObj.lastName = shippingAddress.lastName;
     shippingAddressObj.phone = shippingAddress.phone;
-    shippingAddressObj.email = null;
+    shippingAddressObj.email = basket.customerEmail;
     shippingAddressObj.companyName = shippingAddress.companyName;
     shippingAddressObj.address1 = shippingAddress.address1;
     shippingAddressObj.address2 = shippingAddress.address2;
@@ -146,10 +150,9 @@ function getShippingLines(primaryShipment) {
 /**
  * Plain JS object that represents the applicable shipping methods of the target dw.order.Shipment
  * @param {dw.order.Shipment} shipment - the shipment of interest
- * @param {Object} address - plain JS object that represents the shipping address (optional)
  * @returns {Object} raw JSON that represents the applicable shipping methods for the target shipment
  */
-function getApplicableDeliveryMethods(shipment, address) {
+function getApplicableDeliveryMethods(shipment) {
     if (!shipment.shippingAddress) {
         return [];
     }
