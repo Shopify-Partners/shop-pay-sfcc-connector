@@ -11,7 +11,8 @@ var urls = {
     BeginSession: URLUtils.https('ShopPay-BeginSession').toString(),
     DiscountCodeChanged: URLUtils.https('ShopPay-DiscountCodeChanged').toString(),
     DeliveryMethodChanged: URLUtils.https('ShopPay-DeliveryMethodChanged').toString(),
-    SubmitPayment: URLUtils.https('ShopPay-SubmitPayment').toString()
+    SubmitPayment: URLUtils.https('ShopPay-SubmitPayment').toString(),
+    ShippingAddressChanged: URLUtils.https('ShopPay-ShippingAddressChanged').toString(),
 };
 
 // core reference for if Shop Pay is enabled, controlled by
