@@ -44,7 +44,7 @@ function setSessionListeners(sessionObj) {
             paymentRequest: JSON.stringify(paymentRequest)
         };
 
-        // ------- FUNCTIONAL AJAX (WORKING) --------
+        // ------- FUNCTIONAL AJAX (WORKING BEFORE LATEST DEVELOP CODE) --------
         let response = $.ajax({
             url: window.shoppayClientRefs.urls.BeginSession,
             method: 'POST',
@@ -55,6 +55,7 @@ function setSessionListeners(sessionObj) {
         const { token, checkoutUrl, sourceIdentifier } = response;
         sessionObj.completeSessionRequest({ token, checkoutUrl, sourceIdentifier });
         console.log(response);
+
     });
 
     sessionObj.addEventListener("discountcodechanged", function(ev) {
