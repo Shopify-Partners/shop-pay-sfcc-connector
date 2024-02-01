@@ -94,7 +94,7 @@ function initShopPaySession() {
             paymentRequest: initialPaymentRequest
         });
 
-        helper.setShopPaySessionListeners(shopPaySession);
+        helper.setSessionListeners(shopPaySession);
         return shopPaySession;
 
         // return window.ShopPay.PaymentRequest.createSession({
