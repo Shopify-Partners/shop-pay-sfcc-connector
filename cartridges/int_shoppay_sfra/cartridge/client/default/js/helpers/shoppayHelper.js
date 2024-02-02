@@ -30,10 +30,6 @@ function setSessionListeners(session) {
 
     console.log('=== APPLYING SESSION LISTENERS ===');
     console.log('SESSION OBJ >>>>> ', session);
-    // let productData = {};
-    // let sourceIdentifier = null;
-    // let token = null;
-    // let checkoutUrl = null;
 
     session.addEventListener("sessionrequested", function (ev) {
         console.log(ev);
@@ -42,7 +38,6 @@ function setSessionListeners(session) {
             paymentRequest: session.paymentRequest
         }
 
-        // ------- AJAX (CURRENTLY WORKING) --------
         let response = $.ajax({
             url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
             method: 'POST',
@@ -58,31 +53,14 @@ function setSessionListeners(session) {
     });
 
     session.addEventListener("discountcodechanged", function(ev) {
+        console.log(ev);
         const currentPaymentRequest = session.paymentRequest;
-        const selectedDiscountCodes = ev.discountCodes;
-
-        // let requestData = {
-        //     csrf_token: getCsrfToken(),
-        //     paymentRequest: JSON.stringify(currentPaymentRequest),
-        //     selectedDiscountCodes: selectedDiscountCodes
-        // };
-
-        // // ------- POTENTIAL AJAX--------
-        // let response = $.ajax({
-        //     url: window.shoppayClientRefs.urls.DiscountCodeChanged,
-        //     method: 'POST',
-        //     async: false,
-        //     data: requestData
-        // }).responseJSON;
-
-
 
         let requestData = {
-            // paymentRequest: session.paymentRequest
-            selectedDiscountCodes: selectedDiscountCodes
+            discountCodes: ev.discountCodes
         }
-        // ------- POTENTIAL AJAX--------
-        let response = $.ajax({
+
+        let responseJSON = $.ajax({
             url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.DiscountCodeChanged),
             method: 'POST',
             async: false,
@@ -90,14 +68,14 @@ function setSessionListeners(session) {
             contentType: 'application/json',
         }).responseJSON;
 
-        // const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
-        //     ...currentPaymentRequest,
-        //     deliveryMethods: responseJSON.paymentRequest.deliveryMethods
-        // });
+        const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
+            ...currentPaymentRequest,
+            discountCodes: responseJSON.paymentRequest.discountCodes,
+            lineItems: responseJSON.paymentRequest.lineItems
+        });
 
-        // sessionObj.completeSessionRequest({ token, checkoutUrl, sourceIdentifier });
-        console.log(response);
-        console.log(ev);
+        session.completeDiscountCodeChange({ updatedPaymentRequest: updatedPaymentRequest });
+        console.log("Updated Payment Req w/ entered Discount Code: ", updatedPaymentRequest);
     });
 
     session.addEventListener("deliverymethodchanged", function(ev) {
@@ -125,8 +103,7 @@ function setSessionListeners(session) {
         });
 
         session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
-        console.log('RESPONSE JSON >>>>> ', responseJSON);
-        console.log("UPDATED PAYMENT REQUEST >>>>> ", updatedPaymentRequest);
+        console.log("Updated Payment Req w/ entered Delivery Method: ", updatedPaymentRequest);
     });
 
     session.addEventListener("shippingaddresschanged", function(ev) {
@@ -151,14 +128,13 @@ function setSessionListeners(session) {
         });
 
         session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
-        console.log(updatedPaymentRequest);
+        console.log("Updated Payment Req w/ entered Shipping Address: ", updatedPaymentRequest);
     });
 
     // sessionObj.addEventListener("paymentconfirmationrequested", function(ev) {
     //     console.log(ev);
     //     const requestData = {
     //         paymentRequest: sessionObj.paymentRequest,
-    //         token: token
     //     };
     //     let responseJSON = $.ajax({
     //         url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.SubmitPayment),
