@@ -129,45 +129,47 @@ function setSessionListeners(session) {
         console.log("Updated Payment Req w/ entered Shipping Address: ", updatedPaymentRequest);
     });
 
-    // sessionObj.addEventListener("paymentconfirmationrequested", function(ev) {
-    //     console.log(ev);
-    //     const requestData = {
-    //         paymentRequest: sessionObj.paymentRequest,
-    //     };
-    //     let responseJSON = $.ajax({
-    //         url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.SubmitPayment),
-    //         method: 'POST',
-    //         async: false,
-    //         data: JSON.stringify(requestData),
-    //         contentType: 'application/json'
-    //     }).responseJSON;
+    session.addEventListener("paymentconfirmationrequested", function(ev) {
+        console.log(ev);
+        const requestData = {
+            token: session.token,
+            paymentRequest: session.paymentRequest,
+        };
 
-    //     let orderConfirmationData = {
-    //         orderID: responseJSON.orderID,
-    //         orderToken: responseJSON.orderToken,
-    //         continueUrl: responseJSON.continueUrl
-    //     };
-    //     sessionObj.completePaymentConfirmationRequest();
-    // });
+        let responseJSON = $.ajax({
+            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.SubmitPayment),
+            method: 'POST',
+            async: false,
+            data: JSON.stringify(requestData),
+            contentType: 'application/json'
+        }).responseJSON;
 
-    // // sessionObj.addEventListener("paymentcomplete", function(ev) {
-    //     console.log(ev);
-    //     sessionObj.close();
-    //     let data = orderConfirmationData;
-    //     let redirect = $('<form>').appendTo(document.body).attr({
-    //         method: 'POST',
-    //         action: data.continueUrl
-    //         });
-    //     $('<input>').appendTo(redirect).attr({
-    //         name: 'orderID',
-    //         value: data.orderID
-    //     });
-    //     $('<input>').appendTo(redirect).attr({
-    //         name: 'orderToken',
-    //         value: data.orderToken
-    //     });
-    //     redirect.submit();
-    // });
+        var orderConfirmationData = {
+            orderID: responseJSON.orderID,
+            orderToken: responseJSON.orderToken,
+            continueUrl: responseJSON.continueUrl
+        };
+        session.completePaymentConfirmationRequest();
+    });
+
+    session.addEventListener("paymentcomplete", function(ev) {
+        console.log(ev);
+        session.close();
+        let data = orderConfirmationData;
+        let redirect = $('<form>').appendTo(document.body).attr({
+            method: 'POST',
+            action: data.continueUrl
+            });
+        $('<input>').appendTo(redirect).attr({
+            name: 'orderID',
+            value: data.orderID
+        });
+        $('<input>').appendTo(redirect).attr({
+            name: 'orderToken',
+            value: data.orderToken
+        });
+        redirect.submit();
+    });
 }
 
 export {
