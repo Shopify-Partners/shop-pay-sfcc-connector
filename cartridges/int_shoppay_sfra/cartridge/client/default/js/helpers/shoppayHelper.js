@@ -101,13 +101,10 @@ function setSessionListeners(session) {
     });
 
     session.addEventListener("deliverymethodchanged", function(ev) {
-
-        console.log(ev);
+        console.log('Selected Delivery Method: ', ev.deliveryMethod);
         const currentPaymentRequest = session.paymentRequest;
-        const selectedDeliveryMethod = ev.deliveryMethod;
-
         const requestData = {
-            deliveryMethod: selectedDeliveryMethod
+            deliveryMethod: ev.deliveryMethod
         };
 
         let responseJSON = $.ajax({
@@ -117,8 +114,6 @@ function setSessionListeners(session) {
             data: JSON.stringify(requestData),
             contentType: 'application/json'
         }).responseJSON;
-
-        console.log('RESPONSE JSON >>>>> ', responseJSON);
 
         // Update the payment request based on the delivery method change and update the total accordingly
         const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
@@ -130,6 +125,7 @@ function setSessionListeners(session) {
         });
 
         session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
+        console.log('RESPONSE JSON >>>>> ', responseJSON);
         console.log("UPDATED PAYMENT REQUEST >>>>> ", updatedPaymentRequest);
     });
 
