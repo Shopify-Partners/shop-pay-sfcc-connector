@@ -41,8 +41,6 @@ function setSessionListeners(session) {
         let requestData = {
             paymentRequest: session.paymentRequest
         }
-        // let url = getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession);
-        // console.log('URL >>>>> ', url);
 
         // ------- AJAX (CURRENTLY WORKING) --------
         let response = $.ajax({
@@ -59,33 +57,48 @@ function setSessionListeners(session) {
 
     });
 
-    // sessionObj.addEventListener("discountcodechanged", function(ev) {
-    //     const currentPaymentRequest = sessionObj.paymentRequest;
-    //     const selectedDiscountCodes = ev.discountCodes;
+    session.addEventListener("discountcodechanged", function(ev) {
+        const currentPaymentRequest = session.paymentRequest;
+        const selectedDiscountCodes = ev.discountCodes;
 
-    //     let requestData = {
-    //         csrf_token: getCsrfToken(),
-    //         paymentRequest: JSON.stringify(currentPaymentRequest),
-    //         selectedDiscountCodes: selectedDiscountCodes
-    //     };
+        // let requestData = {
+        //     csrf_token: getCsrfToken(),
+        //     paymentRequest: JSON.stringify(currentPaymentRequest),
+        //     selectedDiscountCodes: selectedDiscountCodes
+        // };
 
-    //     // // ------- POTENTIAL AJAX--------
-    //     let response = $.ajax({
-    //         url: window.shoppayClientRefs.urls.DiscountCodeChanged,
-    //         method: 'POST',
-    //         async: false,
-    //         data: requestData
-    //     }).responseJSON;
+        // // ------- POTENTIAL AJAX--------
+        // let response = $.ajax({
+        //     url: window.shoppayClientRefs.urls.DiscountCodeChanged,
+        //     method: 'POST',
+        //     async: false,
+        //     data: requestData
+        // }).responseJSON;
 
-    //     // const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
-    //     //     ...currentPaymentRequest,
-    //     //     deliveryMethods: responseJSON.paymentRequest.deliveryMethods
-    //     // });
 
-    //     // sessionObj.completeSessionRequest({ token, checkoutUrl, sourceIdentifier });
-    //     console.log(response);
-    //     console.log(ev);
-    // });
+
+        let requestData = {
+            // paymentRequest: session.paymentRequest
+            selectedDiscountCodes: selectedDiscountCodes
+        }
+        // ------- POTENTIAL AJAX--------
+        let response = $.ajax({
+            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.DiscountCodeChanged),
+            method: 'POST',
+            async: false,
+            data: JSON.stringify(requestData),
+            contentType: 'application/json',
+        }).responseJSON;
+
+        // const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
+        //     ...currentPaymentRequest,
+        //     deliveryMethods: responseJSON.paymentRequest.deliveryMethods
+        // });
+
+        // sessionObj.completeSessionRequest({ token, checkoutUrl, sourceIdentifier });
+        console.log(response);
+        console.log(ev);
+    });
 
     // sessionObj.addEventListener("deliverymethodchanged", function(ev) {
     //     //console.log(ev);
@@ -123,33 +136,30 @@ function setSessionListeners(session) {
     //     // sessionObj.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
     // });
 
-    // sessionObj.addEventListener("shippingaddresschanged", function(ev) {
-    //     //console.log(ev);
-    //     const currentPaymentRequest = sessionObj.paymentRequest;
-    //     const selectedAddress = ev.shippingAddress;
-    //     const requestData = {
-    //         selectedAddress: selectedAddress,
-    //         paymentRequest: currentPaymentRequest,
-    //         basketId: sourceIdentifier
-    //     };
+    session.addEventListener("shippingaddresschanged", function(ev) {
+        console.log('Shipping Address: ', ev.shippingAddress);
+        const currentPaymentRequest = session.paymentRequest;
+        const requestData = {
+            shippingAddress: ev.shippingAddress,
+        };
 
-    //     let responseJSON = $.ajax({
-    //         url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.ShippingAddressChanged),
-    //         method: 'POST',
-    //         async: false,
-    //         data: JSON.stringify(requestData),
-    //         contentType: 'application/json'
-    //     }).responseJSON;
+        let responseJSON = $.ajax({
+            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.ShippingAddressChanged),
+            method: 'POST',
+            async: false,
+            data: JSON.stringify(requestData),
+            contentType: 'application/json'
+        }).responseJSON;
 
-    //     // Update the payment request based on the shipping address change
-    //     const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
-    //         ...currentPaymentRequest,
-    //         deliveryMethods: responseJSON.paymentRequest.deliveryMethods
-    //     });
+        // Update the payment request based on the shipping address change
+        const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
+            ...currentPaymentRequest,
+            deliveryMethods: responseJSON.paymentRequest.deliveryMethods
+        });
 
-    //     sessionObj.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
-    //     console.log(updatedPaymentRequest);
-    // });
+        session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
+        console.log(updatedPaymentRequest);
+    });
 
     // sessionObj.addEventListener("paymentconfirmationrequested", function(ev) {
     //     console.log(ev);
