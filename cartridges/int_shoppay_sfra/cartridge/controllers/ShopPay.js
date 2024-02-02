@@ -343,7 +343,7 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
 
     var data = JSON.parse(req.body);
 
-    var inputValidation = validateInputs(req, currentBasket, ['shippingLines']);
+    var inputValidation = validateInputs(req, currentBasket, ['deliveryMethod']);
     if (!inputValidation || inputValidation.error) {
         res.json({
             error: true,
@@ -365,7 +365,7 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
     // Find shipping method for selected shipping option
     var applicableShippingMethods = shippingHelpers.getApplicableShippingMethods(shipment);
     var shippingMethod = array.find(applicableShippingMethods, function(shippingMethod) {
-        return shippingMethod.ID === data.shippingLines[0].code;
+        return shippingMethod.ID === data.deliveryMethod.code;
     });
 
     if (!shippingMethod) {

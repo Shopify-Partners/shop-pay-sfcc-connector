@@ -100,41 +100,38 @@ function setSessionListeners(session) {
         console.log(ev);
     });
 
-    // sessionObj.addEventListener("deliverymethodchanged", function(ev) {
-    //     //console.log(ev);
-    //     const currentPaymentRequest = sessionObj.paymentRequest;
-    //     const selectedDeliveryMethod = ev.deliveryMethod;
-    //     const requestData = {
-    //         selectedDeliveryMethod: selectedDeliveryMethod,
-    //         paymentRequest: currentPaymentRequest,
-    //         basketId: sourceIdentifier
-    //     };
+    session.addEventListener("deliverymethodchanged", function(ev) {
 
+        console.log(ev);
+        const currentPaymentRequest = session.paymentRequest;
+        const selectedDeliveryMethod = ev.deliveryMethod;
 
-    //     console.log(ev);
-    //     console.log('REQUEST DATA >>>> ', requestData);
+        const requestData = {
+            deliveryMethod: selectedDeliveryMethod
+        };
 
+        let responseJSON = $.ajax({
+            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.DeliveryMethodChanged),
+            method: 'POST',
+            async: false,
+            data: JSON.stringify(requestData),
+            contentType: 'application/json'
+        }).responseJSON;
 
-    //     // let responseJSON = $.ajax({
-    //     //     url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.DeliveryMethodChanged),
-    //     //     method: 'POST',
-    //     //     async: false,
-    //     //     data: JSON.stringify(requestData),
-    //     //     contentType: 'application/json'
-    //     // }).responseJSON;
+        console.log('RESPONSE JSON >>>>> ', responseJSON);
 
-    //     // // Update the payment request based on the delivery method change
-    //     // // and update the total accordingly
-    //     // const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
-    //     //     ...currentPaymentRequest,
-    //     //     shippingLines: responseJSON.paymentRequest.shippingLines,
-    //     //     totalShippingPrice: responseJSON.paymentRequest.totalShippingPrice,
-    //     //     totalTax: responseJSON.paymentRequest.totalTax,
-    //     //     total: responseJSON.paymentRequest.total
-    //     // });
+        // Update the payment request based on the delivery method change and update the total accordingly
+        const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
+            ...currentPaymentRequest,
+            shippingLines: responseJSON.paymentRequest.shippingLines,
+            totalShippingPrice: responseJSON.paymentRequest.totalShippingPrice,
+            totalTax: responseJSON.paymentRequest.totalTax,
+            total: responseJSON.paymentRequest.total
+        });
 
-    //     // sessionObj.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
-    // });
+        session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
+        console.log("UPDATED PAYMENT REQUEST >>>>> ", updatedPaymentRequest);
+    });
 
     session.addEventListener("shippingaddresschanged", function(ev) {
         console.log('Shipping Address: ', ev.shippingAddress);
