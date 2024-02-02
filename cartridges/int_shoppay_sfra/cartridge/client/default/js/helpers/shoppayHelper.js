@@ -27,9 +27,7 @@ function getCsrfToken() {
 
 // Sets Up ShopPay listener Events
 function setSessionListeners(session) {
-
     console.log('=== APPLYING SESSION LISTENERS ===');
-    console.log('SESSION OBJ >>>>> ', session);
 
     session.addEventListener("sessionrequested", function (ev) {
         console.log(ev);
@@ -79,7 +77,6 @@ function setSessionListeners(session) {
     });
 
     session.addEventListener("deliverymethodchanged", function(ev) {
-        console.log('Selected Delivery Method: ', ev.deliveryMethod);
         const currentPaymentRequest = session.paymentRequest;
         const requestData = {
             deliveryMethod: ev.deliveryMethod
@@ -103,6 +100,7 @@ function setSessionListeners(session) {
         });
 
         session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
+        console.log('Selected Delivery Method: ', ev.deliveryMethod);
         console.log("Updated Payment Req w/ entered Delivery Method: ", updatedPaymentRequest);
     });
 
@@ -143,7 +141,8 @@ function setSessionListeners(session) {
     //         data: JSON.stringify(requestData),
     //         contentType: 'application/json'
     //     }).responseJSON;
-    //     orderConfirmationData = {
+
+    //     let orderConfirmationData = {
     //         orderID: responseJSON.orderID,
     //         orderToken: responseJSON.orderToken,
     //         continueUrl: responseJSON.continueUrl
