@@ -25,6 +25,14 @@ function getCsrfToken() {
     return '';
 }
 
+function isCartEmptyOnLoad() {
+    let $element = document.querySelector('[data-empty-cart-load]');
+    if ($element && $element.attributes['data-empty-cart-load'] && $element.attributes['data-empty-cart-load'].value) {
+        return $element.attributes['data-empty-cart-load'].value === 'true';
+    }
+    return false;
+}
+
 // Sets Up ShopPay listener Events
 function setSessionListeners(session) {
     console.log('=== APPLYING SESSION LISTENERS ===');
@@ -175,5 +183,6 @@ function setSessionListeners(session) {
 export {
     getCsrfToken,
     getUrlWithCsrfToken,
+    isCartEmptyOnLoad,
     setSessionListeners
 };

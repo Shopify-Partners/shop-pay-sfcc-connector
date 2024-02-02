@@ -30,8 +30,7 @@ function initShopPayButton() {
 
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
-    let paymentRequestResponse = buildPaymentRequest();
-    const cartIsEmpty =  paymentRequestResponse && paymentRequestResponse.responseJSON ? paymentRequestResponse.responseJSON.error : null;
+    const cartIsEmpty = helper.isCartEmptyOnLoad();
     utils.shopPayMutationObserver(paymentSelector, cartIsEmpty);  // set mutation observ. to apply correct btn styles when this element is rendered to the DOM (based on whether basket is empty or not)
 }
 
