@@ -43,13 +43,16 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
 /**
  * Function to create a GraphQL ShopPay payment request session
  * @param {Object} paymentRequest - the Shop Pay payment request object representing the customer's basket
- * @param {String} token - the Shop Pay session token returned in the session create GraphQL response
+ * @param {string} token - the Shop Pay session token returned in the session create GraphQL response
  * @returns {Object} The GraphQL service response body
  */
 function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
     var shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
-    /* Kristin TODO: Verify that the paymentRequest.paymentMethod is passed in from the client-side JS here
-       when the modal flows are implemented. */
+    /* shippingAddress.id is a Shop Pay specific/provided element and is not a valid input for the GraphQL session
+       submit request, but is included in the payment request object from the client-side Shop Pay session */
+    if (paymentRequest.shippingAddress.id) {
+        delete paymentRequest.shippingAddress.id;
+    }
     try {
         const bodyObj = {
             query: 'mutation shopPayPaymentRequestSessionSubmit($token: String!, $paymentRequest: ShopPayPaymentRequestInput!, $idempotencyKey: String!) {shopPayPaymentRequestSessionSubmit(token: $token, paymentRequest: $paymentRequest, idempotencyKey: $idempotencyKey) {paymentRequestReceipt {token processingStatusType} userErrors {field message}}}',

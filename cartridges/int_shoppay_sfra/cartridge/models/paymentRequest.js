@@ -26,7 +26,7 @@ function PaymentRequest(basket) {
     var paymentMethod = paymentHelpers.getPaymentMethod(basket);
     var totalShippingPrice = totalsHelpers.getTotalShippingPrice(basket);
 
-    this.shippingAddress = shippingHelpers.getShippingAddress(mainShipment);
+    this.shippingAddress = shippingHelpers.getShippingAddress(mainShipment, basket);
     if (paymentMethod != null) {
         this.paymentMethod = paymentMethod;
     }
