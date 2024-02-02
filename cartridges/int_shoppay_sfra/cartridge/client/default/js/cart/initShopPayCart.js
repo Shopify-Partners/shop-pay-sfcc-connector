@@ -84,7 +84,13 @@ function initShopPaySession() {
     const paymentRequestResponse = buildPaymentRequest();
     const responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
     // TODO: remove this debugging line before final delivery
-    console.log(JSON.stringify(responseJSON.paymentRequest));
+    if (responseJSON) {
+        if (responseJSON.error && responseJSON.errorMsg) {
+            console.log(responseJSON.errorMsg);
+        } else {
+            console.log(JSON.stringify(responseJSON.paymentRequest));
+        }
+    }
 
     if (!responseJSON.error && responseJSON.paymentRequest !== null) {
         const initialPaymentRequest = window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest);
@@ -94,7 +100,10 @@ function initShopPaySession() {
             paymentRequest: initialPaymentRequest
         });
 
-        helper.setSessionListeners(shopPaySession);
+        if (shopPaySession) {
+            helper.setSessionListeners(shopPaySession);
+        }
+
         return shopPaySession;
 
         // return window.ShopPay.PaymentRequest.createSession({
