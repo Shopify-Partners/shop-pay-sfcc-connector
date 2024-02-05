@@ -468,7 +468,7 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
         return next();
     }
 
-    shoppayCheckoutHelpers.handleBillingAddress(currentBasket, paymentRequest);
+    shoppayCheckoutHelpers.handleBillingAddress(currentBasket, paymentRequest, req);
 
     var paymentMethodId = shoppayGlobalRefs.shoppayPaymentMethodId;
     var paymentProcessor = PaymentMgr.getPaymentMethod(paymentMethodId).paymentProcessor;

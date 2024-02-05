@@ -114,8 +114,9 @@ function validateShippingMethods(basket) {
  * order creation. Billing data is not available in the Shop Pay payment request object.
  * @param {dw.order.Basket} basket - The target basket
  * @param {Object} paymentRequest - The Shop Pay payment request object
+ * @param {Object} req - the current request
  */
-function handleBillingAddress(basket, paymentRequest) {
+function handleBillingAddress(basket, paymentRequest, req) {
     Transaction.wrap(function() {
         if (!basket.billingAddress) {
             basket.createBillingAddress();
