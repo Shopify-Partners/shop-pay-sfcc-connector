@@ -1,3 +1,6 @@
+// Global Variables
+let orderConfirmationData;
+
 /**
  * Add csrf token param to url
  * @param {string} url - source url
@@ -35,11 +38,10 @@ function isCartEmptyOnLoad() {
 
 // Sets Up ShopPay listener Events
 function setSessionListeners(session) {
+    // TODO: remove this debugging line before final delivery
     console.log('=== APPLYING SESSION LISTENERS ===');
 
     session.addEventListener("sessionrequested", function (ev) {
-        console.log(ev);
-
         let requestData = {
             paymentRequest: session.paymentRequest
         }
@@ -54,14 +56,13 @@ function setSessionListeners(session) {
 
         const { token, checkoutUrl, sourceIdentifier } = response;
         session.completeSessionRequest({ token, checkoutUrl, sourceIdentifier });
+        // TODO: remove these debugging lines before final delivery
+        console.log('sessionrequested', ev);
         console.log(response);
-
     });
 
     session.addEventListener("discountcodechanged", function(ev) {
-        console.log(ev);
         const currentPaymentRequest = session.paymentRequest;
-
         let requestData = {
             discountCodes: ev.discountCodes
         }
@@ -81,6 +82,8 @@ function setSessionListeners(session) {
         });
 
         session.completeDiscountCodeChange({ updatedPaymentRequest: updatedPaymentRequest });
+        // TODO: remove these debugging lines before final delivery
+        console.log('discountcodechanged', ev);
         console.log("Updated Payment Req w/ entered Discount Code: ", updatedPaymentRequest);
     });
 
@@ -108,12 +111,13 @@ function setSessionListeners(session) {
         });
 
         session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
+        // TODO: remove these debugging lines before final delivery
+        console.log('deliverymethodchanged', ev);
         console.log('Selected Delivery Method: ', ev.deliveryMethod);
         console.log("Updated Payment Req w/ entered Delivery Method: ", updatedPaymentRequest);
     });
 
     session.addEventListener("shippingaddresschanged", function(ev) {
-        console.log('Shipping Address: ', ev.shippingAddress);
         const currentPaymentRequest = session.paymentRequest;
         const requestData = {
             shippingAddress: ev.shippingAddress,
@@ -134,11 +138,15 @@ function setSessionListeners(session) {
         });
 
         session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
+        // TODO: remove these debugging lines before final delivery
+        console.log('shippingaddresschanged', ev);
+        console.log('Shipping Address: ', ev.shippingAddress);
         console.log("Updated Payment Req w/ entered Shipping Address: ", updatedPaymentRequest);
     });
 
     session.addEventListener("paymentconfirmationrequested", function(ev) {
-        console.log(ev);
+        // TODO: remove this debugging line before final delivery
+        console.log('paymentconfirmationrequested', ev);
         const requestData = {
             token: session.token,
             paymentRequest: session.paymentRequest,
@@ -152,7 +160,7 @@ function setSessionListeners(session) {
             contentType: 'application/json'
         }).responseJSON;
 
-        var orderConfirmationData = {
+        orderConfirmationData = {
             orderID: responseJSON.orderID,
             orderToken: responseJSON.orderToken,
             continueUrl: responseJSON.continueUrl
@@ -161,7 +169,8 @@ function setSessionListeners(session) {
     });
 
     session.addEventListener("paymentcomplete", function(ev) {
-        console.log(ev);
+        // TODO: remove this debugging line before final delivery
+        console.log('paymentcomplete', ev);
         session.close();
         let data = orderConfirmationData;
         let redirect = $('<form>').appendTo(document.body).attr({

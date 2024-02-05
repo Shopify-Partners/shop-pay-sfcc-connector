@@ -71,8 +71,6 @@ $('body').on('cart:update product:afterAddToCart product:updateAddToCart', funct
                 console.log('RESPONSE JSON >>>> ', responseJSON.paymentRequest)
                 console.log('SESSION Obj >>>> ', session.paymentRequest)
 
-                // // set up shopPay listeners (WOULD THIS STILL GO HERE IF NEW METHOD FROM SHOPPAY IS CREATED)???
-                // helper.setShopPaySessionListeners(session);
             }
         }
     }
@@ -105,9 +103,6 @@ function initShopPaySession() {
 
         return shopPaySession;
 
-        // return window.ShopPay.PaymentRequest.createSession({
-        //     paymentRequest: initialPaymentRequest
-        // });
     }
 }
 
