@@ -3,6 +3,7 @@
 var Transaction = require('dw/system/Transaction');
 var collections = require('*/cartridge/scripts/util/collections');
 var common = require('*/cartridge/scripts/shoppay/common');
+var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 /**
  * Ensures that no shipment exists with 0 product line items in the customer's basket.
@@ -76,24 +77,19 @@ function ensureNoEmptyShipments(currentBasket, req) {
  * @returns {boolean} true if the paymentRequest objects are a match, otherwise false
  */
 function validatePaymentRequest(clientRequest, serverRequest) {
-    // Append attributes to the server request that are provided only by Shop Pay before comparing
-    if (clientRequest.paymentMethod && !serverRequest.paymentMethod) {
-        serverRequest.paymentMethod = clientRequest.paymentMethod;
-    }
-    if (clientRequest.shippingAddress.id && !serverRequest.shippingAddress.id) {
-        serverRequest.shippingAddress.id = clientRequest.shippingAddress.id;
-    }
     try {
-        //dw.system.Logger.debug("\n<<<--Start Compare Objects---------------------------------------------------------->>>")
-        return common.compareObjects(clientRequest, serverRequest);
+        // Append attributes to the server request that are provided only by Shop Pay before comparing
+        if (clientRequest.paymentMethod && !serverRequest.paymentMethod) {
+            serverRequest.paymentMethod = clientRequest.paymentMethod;
+        }
+        if (clientRequest.shippingAddress.id && !serverRequest.shippingAddress.id) {
+            serverRequest.shippingAddress.id = clientRequest.shippingAddress.id;
+        }
+        return common.matchObjects(clientRequest, serverRequest);
     } catch (e) {
-        var test = e;
-        var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
         logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
     }
-    //dw.system.Logger.debug("\n<<<--End Compare Objects------------------------------------------------------------>>>")
     return false;
-
 }
 
 /**
