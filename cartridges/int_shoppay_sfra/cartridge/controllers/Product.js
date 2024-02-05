@@ -6,6 +6,7 @@ const server = require('server');
 server.extend(page);
 
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
+var BasketMgr = require('dw/order/BasketMgr');
 
 const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 
@@ -15,6 +16,14 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
     res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('pdp');
     res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs());
+    var currentBasket = BasketMgr.getCurrentBasket();
+    var isEmptyCart = false;
+    if (!currentBasket
+        || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
+    ) {
+        isEmptyCart = true;
+    }
+    res.viewData.isEmptyCart = isEmptyCart;
     next();
 });
 

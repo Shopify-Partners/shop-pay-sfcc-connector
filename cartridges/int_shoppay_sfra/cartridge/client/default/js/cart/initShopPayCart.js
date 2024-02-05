@@ -20,7 +20,6 @@ function initShopPayConfig() {
         shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
         clientId: window.shoppayClientRefs.preferences.shoppayClientId,
     });
-
 }
 
 function initShopPayButton() {
@@ -28,8 +27,7 @@ function initShopPayButton() {
 
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
-    let paymentRequestResponse = buildPaymentRequest();
-    const cartIsEmpty =  paymentRequestResponse && paymentRequestResponse.responseJSON ? paymentRequestResponse.responseJSON.error : null;
+    const cartIsEmpty = helper.isCartEmptyOnLoad();
     utils.shopPayMutationObserver(paymentSelector, cartIsEmpty);  // set mutation observ. to apply correct btn styles when this element is rendered to the DOM (based on whether basket is empty or not)
 }
 
@@ -69,6 +67,7 @@ $('body').on('cart:update product:afterAddToCart product:updateAddToCart', funct
                 // TODO: remove these debugging lines before final delivery
                 console.log('RESPONSE JSON >>>> ', responseJSON.paymentRequest)
                 console.log('SESSION Obj >>>> ', session.paymentRequest)
+
             }
         }
     }
@@ -79,15 +78,28 @@ function initShopPaySession() {
     const paymentRequestResponse = buildPaymentRequest();
     const responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
     // TODO: remove this debugging line before final delivery
-    console.log(JSON.stringify(responseJSON.paymentRequest));
+    if (responseJSON) {
+        if (responseJSON.error && responseJSON.errorMsg) {
+            console.log(responseJSON.errorMsg);
+        } else {
+            console.log(JSON.stringify(responseJSON.paymentRequest));
+        }
+    }
 
     if (!responseJSON.error && responseJSON.paymentRequest !== null) {
         const initialPaymentRequest = window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest);
         utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), responseJSON.error) // basket NOT empty. Update btn styles (remove opacity)
 
-        return window.ShopPay.PaymentRequest.createSession({
+        const shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
         });
+
+        if (shopPaySession) {
+            helper.setSessionListeners(shopPaySession);
+        }
+
+        return shopPaySession;
+
     }
 }
 
@@ -106,3 +118,4 @@ function buildPaymentRequest () {
         session.close();
     }
 }
+

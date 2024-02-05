@@ -3,6 +3,6 @@
     assets.addJs('/js/cart/initShopPayCart.js');
 </isscript>
 
-<div class="shop-pay-container" data-csrf-name="${pdict.csrf.tokenName}" data-csrf-token="${pdict.csrf.token}">
+<div class="shop-pay-container" data-csrf-name="${pdict.csrf.tokenName}" data-csrf-token="${pdict.csrf.token}" data-empty-cart-load="${pdict.isEmptyCart}">
     <div id="shop-pay-button-container"></div>
 </div>
