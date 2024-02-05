@@ -2,6 +2,7 @@
 
 var Transaction = require('dw/system/Transaction');
 var collections = require('*/cartridge/scripts/util/collections');
+var common = require('*/cartridge/scripts/common');
 
 /**
  * Ensures that no shipment exists with 0 product line items in the customer's basket.
@@ -82,9 +83,17 @@ function validatePaymentRequest(clientRequest, serverRequest) {
     if (clientRequest.shippingAddress.id && !serverRequest.shippingAddress.id) {
         serverRequest.shippingAddress.id = clientRequest.shippingAddress.id;
     }
+    try {
+        //dw.system.Logger.debug("\n<<<--Start Compare Objects---------------------------------------------------------->>>")
+        return common.compareObjects(clientRequest, serverRequest);
+    } catch (e) {
+        var test = e;
+        var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+        logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
+    }
+    //dw.system.Logger.debug("\n<<<--End Compare Objects------------------------------------------------------------>>>")
+    return false;
 
-    // Kristin TODO: Do we need to replace this with a more robust object traversal?
-    return JSON.stringify(clientRequest) === JSON.stringify(serverRequest);
 }
 
 /**
