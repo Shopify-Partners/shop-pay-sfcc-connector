@@ -5,7 +5,7 @@ var ImageModel = require('*/cartridge/models/product/productImages');
 var priceFactory = require('*/cartridge/scripts/factories/price');
 var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHelpers');
-var common = require('*/cartridge/scripts/common');
+var common = require('*/cartridge/scripts/shoppay/common');
 
 /**
  * Gets the absolute image URL and alt text for a product to display in the Shop Pay modal

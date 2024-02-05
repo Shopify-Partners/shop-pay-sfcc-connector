@@ -1,7 +1,7 @@
 'use strict'
 
 var collections = require('*/cartridge/scripts/util/collections');
-var common = require('*/cartridge/scripts/common');
+var common = require('*/cartridge/scripts/shoppay/common');
 
 /**
  * An array of coupon codes applied to a cart or order

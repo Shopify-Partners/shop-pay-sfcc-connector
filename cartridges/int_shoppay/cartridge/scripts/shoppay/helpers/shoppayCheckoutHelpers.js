@@ -2,7 +2,7 @@
 
 var Transaction = require('dw/system/Transaction');
 var collections = require('*/cartridge/scripts/util/collections');
-var common = require('*/cartridge/scripts/common');
+var common = require('*/cartridge/scripts/shoppay/common');
 
 /**
  * Ensures that no shipment exists with 0 product line items in the customer's basket.
