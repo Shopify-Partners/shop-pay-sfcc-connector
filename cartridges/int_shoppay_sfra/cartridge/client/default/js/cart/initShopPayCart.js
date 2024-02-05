@@ -1,5 +1,5 @@
 const helper = require('../helpers/shoppayHelper');
-const utils = require('../../../../../../int_shoppay/cartridge/scripts/utils');
+const utils = require('../utils');
 
 let session;
 
