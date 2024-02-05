@@ -113,9 +113,11 @@ function getShippingAddress(shipment, basket) {
     shippingAddressObj.lastName = shippingAddress.lastName;
     shippingAddressObj.phone = shippingAddress.phone;
     shippingAddressObj.email = basket.customerEmail;
-    shippingAddressObj.companyName = shippingAddress.companyName;
+    shippingAddressObj.companyName = shippingAddress.companyName || "";
     shippingAddressObj.address1 = shippingAddress.address1;
-    shippingAddressObj.address2 = shippingAddress.address2;
+    if (shippingAddressObj.address2) {
+        shippingAddressObj.address2 = shippingAddress.address2;
+    }
     shippingAddressObj.city = shippingAddress.city;
     shippingAddressObj.provinceCode = shippingAddress.stateCode;
     shippingAddressObj.postalCode = shippingAddress.postalCode;

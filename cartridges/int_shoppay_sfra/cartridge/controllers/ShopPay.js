@@ -301,12 +301,16 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
         // Copy shipping contact information to shipping address
         shippingAddress.firstName = data.shippingAddress.firstName;
         shippingAddress.lastName = data.shippingAddress.lastName;
+        shippingAddress.companyName = data.shippingAddress.companyName || "";
         shippingAddress.address1 = data.shippingAddress.address1;
-        shippingAddress.address2 = data.shippingAddress.address2;
+        if (data.shippingAddress.address2) {
+            shippingAddress.address2 = data.shippingAddress.address2;
+        }
         shippingAddress.city = data.shippingAddress.city;
         shippingAddress.stateCode = data.shippingAddress.provinceCode;
         shippingAddress.postalCode = data.shippingAddress.postalCode;
         shippingAddress.countryCode = data.shippingAddress.countryCode;
+        shippingAddress.phone = data.shippingAddress.phone;
     });
 
     COHelpers.recalculateBasket(currentBasket);
