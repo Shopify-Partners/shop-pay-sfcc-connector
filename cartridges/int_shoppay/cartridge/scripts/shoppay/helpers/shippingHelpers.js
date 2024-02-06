@@ -26,8 +26,12 @@ function hasIneligibleShipments(basket) {
 
     var ineligibleShipments = collections.find(basket.shipments, function (shipment) {
         var shippingMethod = shipment.shippingMethod;
-        var isBOPIS = shippingMethod != null && shippingMethod.custom.storePickupEnabled ? true : false;
-        return isBOPIS === true;
+        var isBOPISShipment = shippingMethod != null && shippingMethod.custom.storePickupEnabled ? true : false;
+        // Ensure BOPIS shipment actually has BOPIS line items
+        var BOPISLines = collections.find(shipment.productLineItems, function(pli) {
+            return !empty(pli.custom.fromStoreId);
+        });
+        return (isBOPISShipment === true && shipment.productLineItems.length > 0) || BOPISLines !== null;
     });
     if (ineligibleShipments) {
         return true;

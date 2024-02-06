@@ -76,6 +76,24 @@
         </custom-attribute-definitions>
     </type-extension>
 
+    <type-extension type-id="Product">
+        <custom-attribute-definitions>
+            <attribute-definition attribute-id="shoppayPDPButtonEnabled">
+                <display-name xml:lang="x-default">Shop Pay PDP Button Enabled</display-name>
+                <description xml:lang="x-default">If Site Preference Shop Pay PDP Button Enabled is set to "Yes", this product-level attribute is ignored. The button is never shown on product set PDPs.</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+        </custom-attribute-definitions>
+        <group-definitions>
+            <attribute-group group-id="ShopPay">
+                <display-name xml:lang="x-default">Shop Pay</display-name>
+                <attribute attribute-id="shoppayPDPButtonEnabled"/>
+            </attribute-group>
+        </group-definitions>
+    </type-extension>
+
     <type-extension type-id="SitePreferences">
         <custom-attribute-definitions>
             <attribute-definition attribute-id="shoppayAdminAPIToken">
@@ -107,6 +125,7 @@
             </attribute-definition>
             <attribute-definition attribute-id="shoppayPDPButtonEnabled">
                 <display-name xml:lang="x-default">Shop Pay PDP Button Enabled</display-name>
+                <description xml:lang="x-default">If Yes, PDP button is enabled for all PDPs (except product sets). If No, PDP button is enabled based on product-level attribute.</description>
                 <type>boolean</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>

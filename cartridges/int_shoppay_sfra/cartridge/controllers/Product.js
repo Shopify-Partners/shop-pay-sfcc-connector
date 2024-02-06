@@ -14,8 +14,8 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
  * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS
  */
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
-    res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('pdp');
-    res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs());
+    res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('pdp', res.viewData.product.id);
+    res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs(false, res.viewData.product.id));
     var currentBasket = BasketMgr.getCurrentBasket();
     var isEmptyCart = false;
     if (!currentBasket

@@ -2,6 +2,7 @@
 
 var URLUtils = require('dw/web/URLUtils');
 var PaymentMgr = require('dw/order/PaymentMgr');
+var ProductMgr = require('dw/catalog/ProductMgr');
 var currentSite = require('dw/system/Site').current;
 
 const shoppayPaymentMethodId = 'ShopPay';
@@ -22,11 +23,32 @@ var shoppayEnabled = function() {
     return (paymentMethod) ? paymentMethod.isActive() : false;
 };
 
+/**
+ * Considers both site preference and product-level PDP button toggles to determine whether
+ * the Shop Pay button should be present on a given PDP.
+ * @param {string} productId - productID of the SFCC product for PDP context (optional)
+ * @returns {boolean} true if the PDP Shop Pay button is enabled, otherwise false
+ */
+var isShoppayPDPButtonEnabled = function(productId) {
+    var isEnabled = false;
+    if (currentSite.getCustomPreferenceValue('shoppayPDPButtonEnabled')) {
+        isEnabled = true;
+    } else if (productId != null) {
+        var product = ProductMgr.getProduct(productId);
+        if (product
+            && product.custom.shoppayPDPButtonEnabled
+            && !product.productSet
+        ) {
+            isEnabled = true;
+        }
+    }
+    return isEnabled;
+}
+
 // shortcut references to individual Shop Pay site preference values
-var isShoppayPDPButtonEnabled   = function() { return currentSite.getCustomPreferenceValue('shoppayPDPButtonEnabled'); }
 var isShoppayCartButtonEnabled  = function() { return currentSite.getCustomPreferenceValue('shoppayCartButtonEnabled'); }
 var shoppayStoreId              = function() { return currentSite.getCustomPreferenceValue('shoppayStoreId'); }
-var shoppayClientId              = function() { return currentSite.getCustomPreferenceValue('shoppayClientId'); }
+var shoppayClientId             = function() { return currentSite.getCustomPreferenceValue('shoppayClientId'); }
 var shoppayAdminAPIVersion      = function() { return currentSite.getCustomPreferenceValue('shoppayAdminAPIVersion'); }
 var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPreferenceValue('shoppayStorefrontAPIVersion'); }
 var shoppayModalImageViewType   = function() { return currentSite.getCustomPreferenceValue('shoppayModalImageViewType'); }
@@ -40,7 +62,10 @@ var shoppayModalImageViewType   = function() { return currentSite.getCustomPrefe
  */
 function shoppayApplicable(req, currentBasket) {
     var shoppayPaymentMethod = PaymentMgr.getPaymentMethod(shoppayPaymentMethodId);
-    var paymentAmount = currentBasket.totalGrossPrice.value;
+    var paymentAmount = 0;
+    if (currentBasket) {
+        paymentAmount = currentBasket.totalGrossPrice.value;
+    }
     var countryCode = req.geolocation.countryCode;
     var currentCustomer = req.currentCustomer.raw;
     var applicablePaymentMethods = PaymentMgr.getApplicablePaymentMethods(
@@ -51,7 +76,10 @@ function shoppayApplicable(req, currentBasket) {
     var eligible = true;
     var message = null;
     var shippingHelpers = require('*/cartridge/scripts/shoppay/helpers/shippingHelpers');
-    var hasIneligibleShipments = shippingHelpers.hasIneligibleShipments(currentBasket);
+    var hasIneligibleShipments = false;
+    if (currentBasket) {
+        hasIneligibleShipments = shippingHelpers.hasIneligibleShipments(currentBasket);
+    }
 
     return !hasIneligibleShipments && applicablePaymentMethods.contains(shoppayPaymentMethod);
 }
@@ -63,13 +91,14 @@ function shoppayApplicable(req, currentBasket) {
  * eligibility for Shop Pay may change as the cart is updated via Ajax, so the code to support
  * Shop Pay should still need to be included.
  * @param {string} context - A string representing the page context ['pdp', 'cart', 'checkout']
+ * @param {string} productID - productID of the SFCC product for PDP context (optional)
  * @returns {boolean} true if Shop Pay elements should be included on the page, otherwise false
  */
-function shoppayElementsApplicable(context) {
+function shoppayElementsApplicable(context, productId) {
     var showShoppayButton = false;
     switch (context) {
         case 'pdp':
-            if (isShoppayPDPButtonEnabled() && shoppayEnabled()) {
+            if (isShoppayPDPButtonEnabled(productId) && shoppayEnabled()) {
                 showShoppayButton = true;
             }
             break;
@@ -102,9 +131,10 @@ function shoppayElementsApplicable(context) {
 /**
  * Add csrf token param to url
  * @param {boolean || undefined} initShopPayEmailRecognition - should email recognition be initialized
+ * @param {string} productId - productID of the SFCC product for PDP context (optional)
  * @returns {object} - js client refs
  */
-var getClientRefs = function(initShopPayEmailRecognition) {
+var getClientRefs = function(initShopPayEmailRecognition, productId) {
     return {
         urls: urls,
         constants: {
@@ -112,12 +142,10 @@ var getClientRefs = function(initShopPayEmailRecognition) {
             initShopPayEmailRecognition: initShopPayEmailRecognition || false
         },
         preferences: {
-            shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(),
+            shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(productId),
             shoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
             shoppayStoreId: shoppayStoreId(),
-            shoppayClientId: shoppayClientId(),
-            shoppayAdminAPIToken: shoppayAdminAPIVersion(),
-            shoppayStorefrontAPIToken: shoppayStorefrontAPIVersion()
+            shoppayClientId: shoppayClientId()
         }
     }
 }
@@ -127,7 +155,7 @@ module.exports = {
     shoppayEnabled: shoppayEnabled,
     shoppayApplicable: shoppayApplicable,
     shoppayElementsApplicable: shoppayElementsApplicable,
-    isShoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(),
+    isShoppayPDPButtonEnabled: isShoppayPDPButtonEnabled,
     isShoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
     shoppayStoreId: shoppayStoreId(),
     shoppayAdminAPIVersion: shoppayAdminAPIVersion(),
