@@ -2,6 +2,8 @@
 
 var Transaction = require('dw/system/Transaction');
 var collections = require('*/cartridge/scripts/util/collections');
+var common = require('*/cartridge/scripts/shoppay/common');
+var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 /**
  * Ensures that no shipment exists with 0 product line items in the customer's basket.
@@ -75,16 +77,19 @@ function ensureNoEmptyShipments(currentBasket, req) {
  * @returns {boolean} true if the paymentRequest objects are a match, otherwise false
  */
 function validatePaymentRequest(clientRequest, serverRequest) {
-    // Append attributes to the server request that are provided only by Shop Pay before comparing
-    if (clientRequest.paymentMethod && !serverRequest.paymentMethod) {
-        serverRequest.paymentMethod = clientRequest.paymentMethod;
+    try {
+        // Append attributes to the server request that are provided only by Shop Pay before comparing
+        if (clientRequest.paymentMethod && !serverRequest.paymentMethod) {
+            serverRequest.paymentMethod = clientRequest.paymentMethod;
+        }
+        if (clientRequest.shippingAddress.id && !serverRequest.shippingAddress.id) {
+            serverRequest.shippingAddress.id = clientRequest.shippingAddress.id;
+        }
+        return common.matchObjects(clientRequest, serverRequest);
+    } catch (e) {
+        logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
     }
-    if (clientRequest.shippingAddress.id && !serverRequest.shippingAddress.id) {
-        serverRequest.shippingAddress.id = clientRequest.shippingAddress.id;
-    }
-
-    // Kristin TODO: Do we need to replace this with a more robust object traversal?
-    return JSON.stringify(clientRequest) === JSON.stringify(serverRequest);
+    return false;
 }
 
 /**
@@ -109,8 +114,9 @@ function validateShippingMethods(basket) {
  * order creation. Billing data is not available in the Shop Pay payment request object.
  * @param {dw.order.Basket} basket - The target basket
  * @param {Object} paymentRequest - The Shop Pay payment request object
+ * @param {Object} req - the current request
  */
-function handleBillingAddress(basket, paymentRequest) {
+function handleBillingAddress(basket, paymentRequest, req) {
     Transaction.wrap(function() {
         if (!basket.billingAddress) {
             basket.createBillingAddress();

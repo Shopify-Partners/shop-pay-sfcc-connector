@@ -1,5 +1,5 @@
 const helper = require('../helpers/shoppayHelper');
-const utils = require('../../../../../../int_shoppay/cartridge/scripts/utils');
+const utils = require('../utils');
 
 let session;
 
@@ -12,6 +12,9 @@ $(document).ready(function () {
         initShopPayButton();
 
         session = initShopPaySession();
+
+        // set up shopPay listeners ?????
+        // helper.setShopPaySessionListeners(session);
     }
 });
 

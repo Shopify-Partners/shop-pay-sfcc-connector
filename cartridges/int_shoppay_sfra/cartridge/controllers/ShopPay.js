@@ -301,12 +301,16 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
         // Copy shipping contact information to shipping address
         shippingAddress.firstName = data.shippingAddress.firstName;
         shippingAddress.lastName = data.shippingAddress.lastName;
+        shippingAddress.companyName = data.shippingAddress.companyName || "";
         shippingAddress.address1 = data.shippingAddress.address1;
-        shippingAddress.address2 = data.shippingAddress.address2;
+        if (data.shippingAddress.address2) {
+            shippingAddress.address2 = data.shippingAddress.address2;
+        }
         shippingAddress.city = data.shippingAddress.city;
         shippingAddress.stateCode = data.shippingAddress.provinceCode;
         shippingAddress.postalCode = data.shippingAddress.postalCode;
         shippingAddress.countryCode = data.shippingAddress.countryCode;
+        shippingAddress.phone = data.shippingAddress.phone;
     });
 
     COHelpers.recalculateBasket(currentBasket);
@@ -434,21 +438,17 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
 
     shoppayCheckoutHelpers.ensureNoEmptyShipments(currentBasket, req);
     COHelpers.recalculateBasket(currentBasket);
+
     var regeneratedPaymentRequest = new PaymentRequestModel(currentBasket);
-    /* Compare the input payment request to a freshly regenerated payment request object to ensure the SFCC
-       cart still matches the Shop Pay modal session */
-    
-    // TODO: Investigate validatePaymentRequest func - check is failing and returning false. Setting validPaymentRequest = true as temp fix to revisit.
-       var validPaymentRequest = true;
-    // var validPaymentRequest = shoppayCheckoutHelpers.validatePaymentRequest(paymentRequest, regeneratedPaymentRequest);
-    // if (!validPaymentRequest) {
-    //     res.json({
-    //         error: true,
-    //         errorMsg: Resource.msg('shoppay.input.error.mismatch', 'shoppay', null),
-    //         paymentRequest: regeneratedPaymentRequest
-    //     });
-    //     return next();
-    // }
+    var validPaymentRequest = shoppayCheckoutHelpers.validatePaymentRequest(paymentRequest, regeneratedPaymentRequest);
+    if (!validPaymentRequest) {
+        res.json({
+            error: true,
+            errorMsg: Resource.msg('shoppay.input.error.mismatch', 'shoppay', null),
+            paymentRequest: regeneratedPaymentRequest
+        });
+        return next();
+    }
 
     var validShipments = shoppayCheckoutHelpers.validateShippingMethods(currentBasket);
     if (!validShipments) {
@@ -468,7 +468,7 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
         return next();
     }
 
-    shoppayCheckoutHelpers.handleBillingAddress(currentBasket, paymentRequest);
+    shoppayCheckoutHelpers.handleBillingAddress(currentBasket, paymentRequest, req);
 
     var paymentMethodId = shoppayGlobalRefs.shoppayPaymentMethodId;
     var paymentProcessor = PaymentMgr.getPaymentMethod(paymentMethodId).paymentProcessor;

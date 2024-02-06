@@ -2,7 +2,7 @@
 
 var ShippingMgr = require('dw/order/ShippingMgr');
 var collections = require('*/cartridge/scripts/util/collections');
-var common = require('*/cartridge/scripts/common');
+var common = require('*/cartridge/scripts/shoppay/common');
 var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHelpers');
 var deliveryDateHelpers = require('*/cartridge/scripts/shoppay/helpers/deliveryDateHelpers');
 
@@ -113,9 +113,11 @@ function getShippingAddress(shipment, basket) {
     shippingAddressObj.lastName = shippingAddress.lastName;
     shippingAddressObj.phone = shippingAddress.phone;
     shippingAddressObj.email = basket.customerEmail;
-    shippingAddressObj.companyName = shippingAddress.companyName;
+    shippingAddressObj.companyName = shippingAddress.companyName || "";
     shippingAddressObj.address1 = shippingAddress.address1;
-    shippingAddressObj.address2 = shippingAddress.address2;
+    if (shippingAddressObj.address2) {
+        shippingAddressObj.address2 = shippingAddress.address2;
+    }
     shippingAddressObj.city = shippingAddress.city;
     shippingAddressObj.provinceCode = shippingAddress.stateCode;
     shippingAddressObj.postalCode = shippingAddress.postalCode;

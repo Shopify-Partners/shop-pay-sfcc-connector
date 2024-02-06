@@ -8,6 +8,9 @@ var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
  * @returns {Object} The GraphQL service response body
  */
 function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
+    if (paymentRequest.shippingAddress && paymentRequest.shippingAddress.id) {
+        delete paymentRequest.shippingAddress.id;
+    }
     try {
         const bodyObj = {
             query: 'mutation shopPayPaymentRequestSessionCreate($sourceIdentifier: String!, $paymentRequest: ShopPayPaymentRequestInput!) {shopPayPaymentRequestSessionCreate(sourceIdentifier: $sourceIdentifier, paymentRequest: $paymentRequest) {shopPayPaymentRequestSession {token sourceIdentifier checkoutUrl paymentRequest {total {amount currencyCode}}} userErrors{field message}}}',

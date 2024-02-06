@@ -35,11 +35,6 @@
                     ${Resource.msg('button.guest.customer.continue', 'checkout', null)}
                 </button>
             </isif>
-            <iscomment>BEGIN SHOPPAY</iscomment>
-            <isif condition="${pdict.includeShopPayJS}">
-                <isinclude template="common/shopPayButton" />
-            </isif>
-            <iscomment>END SHOPPAY</iscomment>
             <strong>${Resource.msg('msg.guest.customer.exists', 'checkout', null)} <button type="button" class="btn btn-link js-login-customer">${Resource.msg('action.customer.login', 'checkout', null)}</button></strong>
         </fieldset>
         <input type="hidden" name="${pdict.csrf.tokenName}" value="${pdict.csrf.token}"/>

@@ -5,7 +5,7 @@ var ImageModel = require('*/cartridge/models/product/productImages');
 var priceFactory = require('*/cartridge/scripts/factories/price');
 var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHelpers');
-var common = require('*/cartridge/scripts/common');
+var common = require('*/cartridge/scripts/shoppay/common');
 
 /**
  * Gets the absolute image URL and alt text for a product to display in the Shop Pay modal
@@ -62,6 +62,8 @@ function getLineItemPricing(pli) {
     if (pli.priceAdjustments.length > 0) {
         lineItemPrice.originalLinePrice = common.getPriceObject(netPrice);
         lineItemPrice.lineDiscounts = common.getDiscountsObject(pli.priceAdjustments);
+    } else {
+        lineItemPrice.originalLinePrice = common.getPriceObject(adjustedNetPrice);
     }
     lineItemPrice.finalLinePrice = common.getPriceObject(adjustedNetPrice);
 
