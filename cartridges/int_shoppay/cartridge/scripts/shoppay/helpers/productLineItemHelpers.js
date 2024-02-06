@@ -100,12 +100,16 @@ function getItemPricing(pli) {
         itemPrice.finalItemPrice = {
             amount: priceFactoryPricing.sales.value,
             currencyCode: priceFactoryPricing.sales.currency
-        }
+        };
     } else {
+        itemPrice.originalItemPrice = {
+            amount: priceFactoryPricing.sales.value,
+            currencyCode: priceFactoryPricing.sales.currency
+        };
         itemPrice.finalItemPrice = {
             amount: priceFactoryPricing.sales.value,
             currencyCode: priceFactoryPricing.sales.currency
-        }
+        };
     }
 
     return itemPrice;
