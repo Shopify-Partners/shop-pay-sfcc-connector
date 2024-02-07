@@ -170,6 +170,34 @@ const mockShopPayPaymentRequestSessionSubmitResponse = {
     }
 }
 
+const mockOrderDetailsResponse = {
+    "data": {
+        "orders": {
+            "edges": [
+                {
+                    "node": {
+                        "billingAddress": {
+                            "firstName": "Kristin",
+                            "lastName": "Van Andel",
+                            "address1": "500 W Madison St",
+                            "address2": null,
+                            "city": "Chicago",
+                            "provinceCode": "IL",
+                            "zip": "60661",
+                            "countryCodeV2": "US",
+                            "phone": "+12085551212"
+                        },
+                        "email": "kristintest559@gmail.com",
+                        "id": "gid://shopify/Order/5745722753344",
+                        "name": "#1023",
+                        "sourceIdentifier": "4d187167221f39d4fea6e5f1d3"
+                    }
+                }
+            ]
+        }
+    }
+};
+
 /**
  * return mock payment request
  * @param {string} mockType type of mock payment request to be recieved
@@ -206,6 +234,10 @@ function getMockResponse (mockType) {
 
         case 'sessionSubmit':
             response = mockShopPayPaymentRequestSessionSubmitResponse;
+            break;
+
+        case 'orderDetails':
+            response = mockOrderDetailsResponse;
             break;
 
         default:

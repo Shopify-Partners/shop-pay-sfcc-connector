@@ -40,6 +40,18 @@ module.exports = function () {
         },
         getResponseLogMessage: function (response) {
             return (shopPayServiceHelper.getAdminResponseLogMessage(response));
+        },
+        mockCall: function (service, params) {
+            var query = JSON.parse(params).query;
+            var mockResponse = {};
+            if (query.indexOf('source_identifier') > 0) {
+                mockResponse = shopPayServiceHelper.getMockResponse('orderDetails');
+            }
+            return {
+                statusCode: 200,
+                statusMessage: 'success',
+                text: JSON.stringify(mockResponse)
+            }
         }
     });
 };
