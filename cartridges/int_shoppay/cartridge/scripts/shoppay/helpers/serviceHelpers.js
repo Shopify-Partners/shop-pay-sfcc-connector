@@ -271,9 +271,19 @@ function getStorefrontResponseLogMessage(response) {
     return response.text;
 }
 
+function getAdminRequestLogMessage(request) {
+    return request;
+};
+
+function getAdminResponseLogMessage(response) {
+    return response.text;
+};
+
 module.exports = {
     getMockPaymentRequest: getMockPaymentRequest,
     getMockResponse: getMockResponse,
     getStorefrontRequestLogMessage: getStorefrontRequestLogMessage,
-    getStorefrontResponseLogMessage: getStorefrontResponseLogMessage
+    getStorefrontResponseLogMessage: getStorefrontResponseLogMessage,
+    getAdminRequestLogMessage: getAdminRequestLogMessage,
+    getAdminResponseLogMessage: getAdminResponseLogMessage
 };
