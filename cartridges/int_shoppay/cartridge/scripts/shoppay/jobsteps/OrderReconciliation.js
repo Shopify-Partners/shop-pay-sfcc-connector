@@ -17,11 +17,11 @@ var beforeStep = function(parameters, stepExecution) {
         var min = new Date(nowMillis - minOrderAgeSecs * 1000).toISOString(); // seconds to milliseconds
         if (maxOrderAgeHrs) {
             var max = new Date(nowMillis - maxOrderAgeHrs * 60 * 60 * 1000).toISOString(); // hours to milliseconds
-            queryString = 'creationDate >= {0} AND creationDate <= {1} AND custom.shoppayOrder = {2} AND status = {3}';
-            orders = OrderMgr.searchOrders(queryString, null, max, min, true, Order.ORDER_STATUS_CREATED);
+            queryString = 'creationDate >= {0} AND creationDate <= {1} AND status = {2} AND custom.shoppayOrder = {3} AND custom.shoppayOrderCreateWebhookReceived != {4}';
+            orders = OrderMgr.searchOrders(queryString, null, max, min, Order.ORDER_STATUS_CREATED, true, true);
         } else {
-            queryString = 'creationDate <= {0} AND custom.shoppayOrder = {1} AND status = {2}';
-            orders = OrderMgr.searchOrders(queryString, null, min, true, Order.ORDER_STATUS_CREATED);
+            queryString = 'creationDate <= {0} AND status = {1} AND custom.shoppayOrder = {2} AND custom.shoppayOrderCreateWebhookReceived != {3}';
+            orders = OrderMgr.searchOrders(queryString, null, min, Order.ORDER_STATUS_CREATED, true,  true);
         }
     } catch (e) {
         logger.error('[ReconcileOrder.js] error: \n\r' + e.message + '\n\r' + e.stack);
