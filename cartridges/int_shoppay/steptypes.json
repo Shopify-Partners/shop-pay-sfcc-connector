@@ -1,0 +1,47 @@
+{
+    "step-types": {
+        "chunk-script-module-step": [{
+            "@type-id": "custom.shoppay.OrderReconciliation",
+            "@supports-parallel-execution": true,
+            "module": "int_shoppay/cartridge/scripts/shoppay/jobsteps/OrderReconciliation.js",
+            "description": "Retrieve and reconcile order data from incomplete Shop Pay orders.",
+            "@supports-site-context": "true",
+            "@supports-organization-context": "false",
+            "before-step-function": "BeforeStep",
+            "read-function": "ReadOrder",
+            "total-count-function": "GetTotalCount",
+            "process-function": "Process",
+            "write-function": "WriteOrder",
+            "after-step-function": "AfterStep",
+            "chunk-size": 10,
+            "transactional": true,
+            "parameters": {
+                "parameter": [{
+                    "@name": "MaxOrderAgeHrs",
+                    "description": "Maximum age (in hours) of orders to process",
+                    "@type": "double",
+                    "@required": "false",
+                    "min-value": 1
+                },
+                {
+                    "@name": "MinOrderAgeSecs",
+                    "description": "Minimum age (in seconds) of orders to process",
+                    "@type": "double",
+                    "@required": "true",
+                    "min-value": 0
+                }]
+            },
+            "status-codes": {
+                "status": [{
+                        "@code": "ERROR",
+                        "description": "Used when an error occurred."
+                    },
+                    {
+                        "@code": "OK",
+                        "description": "Used when execution was successful."
+                    }
+                ]
+            }
+        }]
+    }
+}
