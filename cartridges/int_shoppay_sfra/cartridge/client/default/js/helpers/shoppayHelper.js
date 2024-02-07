@@ -74,12 +74,25 @@ function setSessionListeners(session) {
             data: JSON.stringify(requestData),
             contentType: 'application/json',
         }).responseJSON;
+        const { deliveryMethods, discountCodes, lineItems, shippingLines, subtotal, discounts, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
-        const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
+        let updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
             ...currentPaymentRequest,
-            discountCodes: responseJSON.paymentRequest.discountCodes,
-            lineItems: responseJSON.paymentRequest.lineItems
+            discountCodes: discountCodes,
+            lineItems: lineItems,
+            shippingLines: shippingLines,
+            deliveryMethods: deliveryMethods,
+            subtotal: subtotal,
+            discounts: discounts,
+            totalTax: totalTax,
+            total: total
         });
+        if (totalShippingPrice) {
+            updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
+                ...updatedPaymentRequest,
+                totalShippingPrice: totalShippingPrice
+            });
+        }
 
         session.completeDiscountCodeChange({ updatedPaymentRequest: updatedPaymentRequest });
         // TODO: remove these debugging lines before final delivery
