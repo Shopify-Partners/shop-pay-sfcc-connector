@@ -6,41 +6,31 @@ var Status = require('dw/system/Status');
 
 var adminAPI = require('*/cartridge/scripts/shoppay/adminAPI');
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+var postProcessingHelpers = require('*/cartridge/scripts/shoppay/helpers/postProcessingHelpers');
 
 var orderCount;
 var successCount;
 
-function callbackFunction(order) {
+function processOrder(order) {
     orderCount++;
     var sourceIdentifier = order.custom.shoppaySourceIdentifier;
     var response = adminAPI.getOrderBySourceIdentifier(sourceIdentifier);
     if (response.error || response.orders.edges.length == 0) {
-        return new Status(Status.ERROR);
+        // Allow job to continue and re-attempt this order on next run
+        return new Status(Status.OK);
     }
 
     var node = response.orders.edges[0].node;
-    var billingAddress = order.billingAddress;
-
-    order.custom.shoppayOrderNumber = node.name;
-    order.custom.shoppayGraphQLOrderId = node.id;
-
-    if (node.email) {
-        order.customerEmail = node.email;
+    postProcessingHelpers.setOrderCustomAttributes(order, node);
+    postProcessingHelpers.handleBillingInfo(order, node);
+    var placeOrderResult = postProcessingHelpers.placeOrder(order);
+    if (placeOrderResult.error) {
+        logger.error('Unable to place order ' + order.orderNo);
+        // Kristin TODO: Send status update to cancel order in Shopify?
+        return new Status(Status.ERROR, null, 'Unable to place order ' + order.orderNo);
     }
-    billingAddress.firstName = node.billingAddress.firstName;
-    billingAddress.lastName = node.billingAddress.lastName;
-    billingAddress.address1 = node.billingAddress.address1;
-    if (node.billingAddress.address2 != null && node.billingAddress.address2 != "") {
-        billingAddress.address2 = node.billingAddress.address2;
-    }
-    billingAddress.city = node.billingAddress.city;
-    billingAddress.postalCode = node.billingAddress.zip;
-    billingAddress.stateCode = node.billingAddress.provinceCode;
-    billingAddress.countryCode = node.billingAddress.countryCodeV2;
-    billingAddress.phone = node.billingAddress.phone;
-
-    OrderMgr.placeOrder(order);
     successCount++;
+    return new Status(Status.OK);
 }
 
 exports.Run = function(params, stepExecution) {
@@ -61,19 +51,21 @@ exports.Run = function(params, stepExecution) {
         }
         orderCount = 0;
         successCount = 0;
-        // Kristin TODO: replace collections reference as it is in SFRA core and not in BM cartridge path
+        var result;
         while (orders.hasNext()) {
-            callbackFunction(orders.next());
+            result = processOrder(orders.next());
+            if (result.isError()) {
+                return result;
+            }
         }
-        logger.debug("Processed: {0} orders / Found: {1} orders", successCount, orderCount);
+        logger.debug('Processed: {0} orders / Found: {1} orders', successCount, orderCount);
     } catch (e) {
         if (orders) {
             orders.close();
         }
-        var test = e;
         logger.error('[OrderReconciliation.js] error: \n\r' + e.message + '\n\r' + e.stack);
-        return new Status(Status.ERROR);
+        return new Status(Status.ERROR, null, 'Exception thrown.');
     }
 
-    return new Status(Status.OK);
+    return new Status(Status.OK, null, 'Successfully processed {0} / {1} orders', successCount, orderCount);
 };
