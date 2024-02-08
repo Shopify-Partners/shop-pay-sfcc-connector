@@ -1,19 +1,13 @@
 {
     "step-types": {
-        "chunk-script-module-step": [{
+        "script-module-step": [{
             "@type-id": "custom.shoppay.OrderReconciliation",
             "@supports-parallel-execution": true,
             "module": "int_shoppay/cartridge/scripts/shoppay/jobsteps/OrderReconciliation.js",
             "description": "Retrieve and reconcile order data from incomplete Shop Pay orders.",
             "@supports-site-context": "true",
             "@supports-organization-context": "false",
-            "before-step-function": "BeforeStep",
-            "read-function": "ReadOrder",
-            "total-count-function": "GetTotalCount",
-            "process-function": "Process",
-            "write-function": "WriteOrder",
-            "after-step-function": "AfterStep",
-            "chunk-size": 10,
+            "function": "Run",
             "transactional": true,
             "parameters": {
                 "parameter": [{

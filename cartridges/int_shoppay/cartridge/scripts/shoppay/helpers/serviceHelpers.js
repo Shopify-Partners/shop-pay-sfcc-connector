@@ -304,10 +304,12 @@ function getStorefrontResponseLogMessage(response) {
 }
 
 function getAdminRequestLogMessage(request) {
+    // Kristin TODO
     return request;
 };
 
 function getAdminResponseLogMessage(response) {
+    // Kristin TODO
     return response.text;
 };
 
