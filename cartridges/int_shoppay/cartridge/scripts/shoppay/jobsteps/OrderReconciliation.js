@@ -16,8 +16,8 @@ function processOrder(order) {
     var sourceIdentifier = order.custom.shoppaySourceIdentifier;
     var response = adminAPI.getOrderBySourceIdentifier(sourceIdentifier);
     if (response.error || response.orders.edges.length == 0) {
-        // Allow job to continue and re-attempt this order on next run
-        return new Status(Status.OK);
+        // This order will be reattempted on next run
+        return;
     }
 
     var node = response.orders.edges[0].node;
@@ -27,16 +27,19 @@ function processOrder(order) {
     if (placeOrderResult.error) {
         logger.error('Unable to place order ' + order.orderNo);
         // Kristin TODO: Send status update to cancel order in Shopify?
-        return new Status(Status.ERROR, null, 'Unable to place order ' + order.orderNo);
+        return;
     }
     successCount++;
-    return new Status(Status.OK);
+    return;
 }
 
 exports.Run = function(params, stepExecution) {
     try {
         var queryString;
         var orders;
+        var result;
+        orderCount = 0;
+        successCount = 0;
         var maxOrderAgeHrs = params.MaxOrderAgeHrs; // optional input
         var minOrderAgeSecs = params.MinOrderAgeSecs; // required input
         var nowMillis = new Date().valueOf();
@@ -44,21 +47,11 @@ exports.Run = function(params, stepExecution) {
         if (maxOrderAgeHrs) {
             var max = new Date(nowMillis - maxOrderAgeHrs * 60 * 60 * 1000).toISOString(); // hours to milliseconds
             queryString = 'creationDate >= {0} AND creationDate <= {1} AND status = {2} AND custom.shoppayOrder = {3} AND custom.shoppayOrderCreateWebhookReceived != {4}';
-            orders = OrderMgr.searchOrders(queryString, null, max, min, Order.ORDER_STATUS_CREATED, true, true);
+            OrderMgr.processOrders(processOrder, queryString, max, min, Order.ORDER_STATUS_CREATED, true, true);
         } else {
             queryString = 'creationDate <= {0} AND status = {1} AND custom.shoppayOrder = {2} AND custom.shoppayOrderCreateWebhookReceived != {3}';
-            orders = OrderMgr.searchOrders(queryString, null, min, Order.ORDER_STATUS_CREATED, true,  true);
+            OrderMgr.processOrders(processOrder, queryString, min, Order.ORDER_STATUS_CREATED, true,  true);
         }
-        orderCount = 0;
-        successCount = 0;
-        var result;
-        while (orders.hasNext()) {
-            result = processOrder(orders.next());
-            if (result.isError()) {
-                return result;
-            }
-        }
-        logger.debug('Processed: {0} orders / Found: {1} orders', successCount, orderCount);
     } catch (e) {
         if (orders) {
             orders.close();
@@ -67,5 +60,6 @@ exports.Run = function(params, stepExecution) {
         return new Status(Status.ERROR, null, 'Exception thrown.');
     }
 
+    // Kristin TODO: exit with error if successCount < orderCount? Track status globally and append message?
     return new Status(Status.OK, null, 'Successfully processed {0} / {1} orders', successCount, orderCount);
 };
