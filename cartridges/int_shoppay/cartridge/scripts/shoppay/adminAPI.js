@@ -19,10 +19,12 @@ function getOrderBySourceIdentifier(sourceIdentifier) {
             body: bodyObj || {}
         });
 
+        // Kristin TODO: Remove !response.object.data from third conditional if permissions issue is resolved
         if (!response.ok
             || !response.object
-            || (response.object.errors && response.object.errors.length > 0)
-            || !response.object.data) {
+            || !response.object.data
+            || (response.object.errors && response.object.errors.length > 0 && !response.object.data)
+        ) {
             return {
                 error: true,
                 errorMsg: response.errorMessage
