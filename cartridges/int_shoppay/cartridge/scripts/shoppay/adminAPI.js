@@ -57,6 +57,8 @@ function subscribeWebhook(topic, callbackUrl) {
     var response = shoppayAdminService.call({
         body: bodyObj || {}
     });
+    var test = client.responseHeaders;
+    var test2 = client.allResponseHeaders;
     if (!response.ok
         || !response.object
         || !response.object.data
