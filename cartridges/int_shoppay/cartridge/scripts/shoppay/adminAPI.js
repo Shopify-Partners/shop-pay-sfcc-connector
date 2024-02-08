@@ -40,6 +40,64 @@ function getOrderBySourceIdentifier(sourceIdentifier) {
     }
 }
 
+function subscribeWebhook(topic, callbackUrl) {
+    var queryString = "mutation webhookSubscriptionCreate($topic: WebhookSubscriptionTopic!, $webhookSubscription: WebhookSubscriptionInput!) {webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {userErrors {field message} webhookSubscription {id legacyResourceId format topic endpoint {__typename ... on WebhookHttpEndpoint {callbackUrl}}}}}";
+    const bodyObj = {
+        query: queryString,
+        variables: {
+            topic: topic,
+            webhookSubscription: {
+                format: "JSON",
+                callbackUrl: callbackUrl
+            }
+        }
+    };
+
+    var shoppayAdminService = require('*/cartridge/scripts/shoppay/service/shoppayAdminService')();
+    var response = shoppayAdminService.call({
+        body: bodyObj || {}
+    });
+    if (!response.ok
+        || !response.object
+        || !response.object.data
+        || (response.object.errors && response.object.errors.length > 0)
+    ) {
+        return {
+            error: true,
+            errorMsg: response.errorMessage
+        }
+    }
+    return response.object.data;
+}
+
+function unsubscribeWebhook(id) {
+    var queryString = "mutation webhookSubscriptionDelete($id: ID!) {webhookSubscriptionDelete(id: $id) {deletedWebhookSubscriptionId userErrors {field message }}}";
+    const bodyObj = {
+        query: queryString,
+        variables: {
+            id: id
+        }
+    };
+
+    var shoppayAdminService = require('*/cartridge/scripts/shoppay/service/shoppayAdminService')();
+    var response = shoppayAdminService.call({
+        body: bodyObj || {}
+    });
+    if (!response.ok
+        || !response.object
+        || !response.object.data
+        || (response.object.errors && response.object.errors.length > 0)
+    ) {
+        return {
+            error: true,
+            errorMsg: response.errorMessage
+        }
+    }
+    return response.object.data;
+}
+
 module.exports = {
-    getOrderBySourceIdentifier: getOrderBySourceIdentifier
+    getOrderBySourceIdentifier: getOrderBySourceIdentifier,
+    subscribeWebhook: subscribeWebhook,
+    unsubscribeWebhook: unsubscribeWebhook
 };
