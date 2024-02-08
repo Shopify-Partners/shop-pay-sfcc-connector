@@ -12,9 +12,6 @@ $(document).ready(function () {
         initShopPayButton();
 
         session = initShopPaySession();
-
-        // set up shopPay listeners ?????
-        // helper.setShopPaySessionListeners(session);
     }
 });
 
@@ -45,7 +42,7 @@ function initShopPayEmailRecognition() {
         .render('#shop-pay-login-container');
 }
 
-$('body').on('cart:update product:afterAddToCart product:updateAddToCart', function () {
+$('body').on('cart:update product:afterAddToCart product:updateAddToCart promotion:success', function () {
     if (window.ShopPay) {
         if (!session) {
             session = initShopPaySession();
