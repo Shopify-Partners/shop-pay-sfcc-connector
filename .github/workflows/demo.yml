@@ -65,7 +65,7 @@ jobs:
           HOST: ${{ secrets.DEMO_HOST }}
         run: |
           REF=${{ github.ref }}
-          BUILD_NAME=${REF#*/}
+          BUILD_NAME=$(echo ${REF#*/})
           npm run code:zip -- -r ${BUILD_NAME}
           sfcc-ci client:auth
           sfcc-ci code:deploy dist/${BUILD_NAME}.zip -i ${HOST} --activate
