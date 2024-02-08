@@ -26,8 +26,8 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
 server.get('Subscribe', server.middleware.https, function (req, res, next) {
     var response;
     try {
-        //var callbackUrl = URLUtils.https('Webhooks-OrdersCreate').toString();
-        var callbackUrl = 'https://webhook.site/9ae0c822-d2f9-46ed-9f91-7c38e714401d';
+        var callbackUrl = URLUtils.https('Webhooks-OrdersCreate').toString();
+        //var callbackUrl = 'https://webhook.site/9ae0c822-d2f9-46ed-9f91-7c38e714401d';
         response = adminAPI.subscribeWebhook('ORDERS_CREATE', callbackUrl);
     } catch (e) {
         logger.error('[Webhooks-Subscribe] error: \n\r' + e.message + '\n\r' + e.stack);
