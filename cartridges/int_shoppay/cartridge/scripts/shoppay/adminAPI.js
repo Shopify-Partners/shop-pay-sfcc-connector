@@ -14,8 +14,8 @@ function getOrderBySourceIdentifier(sourceIdentifier) {
             "query":queryString,
             "variables":{}
         };
-        var shopPayStorefrontService = require('*/cartridge/scripts/shoppay/service/shoppayAdminService')();
-        var response = shopPayStorefrontService.call({
+        var shoppayAdminService = require('*/cartridge/scripts/shoppay/service/shoppayAdminService')();
+        var response = shoppayAdminService.call({
             body: bodyObj || {}
         });
 

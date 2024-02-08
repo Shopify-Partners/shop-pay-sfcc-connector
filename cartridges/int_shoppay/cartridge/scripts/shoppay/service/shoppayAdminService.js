@@ -2,7 +2,7 @@
 
 const serviceName = 'shoppay.api.admin';
 const LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
-const shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
+const shoppayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
 
 /** Creates 'createRequest' callback for a service
  * @param  {dw.svc.Service} service service instance
@@ -36,16 +36,16 @@ module.exports = function () {
             return JSON.parse(response.text);
         },
         getRequestLogMessage: function (request) {
-            return (shopPayServiceHelper.getAdminRequestLogMessage(request));
+            return (shoppayServiceHelper.getAdminRequestLogMessage(request));
         },
         getResponseLogMessage: function (response) {
-            return (shopPayServiceHelper.getAdminResponseLogMessage(response));
+            return (shoppayServiceHelper.getAdminResponseLogMessage(response));
         },
         mockCall: function (service, params) {
             var query = JSON.parse(params).query;
             var mockResponse = {};
             if (query.indexOf('source_identifier') > 0) {
-                mockResponse = shopPayServiceHelper.getMockResponse('orderDetails');
+                mockResponse = shoppayServiceHelper.getMockResponse('orderDetails');
             }
             return {
                 statusCode: 200,
