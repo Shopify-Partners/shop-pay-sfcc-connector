@@ -18,10 +18,10 @@ const addressElements = {
 };
 
 /**
- *
- * @param {dw.order.Order} order
- * @param {Object} billingAddress
- * @param {string} customerEmail
+ * Updates the billing address, customer name, and email on an SFCC order (paid with Shop Pay)
+ * from an associated Shopify order. This data is not available at the time of order creation during checkout.
+ * @param {dw.order.Order} order - The target SFCC order
+ * @param {Object} node - The Shopify order payload
  */
 var handleBillingInfo = function(order, node) {
     var billingAddress = order.billingAddress;
@@ -48,9 +48,10 @@ var handleBillingInfo = function(order, node) {
 };
 
 /**
- *
- * @param {dw.order.Order} order
- * @param {Object} node
+ * Captures references to an associated Shopify order on an SFCC order paid with Shop Pay.
+ * This data is not available at the time of order creation during checkout.
+ * @param {dw.order.Order} order - The target SFCC order
+ * @param {Object} node - The Shopify order payload
  */
 var setOrderCustomAttributes = function(order, node) {
     order.custom.shoppayOrderNumber = node.name;
@@ -58,8 +59,8 @@ var setOrderCustomAttributes = function(order, node) {
 };
 
 /**
- * Attempts to place the order
- * @param {dw.order.Order} order - The order object to be placed
+ * Attempts to place an SFCC order that was paid with Shop Pay.
+ * @param {dw.order.Order} order - The target SFCC order
  * @returns {Object} an error object
  */
 var placeOrder = function(order) {

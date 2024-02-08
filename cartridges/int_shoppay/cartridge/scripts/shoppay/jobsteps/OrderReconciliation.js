@@ -11,6 +11,12 @@ var postProcessingHelpers = require('*/cartridge/scripts/shoppay/helpers/postPro
 var orderCount;
 var successCount;
 
+/**
+ * Finalizes processing of an SFCC order paid using Shop Pay. Finds the corresponding Shopify order,
+ * updates select billing and customer attributes on the SFCC order from the Shopify order data,
+ * and places the SFCC order.
+ * @param {dw.order.Order} order - The SFCC order to finalize (Created -> New/Open)
+ */
 function processOrder(order) {
     orderCount++;
     var sourceIdentifier = order.custom.shoppaySourceIdentifier;

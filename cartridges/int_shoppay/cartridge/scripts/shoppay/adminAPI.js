@@ -4,7 +4,7 @@ var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 /**
  * Function to retrieve the details of a Shop Pay order using the Shopify GraphQL Admin API
- * @param {string} sourceIdentifier - the Shop Pay payment request object representing the customer's basket
+ * @param {string} sourceIdentifier - the sourceIdentifier value (SFCC basket UUID) sent to Shopify during checkout
  * @returns {Object} The GraphQL service response body
  */
 function getOrderBySourceIdentifier(sourceIdentifier) {
