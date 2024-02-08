@@ -574,18 +574,4 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
     next();
 });
 
-server.get('Test', server.middleware.https, function (req, res, next) {
-    var nowDate = new Date();
-    var nowMillis = nowDate.valueOf();
-    var lookback = new Date(nowMillis - 48 * 60 * 60 * 1000); // hours to millis
-    var min = new Date(nowMillis - 30 * 1000); // seconds to millis
-    res.json({
-        nowMills: nowMillis,
-        nowTime: nowDate.toISOString(),
-        min: min.toISOString(),
-        lookback: lookback.toISOString(),
-    });
-    next();
-});
-
 module.exports = server.exports();
