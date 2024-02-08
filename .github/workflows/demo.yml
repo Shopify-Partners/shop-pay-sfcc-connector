@@ -64,7 +64,7 @@ jobs:
           SFCC_OAUTH_CLIENT_SECRET: ${{ secrets.SFCC_OAUTH_CLIENT_SECRET }}
           HOST: ${{ secrets.DEMO_HOST }}
         run: |
-          BUILD_NAME=${{ github.ref }}
+          BUILD_NAME=${GITHUB_BASE_REF}
           npm run code:zip -- -r ${BUILD_NAME}
           sfcc-ci client:auth
           sfcc-ci code:deploy dist/${BUILD_NAME}.zip -i ${HOST} --activate
