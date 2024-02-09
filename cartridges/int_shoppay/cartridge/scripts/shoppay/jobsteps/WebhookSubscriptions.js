@@ -12,9 +12,11 @@ const callbackEndpoints = {
 };
 
 /**
- *
- * @param {*} userErrors
- * @returns {object}
+ * Parses a set of userErrors from a Shopify webhook subscribe request to determine if the
+ * subscribe action failed because the subscription for that callbackUrl and topic already
+ * exists.
+ * @param {Object} userErrors - an array of userErrors from the GraphQL response
+ * @returns {boolean} - true if the error is due to "already subscribed", false if some other cause
  */
 function isAlreadySubscribedError(userErrors) {
     var subscribed = false;
@@ -35,9 +37,11 @@ function isAlreadySubscribedError(userErrors) {
 }
 
 /**
- *
- * @param {*} userErrors
- * @returns {object}
+ * Parses a set of userErrors from a Shopify webhook unsubscribe request to determine if the
+ * unsubscribe action failed because the subscription with that ID does not exist (already unsubscribed
+ * or never subscribed).
+ * @param {Object} userErrors - an array of userErrors from the GraphQL response
+ * @returns {boolean} - true if the error is due to "not found", false if some other cause
  */
 function isSubscriptionNotFoundError(userErrors) {
     var existenceErrorFound = false;
@@ -57,19 +61,25 @@ function isSubscriptionNotFoundError(userErrors) {
 }
 
 /**
- *
- * @param {*} webhookObj
- * @param {*} webhookData
- * @returns
+ * Assigns the details of a Shopify webhook subscription to an SFCC custom object for reference (and
+ * future unsubscribe, if necessary).
+ * @param {Object} webhookObj - The custom object in which the subscription details will be stored
+ * @param {dw.object.CustomObject} webhookData - The webhook data from the GraphQL webhook subscribe response
  */
 function setSubscriptionObjectData(webhookObj, webhookData) {
     webhookObj.custom.topic = webhookData.topic;
     webhookObj.custom.callbackUrl = webhookData.endpoint.callbackUrl;
     webhookObj.custom.subscriptionId = webhookData.id;
     webhookObj.custom.format = webhookData.format;
-    return webhookObj;
 }
 
+/**
+ * This job step subscribes an SFCC controller endpoint to a relevant Shopify webhook and captures the subscription
+ * information in a custom object for reference (and future unsubscribe, if necessary).
+ * @param {dw.util.HashMap} params - Map of job step inputs
+ * @param {dw.job.JobStepExecution} stepExecution - Represents an execution of a step that belongs to a job.
+ * @returns {dw.system.Status} Status object indicating job step success or failure.
+ */
 exports.Subscribe = function(params, stepExecution) {
     try {
         var topic = params.WebhookTopic;
@@ -116,6 +126,13 @@ exports.Subscribe = function(params, stepExecution) {
     return new Status(Status.OK);
 };
 
+/**
+ * This job step removes a Shopify webhook subscription by webhook subscription ID and deletes the SFCC custom
+ * object that stored the subscription data, if it exists.
+ * @param {dw.util.HashMap} params - Map of job step inputs
+ * @param {dw.job.JobStepExecution} stepExecution - Represents an execution of a step that belongs to a job.
+ * @returns {dw.system.Status} Status object indicating job step success or failure.
+ */
 exports.Unsubscribe = function(params, stepExecution) {
     try {
         var id = params.WebhookId;

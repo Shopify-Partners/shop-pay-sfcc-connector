@@ -40,6 +40,12 @@ function getOrderBySourceIdentifier(sourceIdentifier) {
     }
 }
 
+/**
+ * Subscribes an SFCC controller endpoint to a relevant Shopify webhook.
+ * @param {string} topic - The webhook topic
+ * @param {string} callbackUrl - The webhook callback URL
+ * @returns {Object} - An object representing an error or the GraphQL service response body
+ */
 function subscribeWebhook(topic, callbackUrl) {
     var queryString = "mutation webhookSubscriptionCreate($topic: WebhookSubscriptionTopic!, $webhookSubscription: WebhookSubscriptionInput!) {webhookSubscriptionCreate(topic: $topic, webhookSubscription: $webhookSubscription) {userErrors {field message} webhookSubscription {id legacyResourceId format topic endpoint {__typename ... on WebhookHttpEndpoint {callbackUrl}}}}}";
     const bodyObj = {
@@ -57,6 +63,7 @@ function subscribeWebhook(topic, callbackUrl) {
     var response = shoppayAdminService.call({
         body: bodyObj || {}
     });
+    // Kristin TODO: Add some response header logging for troubleshooting purposes?
     var test = shoppayAdminService.client.responseHeaders;
     var test2 = shoppayAdminService.client.allResponseHeaders;
     if (!response.ok
@@ -67,11 +74,17 @@ function subscribeWebhook(topic, callbackUrl) {
         return {
             error: true,
             errorMsg: response.errorMessage
-        }
+        };
     }
     return response.object.data;
 }
 
+/**
+ * Searches for an existing Shopify webhook subscription with matching topic and callback Url.
+ * @param {string} topic - The webhook topic
+ * @param {string} callbackUrl - The webhook callback URL (SFCC controller endpoint as absolute URL)
+ * @returns {Object} - An object representing an error or the GraphQL service response body
+ */
 function getExistingWebhook(topic, callbackUrl) {
     var queryString = "{webhookSubscriptions(first: 1, topics:" + topic + ", callbackUrl: \"" + callbackUrl + "\") {edges {node {id legacyResourceId format topic endpoint {__typename ... on WebhookHttpEndpoint {callbackUrl}}}}}}";
     const bodyObj = {
@@ -92,11 +105,16 @@ function getExistingWebhook(topic, callbackUrl) {
         return {
             error: true,
             errorMsg: response.errorMessage
-        }
+        };
     }
     return response.object.data;
 }
 
+/**
+ * Unsubscribes an SFCC controller endpoint from a Shopify webhook.
+ * @param {string} id - The webhook ID to unsubscribe (format: "gid://shopify/WebhookSubscription/1464424628544")
+ * @returns {Object} - An object representing an error or the GraphQL service response body
+ */
 function unsubscribeWebhook(id) {
     var queryString = "mutation webhookSubscriptionDelete($id: ID!) {webhookSubscriptionDelete(id: $id) {deletedWebhookSubscriptionId userErrors {field message }}}";
     const bodyObj = {
@@ -118,7 +136,7 @@ function unsubscribeWebhook(id) {
         return {
             error: true,
             errorMsg: response.errorMessage
-        }
+        };
     }
     return response.object.data;
 }
