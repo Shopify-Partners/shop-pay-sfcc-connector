@@ -8,7 +8,7 @@ var adminAPI = require('*/cartridge/scripts/shoppay/adminAPI');
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 const callbackEndpoints = {
-    "ORDERS_CREATE": URLUtils.https('Webhooks-OrdersCreate').toString()
+    "ORDERS_CREATE": URLUtils.https('ShopPayWebhooks-OrdersCreate').toString()
 };
 
 /**
