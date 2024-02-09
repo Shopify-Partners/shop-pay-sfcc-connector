@@ -11,7 +11,18 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-        session = initShopPaySession();
+
+        // =========================== FROM POC BRANCH (WIP ????) ===========================
+        var readyToOrder = helper.isReadyToOrder();
+        if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
+            $('body').on('product:updateAddToCart', helper.initBuyNow);
+        } else {
+            // initShopPaySession();
+            session = initShopPaySession();
+        }
+        // ==================================================================================
+
+        // session = initShopPaySession(); // COMMENTED OUT (ORIGINAL DEVELOP BRANCH SETS HERE...SETTING ABOVE IN ELSE WITH POC BRANCH)
 
         // set up shopPay listeners ?????
         // helper.setShopPaySessionListeners(session);
@@ -77,9 +88,39 @@ $('body').on('cart:update product:afterAddToCart product:updateAddToCart', funct
 });
 
 
-function initShopPaySession() {
-    const paymentRequestResponse = buildPaymentRequest();
-    const responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
+// function initShopPaySession() {
+function initShopPaySession(paymentRequestInput) {
+
+    // =========================== FROM POC BRANCH ===========================
+    const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
+    let paymentRequest;
+    let testPaymentRequestResponse;
+    if (isBuyNow && paymentRequestInput) {
+        paymentRequest = paymentRequestInput;
+    } else if (isBuyNow && !paymentRequestInput) {
+        productData = helper.getInitProductData();
+        testPaymentRequestResponse = $.ajax({
+            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
+            type: 'POST',
+            data: JSON.stringify(productData),
+            contentType: 'application/json',
+            async: false
+        }) || {};
+        paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
+    } else {
+        testPaymentRequestResponse = $.ajax({
+            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+            type: 'GET',
+            contentType: 'application/json',
+            async: false
+        }) || {};
+        paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
+    }
+    // =======================================================================================
+
+
+    const initShopPayPaymentRequestResponse = buildPaymentRequest();
+    const responseJSON = initShopPayPaymentRequestResponse ? initShopPayPaymentRequestResponse.responseJSON : null;
     // TODO: remove this debugging line before final delivery
     if (responseJSON) {
         if (responseJSON.error && responseJSON.errorMsg) {
@@ -99,10 +140,67 @@ function initShopPaySession() {
 
         if (shopPaySession) {
             helper.setSessionListeners(shopPaySession);
+
+
+            // ================================== FROM POC BRANCH ==================================
+            if (shopPaySession && shopPaySession.paymentRequest){
+                console.log(shopPaySession.paymentRequest);
+            }
+            $('body').off('product:updateAddToCart', helper.initBuyNow);
+
+            $('body').on('product:updateAddToCart', function(e, response) {
+                console.log("EVENT IN NEW WATCHER >>>>> ", e);
+
+                if (window.shoppayClientRefs.constants.isBuyNow && response.product.buyNow) {
+                    if (shopPaySession) {
+                        shopPaySession.close();
+                    }
+                    var PR = window.ShopPay.PaymentRequest.build(response.product.buyNow);
+                    shopPaySession = window.ShopPay.PaymentRequest.createSession({
+                        paymentRequest: PR
+                    });
+                    helper.setSessionListeners(shopPaySession);
+
+                    console.log(shopPaySession.paymentRequest);
+                    // UPDATE GLOBAL VAR FROM SHOPPAYHELPER.JS (????)
+                    helper.productData = {
+                        pid: response.product.id,
+                        quantity: response.product.selectedQuantity,
+                        options: response.product.options
+                    };
+                } else {
+                    $.ajax({
+                        url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+                        type: 'GET',
+                        contentType: 'application/json',
+                        async: false,
+                        success: function (data) {
+                            if (!data.error) {
+                                if (shopPaySession) {
+                                    shopPaySession.close();
+                                }
+                                var PR = window.ShopPay.PaymentRequest.build(response.product.buyNow);
+                                shopPaySession = window.ShopPay.PaymentRequest.createSession({
+                                    paymentRequest: PR
+                                });
+                                helper.setSessionListeners(shopPaySession);
+                                console.log(shopPaySession.paymentRequest);
+                            } else {
+                                console.log(data.errorMsg);
+                            }
+                        },
+                        error: function () {
+                            // TODO
+                            console.log("ERROR HAPPENED!")
+                        }
+                    });
+                }
+            });
+            // =====================================================================================
+
         }
 
         return shopPaySession;
-
     }
 }
 

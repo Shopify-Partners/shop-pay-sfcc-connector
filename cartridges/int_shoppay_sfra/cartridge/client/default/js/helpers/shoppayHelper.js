@@ -1,6 +1,14 @@
 // Global Variables
 let orderConfirmationData;
 
+// =========================== NEW GLOBAL VARS FROM POC BRANCH ===========================
+var sourceIdentifier = null;
+var token = null;
+var checkoutUrl = null;
+var productData = {};
+var buyNowResponse = null;
+// =======================================================================================
+
 /**
  * Add csrf token param to url
  * @param {string} url - source url
@@ -72,23 +80,118 @@ function setSessionListeners(session) {
     console.log('=== APPLYING SESSION LISTENERS ===');
 
     session.addEventListener("sessionrequested", function (ev) {
-        let requestData = {
-            paymentRequest: session.paymentRequest
+        let sessionPaymentRequest
+        
+        // ====================================================================================
+        // ========== FROM ORIGINAL DEVELOP BRANCH (was full sessionrequested logic) ==========
+        // let requestData = {
+        //     paymentRequest: session.paymentRequest
+        // }
+
+        // let response = $.ajax({
+        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
+        //     method: 'POST',
+        //     async: false,
+        //     data: JSON.stringify(requestData),
+        //     contentType: 'application/json',
+        // }).responseJSON;
+
+        // const { token, checkoutUrl, sourceIdentifier } = response;
+        // session.completeSessionRequest({ token, checkoutUrl, sourceIdentifier });
+        // // TODO: remove these debugging lines before final delivery
+        // console.log('sessionrequested', ev);
+        // console.log(response);
+        // ====================================================================================
+        // ====================================================================================
+
+
+        // =========================== FROM POC BRANCH ===========================
+        if (window.shoppayClientRefs.constants.isBuyNow) {
+            console.log('Calling ShopPay-PrepareBasket controller');
+
+            const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
+            let paymentRequest;
+            let testPaymentRequestResponse;
+
+            if (isBuyNow) {
+                productData = getInitProductData();
+                console.log("BUY NOW PRODUCT ??? ", productData);
+                testPaymentRequestResponse = $.ajax({
+                    url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
+                    type: 'POST',
+                    data: JSON.stringify(productData),
+                    contentType: 'application/json',
+                    async: false
+                }) || {};
+                paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
+                console.log('BUY NOW PAYMENT REQUEST ??? ', paymentRequest);
+            } 
+            // ======== COMMENTED OUT ELSE BLOCK BELOW (pasted from initShipPayCart.js) ????? ========
+            // else {
+            //     testPaymentRequestResponse = $.ajax({
+            //         url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+            //         type: 'GET',
+            //         contentType: 'application/json',
+            //         async: false
+            //     }) || {};
+            //     paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
+            // }
+            // =======================================================================================
+            // =======================================================================================
+
+
+
+
+            $.ajax({
+                url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.PrepareBasket),
+                method: 'POST',
+                async: false,
+                data: JSON.stringify(productData),
+                contentType: 'application/json',
+                success: function (data) {
+                    if (!data.error) {
+                        sessionPaymentRequest = data.paymentRequest;
+                        sourceIdentifier = data.basketId;
+                    } else {
+                        console.log(data.errorMsg);
+                    }
+                },
+                error: function () {
+                    // TODO
+                }
+            });
+        } else {
+            sessionPaymentRequest = session.paymentRequest
         }
 
-        let response = $.ajax({
+         // TODO: only passing basketId for temp baskets right now.... try to add to all for robustness
+         var requestData = {
+            paymentRequest: sessionPaymentRequest,
+            basketId: sourceIdentifier
+        };
+
+        console.log("BEFORE BEGIN SESSION (requestData obj) >>>>> ", requestData);
+        // ====================================================================================
+        // ====================================================================================
+
+        $.ajax({
             url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
             method: 'POST',
             async: false,
             data: JSON.stringify(requestData),
             contentType: 'application/json',
-        }).responseJSON;
+            success: function (data) {
+                console.log("DATA (to send in completeSessionRequest) >>>> ", data);
+                token = data.token;
+                checkoutUrl = data.checkoutUrl;
+                sourceIdentifier = data.sourceIdentifier;
+                session.completeSessionRequest({token, checkoutUrl, sourceIdentifier});
+            },
+            error: function (err) {
+                console.log(err);
+            }
 
-        const { token, checkoutUrl, sourceIdentifier } = response;
-        session.completeSessionRequest({ token, checkoutUrl, sourceIdentifier });
-        // TODO: remove these debugging lines before final delivery
-        console.log('sessionrequested', ev);
-        console.log(response);
+        });
     });
 
     session.addEventListener("discountcodechanged", function(ev) {
@@ -133,7 +236,11 @@ function setSessionListeners(session) {
     session.addEventListener("deliverymethodchanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
         const requestData = {
-            deliveryMethod: ev.deliveryMethod
+            deliveryMethod: ev.deliveryMethod,
+            // ======= FROM POC....CHECK IF THESE ARE NEEDED IN CONTROLLER CALL ???? =======
+            paymentRequest: currentPaymentRequest,
+            basketId: sourceIdentifier
+            // =============================================================================
         };
 
         let responseJSON = $.ajax({
@@ -162,8 +269,14 @@ function setSessionListeners(session) {
 
     session.addEventListener("shippingaddresschanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
+        console.log('WHAT IS CURRENT PAYMENT REQUEST (shippingAddressChanged) >>> ', currentPaymentRequest);
+        console.log('WHAT IS PRODUCT DATA??? ', productData);
         const requestData = {
             shippingAddress: ev.shippingAddress,
+            // ======= FROM POC....CHECK IF THESE ARE NEEDED IN CONTROLLER CALL ???? =======
+            paymentRequest: currentPaymentRequest,
+            basketId: sourceIdentifier
+            // =============================================================================
         };
 
         let responseJSON = $.ajax({
@@ -193,6 +306,9 @@ function setSessionListeners(session) {
         const requestData = {
             token: session.token,
             paymentRequest: session.paymentRequest,
+            // ======= FROM POC....CHECK IF THESE ARE NEEDED IN CONTROLLER CALL ???? =======
+            basketId: sourceIdentifier
+            // =============================================================================
         };
 
         let responseJSON = $.ajax({
@@ -232,11 +348,39 @@ function setSessionListeners(session) {
     });
 }
 
+
+// ================================== FROM POC BRANCH ==================================
+function initBuyNow(e, response) {
+    console.log("EVT >>>>> ", e);
+    console.log("RESPONSE >>>>> ", response);
+
+    if (response.product && response.product.buyNow) {
+        var readyToOrder = response.product.readyToOrder;
+        if (readyToOrder) {
+            var product = response.product;
+            initShopPaySession(product.buyNow);
+            productData = {
+                pid: product.id,
+                quantity: product.selectedQuantity,
+                options: product.options
+            };
+            if (product.childProducts) {
+                productData.childProducts = product.childProducts;
+            }
+            // TODO: Handle sets if supported
+        }
+    }
+}
+// =============================================================================
+
+
 export {
     getCsrfToken,
     getUrlWithCsrfToken,
     isCartEmptyOnLoad,
     setSessionListeners,
     getInitProductData,
-    isReadyToOrder
+    isReadyToOrder,
+    initBuyNow,
+    productData
 };
