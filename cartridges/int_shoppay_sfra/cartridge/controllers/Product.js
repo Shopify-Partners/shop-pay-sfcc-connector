@@ -14,8 +14,18 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
  * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS
  */
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
+
+    // =========================== FROM SSPSC-38 POC ===========================
+    var product = res.viewData.product;
+    if (product.productType === 'set') {
+        return next();
+    }
+    // ==========================================================================
+
+var contextTest = res;
+
     res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('pdp', res.viewData.product.id);
-    res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs(false, res.viewData.product.id));
+    // res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs(false, res.viewData.product.id)); // COMMENTING OUT...WAS LINE ON DEVELOP USING false COMPARED TO POC BRANCH USING 'pdp' (????)
     var currentBasket = BasketMgr.getCurrentBasket();
     var isEmptyCart = false;
     if (!currentBasket
@@ -24,6 +34,39 @@ server.append('Show', csrfProtection.generateToken, function (req, res, next) {
         isEmptyCart = true;
     }
     res.viewData.isEmptyCart = isEmptyCart;
+
+    // =========================== FROM SSPSC-38 POC ===========================
+    res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs('pdp', res.viewData.product.id));
+    if (product.readyToOrder) {
+        var buyNowInitData = {
+            pid: product.id,
+            pidsObj: [],
+            quantity: product.selectedQuantity
+        };
+        if (product.options) {
+            var options = [];
+            product.options.forEach(function(option) {
+                options.push({
+                    optionId: option.id,
+                    selectedValueId: option.selectedValueId
+                })
+            });
+            buyNowInitData.options = options;
+        }
+        if (product.bundledProducts) {
+            var bundlePids = [];
+            product.bundledProducts.forEach(function(bundledProduct) {
+                bundlePids.push({
+                    pid: bundledProduct.id,
+                    quantity: bundledProduct.selectedQuantity
+                });
+            });
+            buyNowInitData.childProducts = bundlePids;
+        }
+        res.viewData.buyNowInitData = JSON.stringify(buyNowInitData);
+    }
+    // ==========================================================================
+
     next();
 });
 
