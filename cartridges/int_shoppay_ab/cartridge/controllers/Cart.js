@@ -13,7 +13,7 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
     var activeSegents = ABTestMgr.assignedTestSegments();
 
-    const segment = ABTestMgr.isParticipant('shoppay-aa', 'ShopPayAAControl') ? 'control' : ABTestMgr.isParticipant('shoppay-aa', 'ShopPayABTreatment') ? 'treatment' : undefined;
+    const segment = ABTestMgr.isParticipant('shoppay-aa', 'ShopPayAAControl') ? 'ShopPayAAControl' : ABTestMgr.isParticipant('shoppay-aa', 'ShopPayABTreatment') ? 'ShopPayABTreatment' : undefined;
     var newShoppayClientRefs = JSON.parse(res.viewData.shoppayClientRefs);
     var newShoppayClientRefsConstants = newShoppayClientRefs['constants'];
     newShoppayClientRefsConstants['segment'] = segment;
