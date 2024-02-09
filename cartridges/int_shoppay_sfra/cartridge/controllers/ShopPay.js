@@ -450,24 +450,24 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
     Transaction.wrap(function () {
 
         // =========================== FROM SSPSC-38 POC ===========================
-        var shipment = currentBasket.defaultShipment;
-        if (!shipment.shippingAddress) {
-            shipment.createShippingAddress();
-        }
+        // var shipment = currentBasket.defaultShipment;
+        // if (!shipment.shippingAddress) {
+        //     shipment.createShippingAddress();
+        // }
 
-        var address = shipment.shippingAddress;
-        address.firstName = inputAddress.firstName;
-        address.lastName = inputAddress.lastName;
-        address.address1 = inputAddress.address1;
-        address.city = inputAddress.city;
-        address.stateCode = inputAddress.provinceCode;
-        address.postalCode = inputAddress.postalCode;
-        address.countryCode = inputAddress.postalCode;
-        address.phone = inputAddress.phone;
-        address.companyName = inputAddress.companyName;
+        // var address = shipment.shippingAddress;
+        // address.firstName = inputAddress.firstName;
+        // address.lastName = inputAddress.lastName;
+        // address.address1 = inputAddress.address1;
+        // address.city = inputAddress.city;
+        // address.stateCode = inputAddress.provinceCode;
+        // address.postalCode = inputAddress.postalCode;
+        // address.countryCode = inputAddress.postalCode;
+        // address.phone = inputAddress.phone;
+        // address.companyName = inputAddress.companyName;
 
-        currentBasket.customerEmail = inputAddress.email;
-        basketCalculationHelpers.calculateTotals(currentBasket);
+        // currentBasket.customerEmail = inputAddress.email;
+        // basketCalculationHelpers.calculateTotals(currentBasket);
     // ==========================================================================
 
 
@@ -570,7 +570,10 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
     var deliveryMethodInput = data.selectedDeliveryMethod;
     var shippingMethods = ShippingMgr.getAllShippingMethods();
     var newShippingMethod = collections.find(shippingMethods, function (shippingMethod) {
-        return shippingMethod.ID === deliveryMethodInput.code;
+        if (deliveryMethodInput && deliveryMethodInput.code) {
+            return shippingMethod.ID === deliveryMethodInput.code;
+        }
+        // return shippingMethod.ID === deliveryMethodInput.code;
     });
     Transaction.wrap(function() {
         currentBasket.defaultShipment.setShippingMethod(newShippingMethod);
