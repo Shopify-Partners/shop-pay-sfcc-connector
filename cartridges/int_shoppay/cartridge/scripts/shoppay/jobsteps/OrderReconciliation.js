@@ -22,6 +22,7 @@ function processOrder(order) {
     var sourceIdentifier = order.custom.shoppaySourceIdentifier;
     var response = adminAPI.getOrderBySourceIdentifier(sourceIdentifier);
     if (response.error || response.orders.edges.length == 0) {
+        logger.error('Shopify order not found for SFCC order ' + order.orderNo);
         // This order will be reattempted on next run
         return;
     }
@@ -32,7 +33,7 @@ function processOrder(order) {
     var placeOrderResult = postProcessingHelpers.placeOrder(order);
     if (placeOrderResult.error) {
         logger.error('Unable to place order ' + order.orderNo);
-        // Kristin TODO: Send status update to cancel order in Shopify?
+        // This order will be reattempted on next run
         return;
     }
     successCount++;
@@ -63,9 +64,8 @@ exports.Run = function(params, stepExecution) {
             orders.close();
         }
         logger.error('[OrderReconciliation.js] error: \n\r' + e.message + '\n\r' + e.stack);
-        return new Status(Status.ERROR, null, 'Exception thrown.');
+        return new Status(Status.ERROR, null, 'Exception thrown: ' + e.message);
     }
 
-    // Kristin TODO: exit with error if successCount < orderCount? Track status globally and append message?
     return new Status(Status.OK, null, 'Successfully processed {0} / {1} orders', successCount, orderCount);
 };

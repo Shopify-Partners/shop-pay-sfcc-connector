@@ -76,8 +76,6 @@ var placeOrder = function(order) {
 
         order.setExportStatus(Order.EXPORT_STATUS_READY);
     } catch (e) {
-        // Kristin TODO: Fail order? Or retry on another job pass? Need to cancel in Shopify if failed?
-        OrderMgr.failOrder(order, false);
         result.error = true;
     }
 
