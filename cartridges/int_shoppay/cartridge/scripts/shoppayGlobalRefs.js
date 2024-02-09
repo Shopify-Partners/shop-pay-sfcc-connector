@@ -14,6 +14,8 @@ var urls = {
     DeliveryMethodChanged: URLUtils.https('ShopPay-DeliveryMethodChanged').toString(),
     SubmitPayment: URLUtils.https('ShopPay-SubmitPayment').toString(),
     ShippingAddressChanged: URLUtils.https('ShopPay-ShippingAddressChanged').toString(),
+    PrepareBasket: URLUtils.https('ShopPay-PrepareBasket').toString(),
+    BuyNowData: URLUtils.https('ShopPay-BuyNowData').toString(),
 };
 
 // core reference for if Shop Pay is enabled, controlled by
@@ -62,6 +64,8 @@ var shoppayModalImageViewType   = function() { return currentSite.getCustomPrefe
  */
 function shoppayApplicable(req, currentBasket) {
     var shoppayPaymentMethod = PaymentMgr.getPaymentMethod(shoppayPaymentMethodId);
+        /* TODO: Consider changing this to check merchanidise + gift certificate total in case shipping is not
+    yet assigned. OOTB assigns shipping method at add to cart, but customer may have customized? */
     var paymentAmount = 0;
     if (currentBasket) {
         paymentAmount = currentBasket.totalGrossPrice.value;
@@ -130,16 +134,26 @@ function shoppayElementsApplicable(context, productId) {
 */
 /**
  * Add csrf token param to url
- * @param {boolean || undefined} initShopPayEmailRecognition - should email recognition be initialized
+ * ---- @param {boolean || undefined} initShopPayEmailRecognition - should email recognition be initialized ---- (ORIGINAL COMMENT...REMOVE IN FAVOR OF CONTEXT INSTEAD ?????)
  * @param {string} productId - productID of the SFCC product for PDP context (optional)
+ * @param {string} context - 'pdp', 'cart', or 'checkout' - used to set global constants in the window  --> (UPDATED COMMENT FROM POC BRANCH -- CONFIRM???)
  * @returns {object} - js client refs
  */
-var getClientRefs = function(initShopPayEmailRecognition, productId) {
+
+// ================================= FUNC PARAMS ON DEVELOP BRANCH. CONFIRM BEFORE REMOVING (???) =================================
+// var getClientRefs = function(initShopPayEmailRecognition, productId) {
+// ================================================================================================================================
+
+var getClientRefs = function(context, productId) {
+    let test = context;
+    let testTwo = productId;
     return {
         urls: urls,
         constants: {
             shoppayEnabled: shoppayEnabled(),
-            initShopPayEmailRecognition: initShopPayEmailRecognition || false
+            // initShopPayEmailRecognition: initShopPayEmailRecognition || false, // FROM ORIGINAL DEVELOP BRANCH. CONFIRM BEFORE REMOVING (???)
+            initShopPayEmailRecognition: context === 'checkout',
+            isBuyNow: context === 'pdp'
         },
         preferences: {
             shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(productId),
