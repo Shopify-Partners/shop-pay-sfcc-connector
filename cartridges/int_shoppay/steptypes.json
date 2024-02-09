@@ -40,7 +40,7 @@
         {
             "@type-id": "custom.shoppay.SubscribeWebhook",
             "module": "int_shoppay/cartridge/scripts/shoppay/jobsteps/WebhookSubscriptions.js",
-            "description": "Retrieve and reconcile order data from incomplete Shop Pay orders.",
+            "description": "Subscribe to a Shopify webhook topic.",
             "@supports-site-context": "true",
             "@supports-organization-context": "false",
             "function": "Subscribe",
@@ -73,7 +73,7 @@
         {
             "@type-id": "custom.shoppay.UnsubscribeWebhook",
             "module": "int_shoppay/cartridge/scripts/shoppay/jobsteps/WebhookSubscriptions.js",
-            "description": "Retrieve and reconcile order data from incomplete Shop Pay orders.",
+            "description": "Unsubscribe from a Shopify webhook topic.",
             "@supports-site-context": "true",
             "@supports-organization-context": "false",
             "function": "Unsubscribe",

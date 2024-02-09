@@ -72,6 +72,31 @@ function subscribeWebhook(topic, callbackUrl) {
     return response.object.data;
 }
 
+function getExistingWebhook(topic, callbackUrl) {
+    var queryString = "{webhookSubscriptions(first: 1, topics:" + topic + ", callbackUrl: \"" + callbackUrl + "\") {edges {node {id legacyResourceId format topic endpoint {__typename ... on WebhookHttpEndpoint {callbackUrl}}}}}}";
+    const bodyObj = {
+        query: queryString,
+        variables: {}
+    };
+
+    var shoppayAdminService = require('*/cartridge/scripts/shoppay/service/shoppayAdminService')();
+    var response = shoppayAdminService.call({
+        body: bodyObj || {}
+    });
+
+    if (!response.ok
+        || !response.object
+        || !response.object.data
+        || (response.object.errors && response.object.errors.length > 0)
+    ) {
+        return {
+            error: true,
+            errorMsg: response.errorMessage
+        }
+    }
+    return response.object.data;
+}
+
 function unsubscribeWebhook(id) {
     var queryString = "mutation webhookSubscriptionDelete($id: ID!) {webhookSubscriptionDelete(id: $id) {deletedWebhookSubscriptionId userErrors {field message }}}";
     const bodyObj = {
@@ -101,5 +126,6 @@ function unsubscribeWebhook(id) {
 module.exports = {
     getOrderBySourceIdentifier: getOrderBySourceIdentifier,
     subscribeWebhook: subscribeWebhook,
+    getExistingWebhook: getExistingWebhook,
     unsubscribeWebhook: unsubscribeWebhook
 };
