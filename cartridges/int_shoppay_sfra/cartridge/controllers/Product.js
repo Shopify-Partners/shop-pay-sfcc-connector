@@ -70,4 +70,45 @@ var contextTest = res;
     next();
 });
 
+
+server.append('Variation', function (req, res, next) {
+    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
+    var viewData = res.getViewData();
+    var product = viewData.product;
+
+    var buyNowProduct = {
+        pid: product.id,
+        pidsObj: [],
+        quantity: product.selectedQuantity
+    };
+    if (product.options) {
+        var options = [];
+        product.options.forEach(function(option) {
+            options.push({
+                optionId: option.id,
+                selectedValueId: option.selectedValueId
+            })
+        });
+        buyNowProduct.options = options;
+    }
+    if (product.bundledProducts) {
+        var bundlePids = [];
+        product.bundledProducts.forEach(function(bundledProduct) {
+            bundlePids.push({
+                pid: bundledProduct.id,
+                quantity: bundledProduct.selectedQuantity
+            });
+        });
+        buyNowProduct.childProducts = bundlePids;
+    }
+
+    var buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(buyNowProduct);
+
+    viewData.product.buyNow = buyNowPaymentRequest;
+    res.setViewData(viewData);
+
+    next();
+});
+
+
 module.exports = server.exports();
