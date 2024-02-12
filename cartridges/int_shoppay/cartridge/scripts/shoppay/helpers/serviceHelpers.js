@@ -303,13 +303,54 @@ function getStorefrontResponseLogMessage(response) {
     return response.text;
 }
 
+/**
+ * Filters the HTTP service response to remove sensitive information before logging the request
+ * @param {Object} request
+ * @returns {string} the filtered log message
+ */
 function getAdminRequestLogMessage(request) {
-    // Kristin TODO
+    // No PII to filter in the Admin requests
     return request;
 };
 
+/**
+ * Filters the HTTP service response to remove sensitive information before logging the response
+ * @param {Object} response
+ * @returns {string} the filtered log message
+ */
 function getAdminResponseLogMessage(response) {
-    // Kristin TODO
+    var responseBody = response.text;
+    var jsonBody = JSON.parse(responseBody);
+    if (!jsonBody.data) {
+        return response.text;
+    }
+    var data = jsonBody.data;
+    // Orders Query - mask PII
+    if (data.orders && data.orders.edges.length > 0) {
+        var node = data.orders.edges[0].node;
+        if (node.email) {
+            node.email = "****";
+        }
+        if (node.billingAddress) {
+            if (node.billingAddress.firstName) {
+                node.billingAddress.firstName = "****";
+            }
+            if (node.billingAddress.lastName) {
+                node.billingAddress.lastName = "****";
+            }
+            if (node.billingAddress.address1) {
+                node.billingAddress.address1 = "****";
+            }
+            if (node.billingAddress.address2) {
+                node.billingAddress.address2 = "****";
+            }
+            if (node.billingAddress.phone) {
+                node.billingAddress.phone = "****";
+            }
+        }
+    }
+
+    // Kristin TODO: Return the filtered response after API permissions issues are resolved and verified
     return response.text;
 };
 
