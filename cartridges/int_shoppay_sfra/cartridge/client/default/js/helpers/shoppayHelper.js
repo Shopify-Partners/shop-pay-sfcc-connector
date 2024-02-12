@@ -107,15 +107,13 @@ function setSessionListeners(session) {
 
         // =========================== FROM POC BRANCH ===========================
         if (window.shoppayClientRefs.constants.isBuyNow) {
-            console.log('Calling ShopPay-PrepareBasket controller');
-
             const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
             let paymentRequest;
             let testPaymentRequestResponse;
 
             if (isBuyNow) {
                 productData = getInitProductData();
-                console.log("BUY NOW PRODUCT ??? ", productData);
+                console.log('Calling ShopPay-BuyNowData controller:  ', productData);
                 testPaymentRequestResponse = $.ajax({
                     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
                     type: 'POST',
@@ -140,8 +138,7 @@ function setSessionListeners(session) {
             // =======================================================================================
 
 
-
-
+            console.log('CALLING ShopPay-PrepareBasket controller:  ', productData);
             $.ajax({
                 url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.PrepareBasket),
                 method: 'POST',
@@ -170,10 +167,10 @@ function setSessionListeners(session) {
             basketId: sourceIdentifier
         };
 
-        console.log("BEFORE BEGIN SESSION (requestData obj) >>>>> ", requestData);
         // ====================================================================================
         // ====================================================================================
 
+        console.log('CALLING ShopPay-BeginSession controller:  ', requestData);
         $.ajax({
             url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
             method: 'POST',

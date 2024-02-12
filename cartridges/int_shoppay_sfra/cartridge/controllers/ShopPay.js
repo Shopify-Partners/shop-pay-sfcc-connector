@@ -285,7 +285,6 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         return next();
     }
 
-    var inputs = JSON.parse(req.body);
     var paymentRequest = inputs.paymentRequest;
 
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
