@@ -94,41 +94,45 @@ function initShopPaySession(paymentRequestInput) {
     // =========================== FROM POC BRANCH ===========================
     const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
     let paymentRequest;
-    let testPaymentRequestResponse;
+    let paymentRequestResponse;
+    let initShopPayPaymentRequestResponse;
+    let responseJSON;
+
     if (isBuyNow && paymentRequestInput) {
         paymentRequest = paymentRequestInput;
     } else if (isBuyNow && !paymentRequestInput) {
         productData = helper.getInitProductData();
-        testPaymentRequestResponse = $.ajax({
+        paymentRequestResponse = $.ajax({
             url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
             type: 'POST',
             data: JSON.stringify(productData),
             contentType: 'application/json',
             async: false
         }) || {};
-        paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
+        paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
+        responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
     } else {
-        testPaymentRequestResponse = $.ajax({
-            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
-            type: 'GET',
-            contentType: 'application/json',
-            async: false
-        }) || {};
-        paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
+        // testPaymentRequestResponse = $.ajax({
+        //     url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+        //     type: 'GET',
+        //     contentType: 'application/json',
+        //     async: false
+        // }) || {};
+        // paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
+
+        initShopPayPaymentRequestResponse = buildPaymentRequest(); // buildPaymentRequest runs the same ajax call as above. Replacing with function call instead. (?????)
+        responseJSON = initShopPayPaymentRequestResponse ? initShopPayPaymentRequestResponse.responseJSON : null;
+        // TODO: remove this debugging line before final delivery
+        if (responseJSON) {
+            if (responseJSON.error && responseJSON.errorMsg) {
+                console.log(responseJSON.errorMsg);
+            } else {
+                console.log(JSON.stringify(responseJSON.paymentRequest));
+            }
+        }
     }
     // =======================================================================================
 
-
-    const initShopPayPaymentRequestResponse = buildPaymentRequest();
-    const responseJSON = initShopPayPaymentRequestResponse ? initShopPayPaymentRequestResponse.responseJSON : null;
-    // TODO: remove this debugging line before final delivery
-    if (responseJSON) {
-        if (responseJSON.error && responseJSON.errorMsg) {
-            console.log(responseJSON.errorMsg);
-        } else {
-            console.log(JSON.stringify(responseJSON.paymentRequest));
-        }
-    }
 
     if (!responseJSON.error && responseJSON.paymentRequest !== null) {
         const initialPaymentRequest = window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest);
@@ -140,8 +144,6 @@ function initShopPaySession(paymentRequestInput) {
 
         if (shopPaySession) {
             helper.setSessionListeners(shopPaySession);
-
-
             // ================================== FROM POC BRANCH ==================================
             if (shopPaySession && shopPaySession.paymentRequest){
                 console.log(shopPaySession.paymentRequest);
@@ -169,6 +171,7 @@ function initShopPaySession(paymentRequestInput) {
                         options: response.product.options
                     };
                 } else {
+                    // NOTE...ADD THE SUCCESS & ERROR FUNCTIONS INTO THE BUILD PAYMENT REQUEST FUNCTION AND USE INSTEAD...
                     $.ajax({
                         url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
                         type: 'GET',
