@@ -87,9 +87,10 @@ exports.Subscribe = function(params, stepExecution) {
         if (!topic) {
             return new Status(Status.ERROR, 'No webhook topic provided for subscribe action');
         }
-        // Kristin TODO: Toggle next 2 lines when Shopify permissions are resolved
-        //var callbackUrl = callbackEndpoints[topic];
-        var callbackUrl = 'https://webhook.site/9ae0c822-d2f9-46ed-9f91-7c38e714401d';
+        var callbackUrl = params.CallbackURL;
+        if (!callbackUrl) {
+            callbackUrl = callbackEndpoints[topic];
+        }
 
         var response = adminAPI.subscribeWebhook(topic, callbackUrl);
         if (response.error || !response.webhookSubscriptionCreate) {

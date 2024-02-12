@@ -56,6 +56,12 @@
                             "ORDERS_CREATE"
                         ]
                     }
+                },
+                {
+                    "@name": "CallbackURL",
+                    "description": "Optional: Can be used to override mapped callback URLs for special aliasing scenarios, etc.",
+                    "@type": "string",
+                    "@required": "false"
                 }]
             },
             "status-codes": {
