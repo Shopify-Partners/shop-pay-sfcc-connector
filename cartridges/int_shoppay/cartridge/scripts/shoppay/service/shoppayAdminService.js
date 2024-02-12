@@ -47,6 +47,8 @@ module.exports = function () {
             if (query.indexOf('source_identifier') > 0) {
                 mockResponse = shoppayServiceHelper.getMockResponse('orderDetails');
             }
+            /* No mock response provided for webhook subscribe/unsubscribe to avoid storing mock data
+               in custom objects, which could cause confusion in managing live webhook subscriptions */
             return {
                 statusCode: 200,
                 statusMessage: 'success',
