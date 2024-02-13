@@ -177,20 +177,25 @@ const mockOrderDetailsResponse = {
                 {
                     "node": {
                         "billingAddress": {
-                            "firstName": "Kristin",
-                            "lastName": "Van Andel",
-                            "address1": "500 W Madison St",
+                            "firstName": "Jane",
+                            "lastName": "Doe",
+                            "address1": "100 W Main St",
                             "address2": null,
                             "city": "Chicago",
                             "provinceCode": "IL",
                             "zip": "60661",
                             "countryCodeV2": "US",
-                            "phone": "+12085551212"
+                            "phone": "+3125555555"
                         },
-                        "email": "kristintest559@gmail.com",
-                        "id": "gid://shopify/Order/5745722753344",
-                        "name": "#1023",
-                        "sourceIdentifier": "4d187167221f39d4fea6e5f1d3"
+                        "email": "janedoe521@yopmail.com",
+                        "id": "gid://shopify/Order/5745722753349",
+                        "name": "#1011",
+                        "sourceIdentifier": "4d187167221f39d4fea6e5f1d3",
+                        "customer": {
+                            "firstName": "Jane",
+                            "lastName": "Doe",
+                            "phone": "+3125555555"
+                        }
                     }
                 }
             ]
@@ -294,7 +299,7 @@ function getStorefrontResponseLogMessage(response) {
             && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token
         ) {
             // mask payment token
-            jsonBody.data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
+            data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
         }
         return JSON.stringify(jsonBody);
     } catch (e) {
@@ -319,38 +324,52 @@ function getAdminRequestLogMessage(request) {
  * @returns {string} the filtered log message
  */
 function getAdminResponseLogMessage(response) {
-    var responseBody = response.text;
-    var jsonBody = JSON.parse(responseBody);
-    if (!jsonBody.data) {
-        return response.text;
-    }
-    var data = jsonBody.data;
-    // Orders Query - mask PII
-    if (data.orders && data.orders.edges.length > 0) {
-        var node = data.orders.edges[0].node;
-        if (node.email) {
-            node.email = "****";
+    try {
+        var responseBody = response.text;
+        var jsonBody = JSON.parse(responseBody);
+        if (!jsonBody.data) {
+            return response.text;
         }
-        if (node.billingAddress) {
-            if (node.billingAddress.firstName) {
-                node.billingAddress.firstName = "****";
+        var data = jsonBody.data;
+        // Orders Query - mask PII
+        if (data.orders && data.orders.edges.length > 0) {
+            var node = data.orders.edges[0].node;
+            if (node.email) {
+                node.email = "****";
             }
-            if (node.billingAddress.lastName) {
-                node.billingAddress.lastName = "****";
+            if (node.billingAddress) {
+                if (node.billingAddress.firstName) {
+                    node.billingAddress.firstName = "****";
+                }
+                if (node.billingAddress.lastName) {
+                    node.billingAddress.lastName = "****";
+                }
+                if (node.billingAddress.address1) {
+                    node.billingAddress.address1 = "****";
+                }
+                if (node.billingAddress.address2) {
+                    node.billingAddress.address2 = "****";
+                }
+                if (node.billingAddress.phone) {
+                    node.billingAddress.phone = "****";
+                }
             }
-            if (node.billingAddress.address1) {
-                node.billingAddress.address1 = "****";
-            }
-            if (node.billingAddress.address2) {
-                node.billingAddress.address2 = "****";
-            }
-            if (node.billingAddress.phone) {
-                node.billingAddress.phone = "****";
+            if (node.customer) {
+                if (node.customer.firstName) {
+                    node.customer.firstName = "****";
+                }
+                if (node.customer.lastName) {
+                    node.customer.lastName = "****";
+                }
+                if (node.customer.phone) {
+                    node.customer.phone = "****";
+                }
             }
         }
+        return JSON.stringify(jsonBody);
+    } catch (e) {
+        // no action - log response as is
     }
-
-    // Kristin TODO: Return the filtered response after API permissions issues are resolved and verified
     return response.text;
 };
 
