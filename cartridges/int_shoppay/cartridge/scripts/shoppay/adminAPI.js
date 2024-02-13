@@ -3,7 +3,7 @@
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 const webhookIncludeFields = {
-    "ORDERS_CREATE": ["admin_graphql_api_id","name","source_identifier","email","billing_address","total_price","confirmed"]
+    "ORDERS_CREATE": ["admin_graphql_api_id","name","source_identifier","email","billing_address","total_price","confirmed","customer"]
 };
 
 /**
