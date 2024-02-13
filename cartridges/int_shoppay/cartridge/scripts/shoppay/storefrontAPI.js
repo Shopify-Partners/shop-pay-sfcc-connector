@@ -24,6 +24,12 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
             body: bodyObj || {}
         });
 
+        var responseHeaders = shoppayStorefrontService.client.responseHeaders;
+        var shopifyRequestID = responseHeaders.get('X-Request-ID');
+        if (shopifyRequestID && shopifyRequestID.length > 0) {
+            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+        }
+
         if (!response.ok
             || !response.object
             || (response.object.errors && response.object.errors.length > 0)
@@ -68,6 +74,12 @@ function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
         var response = shoppayStorefrontService.call({
             body: bodyObj || {}
         });
+
+        var responseHeaders = shoppayStorefrontService.client.responseHeaders;
+        var shopifyRequestID = responseHeaders.get('X-Request-ID');
+        if (shopifyRequestID && shopifyRequestID.length > 0) {
+            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+        }
 
         if (!response.ok
             || !response.object

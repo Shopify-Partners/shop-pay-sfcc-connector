@@ -23,6 +23,12 @@ function getOrderBySourceIdentifier(sourceIdentifier) {
             body: bodyObj || {}
         });
 
+        var responseHeaders = shoppayAdminService.client.responseHeaders;
+        var shopifyRequestID = responseHeaders.get('X-Request-ID');
+        if (shopifyRequestID && shopifyRequestID.length > 0) {
+            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+        }
+
         // Kristin TODO: Remove !response.object.data from third conditional if permissions issue is resolved
         if (!response.ok
             || !response.object
