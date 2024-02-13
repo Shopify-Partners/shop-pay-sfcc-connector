@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ab-tests xmlns="http://www.demandware.com/xml/impex/abtest/2010-04-01">
-    <ab-test test-id="shoppay-aa">
+    <ab-test test-id="shoppayAA">
         <description>The main objectives of the A/A test are to make sure that assignment is evenly distributed between test and control and also to make sure that both groups are converting at the same rate.</description>
         <enabled-flag>false</enabled-flag>
-        <schedule>
-            <start-date>2024-02-15T00:00:00.000Z</start-date>
-            <end-date>2024-02-22T00:00:00.000Z</end-date>
-        </schedule>
         <key-metric>revenue</key-metric>
         <participation>
             <trigger>
@@ -21,21 +17,17 @@
             <control-segment>
                 <allocation-percent>0</allocation-percent>
             </control-segment>
-            <test-segment segment-id="ShopPayAAControl">
+            <test-segment segment-id="shoppayAAControl">
                 <allocation-percent>50</allocation-percent>
             </test-segment>
-            <test-segment segment-id="ShopPayAATreatment">
+            <test-segment segment-id="shoppayAATreatment">
                 <allocation-percent>50</allocation-percent>
             </test-segment>
         </test-segments>
     </ab-test>
-    <ab-test test-id="shoppay-ab">
+    <ab-test test-id="shoppayAB">
         <description>The A/B test is intended to measure the change in conversion rate due to Shop Pay Commerce Component compared to control.</description>
         <enabled-flag>false</enabled-flag>
-        <schedule>
-            <start-date>2024-02-15T00:00:00.000Z</start-date>
-            <end-date>2024-02-22T00:00:00.000Z</end-date>
-        </schedule>
         <key-metric>revenue</key-metric>
         <participation>
             <trigger>
@@ -50,10 +42,10 @@
             <control-segment>
                 <allocation-percent>0</allocation-percent>
             </control-segment>
-            <test-segment segment-id="ShopPayABControl">
+            <test-segment segment-id="shoppayABControl">
                 <allocation-percent>50</allocation-percent>
             </test-segment>
-            <test-segment segment-id="ShopPayABTreatment">
+            <test-segment segment-id="shoppayABTreatment">
                 <allocation-percent>50</allocation-percent>
             </test-segment>
         </test-segments>

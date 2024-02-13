@@ -7,18 +7,27 @@ server.extend(page);
 
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 var ABTestMgr = require('dw/campaign/ABTestMgr');
+var Cookie = require('dw/web/Cookie');
 
-const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+var abTestHelpers = require('*/cartridge/scripts/shoppay/helpers/abTestHelpers');
 
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
-    var activeSegents = ABTestMgr.assignedTestSegments();
+    var shoppayCookie = request.httpCookies['shoppayCookie'];
+    var segment;
 
-    const segment = ABTestMgr.isParticipant('shoppay-aa', 'ShopPayAAControl') ? 'ShopPayAAControl' : ABTestMgr.isParticipant('shoppay-aa', 'ShopPayABTreatment') ? 'ShopPayABTreatment' : undefined;
-    var newShoppayClientRefs = JSON.parse(res.viewData.shoppayClientRefs);
-    var newShoppayClientRefsConstants = newShoppayClientRefs['constants'];
-    newShoppayClientRefsConstants['segment'] = segment;
-    res.viewData.shoppayClientRefs = JSON.stringify(newShoppayClientRefs);
-    res.viewData.segment = segment;
+    if(!shoppayCookie || shoppayCookie.value === '{}') {
+        var shoppayCookie = new Cookie(
+            'shoppayCookie',
+            JSON.stringify({
+                subjectId: session.customer.getID(),
+                assignmentGroup: abTestHelpers.getAssignmentGroup()
+            })
+        );
+        response.addHttpCookie(shoppayCookie);
+    } else {
+        var cookieObject = JSON.parse(shoppayCookie.value);
+        segment = cookieObject.assignmentGroup;
+    }
     next();
 });
 
