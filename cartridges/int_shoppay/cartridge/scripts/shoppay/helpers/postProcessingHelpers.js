@@ -4,17 +4,24 @@ var Order = require('dw/order/Order');
 var OrderMgr = require('dw/order/OrderMgr');
 var Status = require('dw/system/Status');
 
+/* Attribute IDs differ between the ORDERS_CREATE webhook payload and the GraphQL Orders response payload. This
+   object maps the attributes for both payload types to the appropriate SFCC billing address attribute. */
 const addressElements = {
-    companyName: "companyName",
-    firstName: "firstName",
-    lastName: "lastName",
-    address1: "address1",
-    address2: "address2",
-    city: "city",
-    postalCode: "zip",
-    stateCode: "provinceCode",
-    countryCode: "countryCodeV2",
-    phone: "phone"
+    "companyName": "companyName",
+    "company": "companyName",
+    "firstName": "firstName",
+    "first_name": "firstName",
+    "lastName": "lastName",
+    "last_name": "lastName",
+    "address1": "address1",
+    "address2": "address2",
+    "city": "city",
+    "zip": "postalCode",
+    "provinceCode": "stateCode",
+    "province_code": "stateCode",
+    "countryCodeV2": "countryCode",
+    "country_code": "countryCode",
+    "phone": "phone"
 };
 
 /**
@@ -30,19 +37,21 @@ var handleBillingInfo = function(order, node) {
     }
     var addressKeys = Object.keys(addressElements);
     for (var i = 0; i < addressKeys.length; i++) {
-        var key = addressKeys[i];
-        var value = addressElements[key];
-        if (!empty(node.billingAddress[value])) {
-            billingAddress[key] = node.billingAddress[value];
+        var shoppayAttribute = addressKeys[i];
+        var sfccAttribute = addressElements[shoppayAttribute];
+        if (!empty(node.billingAddress[shoppayAttribute])) {
+            billingAddress[sfccAttribute] = node.billingAddress[shoppayAttribute];
         }
     }
-    if (node.customer && (!empty(node.customer.firstName) || !empty(node.customer.lastName))) {
-        var customerName = node.customer.firstName ? node.customer.firstName : "";
-        customerName += node.customer.lastName
-            ? (customerName.length > 0 ? ' ' + node.customer.lastName : node.customer.lastName)
-            : "";
-        if (customerName.length > 0) {
-            order.customerName = customerName;
+    if (node.customer) {
+        var firstName = node.customer.firstName ? node.customer.firstName : node.customer.first_name;
+        var lastName = node.customer.lastName ? node.customer.lastName : node.customer.last_name;
+        if ((!empty(firstName) || !empty(lastName))) {
+            var customerName = !empty(firstName) ? firstName : "";
+            customerName += !empty(lastName) ? (customerName.length > 0 ? ' ' + lastName : lastName) : "";
+            if (customerName.length > 0) {
+                order.customerName = customerName;
+            }
         }
     }
 };
@@ -55,7 +64,11 @@ var handleBillingInfo = function(order, node) {
  */
 var setOrderCustomAttributes = function(order, node) {
     order.custom.shoppayOrderNumber = node.name;
-    order.custom.shoppayGraphQLOrderId = node.id;
+    if (node.admin_graphql_api_id) { // ORDERS_CREATE webhook payload attribute
+        order.custom.shoppayGraphQLOrderId = node.admin_graphql_api_id;
+    } else if (node.id) { // GraphQL Orders response payload attribute
+        order.custom.shoppayGraphQLOrderId = node.id;
+    }
 };
 
 /**
