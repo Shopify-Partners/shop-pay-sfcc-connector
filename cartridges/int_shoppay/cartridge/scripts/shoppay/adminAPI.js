@@ -2,6 +2,10 @@
 
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
+const webhookIncludeFields = {
+    "ORDERS_CREATE": ["admin_graphql_api_id","name","source_identifier","email","billing_address","total_price","confirmed"]
+};
+
 /**
  * Function to retrieve the details of a Shop Pay order using the Shopify GraphQL Admin API
  * @param {string} sourceIdentifier - the sourceIdentifier value (SFCC basket UUID) sent to Shopify during checkout
@@ -58,6 +62,9 @@ function subscribeWebhook(topic, callbackUrl) {
             }
         }
     };
+    if (webhookIncludeFields[topic]) {
+        bodyObj.variables.webhookSubscription.includeFields = webhookIncludeFields[topic];
+    }
 
     var shoppayAdminService = require('*/cartridge/scripts/shoppay/service/shoppayAdminService')();
     var response = shoppayAdminService.call({
