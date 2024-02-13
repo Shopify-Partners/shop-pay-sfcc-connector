@@ -177,20 +177,25 @@ const mockOrderDetailsResponse = {
                 {
                     "node": {
                         "billingAddress": {
-                            "firstName": "Kristin",
-                            "lastName": "Van Andel",
-                            "address1": "500 W Madison St",
+                            "firstName": "Jane",
+                            "lastName": "Doe",
+                            "address1": "100 W Main St",
                             "address2": null,
                             "city": "Chicago",
                             "provinceCode": "IL",
                             "zip": "60661",
                             "countryCodeV2": "US",
-                            "phone": "+12085551212"
+                            "phone": "+3125555555"
                         },
-                        "email": "kristintest559@gmail.com",
-                        "id": "gid://shopify/Order/5745722753344",
-                        "name": "#1023",
-                        "sourceIdentifier": "4d187167221f39d4fea6e5f1d3"
+                        "email": "janedoe521@yopmail.com",
+                        "id": "gid://shopify/Order/5745722753349",
+                        "name": "#1011",
+                        "sourceIdentifier": "4d187167221f39d4fea6e5f1d3",
+                        "customer": {
+                            "firstName": "Jane",
+                            "lastName": "Doe",
+                            "phone": "+3125555555"
+                        }
                     }
                 }
             ]
