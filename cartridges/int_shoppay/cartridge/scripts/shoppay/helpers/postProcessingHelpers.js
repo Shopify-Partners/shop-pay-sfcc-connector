@@ -43,6 +43,10 @@ var handleBillingInfo = function(order, node) {
             billingAddress[sfccAttribute] = node.billingAddress[shoppayAttribute];
         }
     }
+    // billing phone is optional in the Shopify Shop App
+    if (empty(node.phone) && node.customer && !empty(node.customer.phone)) {
+        billingAddress.phone = node.customer.phone;
+    }
     if (node.customer) {
         var firstName = node.customer.firstName ? node.customer.firstName : node.customer.first_name;
         var lastName = node.customer.lastName ? node.customer.lastName : node.customer.last_name;

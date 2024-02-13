@@ -13,7 +13,7 @@ const webhookIncludeFields = {
  */
 function getOrderBySourceIdentifier(sourceIdentifier) {
     try {
-        var queryString = "query {orders(first: 1, query: \"source_identifier:'" + sourceIdentifier + "'\") {edges {node {id name sourceIdentifier email billingAddress {firstName lastName address1 address2 city provinceCode countryCodeV2 phone }}}}}";
+        var queryString = "query {orders(first: 1, query: \"source_identifier:'" + sourceIdentifier + "'\") {edges {node {id name sourceIdentifier email billingAddress {firstName lastName address1 address2 city provinceCode countryCodeV2 phone } customer {firstName lastName phone}}}}}";
         const bodyObj = {
             "query":queryString,
             "variables":{}
