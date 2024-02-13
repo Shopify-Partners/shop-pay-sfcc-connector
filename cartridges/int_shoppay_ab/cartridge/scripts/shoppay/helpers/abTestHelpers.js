@@ -4,7 +4,7 @@ var segmanetTypes = ['Control', 'Treatment'];
 
 /**
  * Helper function to retrieve the active shoppay test segment
- * @returns {string | undefined} the active shoppay ab test segment
+ * @returns {string} the active shoppay ab test segment
  */
 function getAssignmentGroup() {
     var activeSegment = 'excluded';
