@@ -120,7 +120,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     // =======================================================================================
 
     if (paymentRequest !== null || !responseJSON.error) {
-        const initialPaymentRequest = responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
+        const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
         utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
         const shopPaySession = window.ShopPay.PaymentRequest.createSession({
