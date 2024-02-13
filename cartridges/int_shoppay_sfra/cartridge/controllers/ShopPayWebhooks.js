@@ -11,7 +11,7 @@ var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 /**
  * The ShopPayWebhooks-OrdersCreate controller receives the payload of the Shopify ORDERS_CREATE
  * webhook for an order paid with Shop Pay and finalizes the SFCC order.
- * @name Base/ShopPay-BeginSession
+ * @name Base/ShopPayWebhooks-BeginSession
  * @function
  * @memberOf ShopPay
  * @param {middleware} - server.middleware.https
