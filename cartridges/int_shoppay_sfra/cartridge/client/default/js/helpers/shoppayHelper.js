@@ -1,3 +1,5 @@
+const shopPayCart = require('../cart/initShopPayCart');
+
 // Global Variables
 let orderConfirmationData;
 
@@ -109,30 +111,30 @@ function setSessionListeners(session) {
         if (window.shoppayClientRefs.constants.isBuyNow) {
             const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
             let paymentRequest;
-            let testPaymentRequestResponse;
+            let paymentRequestResponse;
 
             if (isBuyNow) {
                 productData = getInitProductData();
                 console.log('Calling ShopPay-BuyNowData controller:  ', productData);
-                testPaymentRequestResponse = $.ajax({
+                paymentRequestResponse = $.ajax({
                     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
                     type: 'POST',
                     data: JSON.stringify(productData),
                     contentType: 'application/json',
                     async: false
                 }) || {};
-                paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
+                paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
                 console.log('BUY NOW PAYMENT REQUEST ??? ', paymentRequest);
             } 
             // ======== COMMENTED OUT ELSE BLOCK BELOW (pasted from initShipPayCart.js) ????? ========
             // else {
-            //     testPaymentRequestResponse = $.ajax({
+            //     paymentRequestResponse = $.ajax({
             //         url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
             //         type: 'GET',
             //         contentType: 'application/json',
             //         async: false
             //     }) || {};
-            //     paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
+            //     paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
             // }
             // =======================================================================================
             // =======================================================================================
@@ -350,12 +352,14 @@ function setSessionListeners(session) {
 function initBuyNow(e, response) {
     console.log("EVT >>>>> ", e);
     console.log("RESPONSE >>>>> ", response);
+    console.log('PRODUCT >>>>>> ', response.data.product)
+    let productData = response.data.product;
 
-    if (response.product && response.product.buyNow) {
-        var readyToOrder = response.product.readyToOrder;
+    if (productData && productData.buyNow) { // ORIGINAL CONDITIONAL...response.product.buyNow {}
+        var readyToOrder = productData.readyToOrder;
         if (readyToOrder) {
-            var product = response.product;
-            initShopPaySession(product.buyNow);
+            var product = productData;
+            shopPayCart.initShopPaySession(product.buyNow, readyToOrder);
             productData = {
                 pid: product.id,
                 quantity: product.selectedQuantity,

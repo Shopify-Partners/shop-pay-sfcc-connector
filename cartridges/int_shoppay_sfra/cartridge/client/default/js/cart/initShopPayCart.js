@@ -15,7 +15,10 @@ $(document).ready(function () {
         // =========================== FROM POC BRANCH (WIP ????) ===========================
         var readyToOrder = helper.isReadyToOrder();
         if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
-            $('body').on('product:updateAddToCart', helper.initBuyNow);
+
+
+            $('body').on('product:afterAttributeSelect', helper.initBuyNow); // receives the Event & Response
+            // $('body').on('product:updateAddToCart', initBuyNow); // CHECK IF THIS EVENT IS ALSO NEEDED IN ADDITION TO THE AFTER ATTRIBUTE SELECT ABOVE??
         } else {
             // initShopPaySession();
             session = initShopPaySession();
@@ -41,8 +44,8 @@ function initShopPayButton() {
 
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
-    const cartIsEmpty = helper.isCartEmptyOnLoad();
-    utils.shopPayMutationObserver(paymentSelector, cartIsEmpty);  // set mutation observ. to apply correct btn styles when this element is rendered to the DOM (based on whether basket is empty or not)
+    // const cartIsEmpty = helper.isCartEmptyOnLoad(); // DOUBLE CHECK IF THIS HELPER IS STILL NEEDED (?????)
+    utils.shopPayMutationObserver(paymentSelector);  // set mutation observ. to apply correct btn styles when this element is rendered to the DOM (based on whether basket is empty or not)
 }
 
 function initShopPayEmailRecognition() {
@@ -56,7 +59,8 @@ function initShopPayEmailRecognition() {
         .render('#shop-pay-login-container');
 }
 
-$('body').on('cart:update product:afterAddToCart product:updateAddToCart', function () {
+// product:updateAddToCart
+$('body').on('cart:update product:afterAddToCart', function () {
     if (window.ShopPay) {
         if (!session) {
             session = initShopPaySession();
@@ -69,7 +73,7 @@ $('body').on('cart:update product:afterAddToCart product:updateAddToCart', funct
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
 
             if (responseJSON) {
-                utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), responseJSON.error);
+                utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"));
             }
 
             if (responseJSON && !responseJSON.error && responseJSON.paymentRequest !== null) {
@@ -89,7 +93,7 @@ $('body').on('cart:update product:afterAddToCart product:updateAddToCart', funct
 
 
 // function initShopPaySession() {
-function initShopPaySession(paymentRequestInput) {
+function initShopPaySession(paymentRequestInput, readyToOrder) {
 
     // =========================== FROM POC BRANCH ===========================
     const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
@@ -101,16 +105,18 @@ function initShopPaySession(paymentRequestInput) {
     if (isBuyNow && paymentRequestInput) {
         paymentRequest = paymentRequestInput;
     } else if (isBuyNow && !paymentRequestInput) {
-        productData = helper.getInitProductData();
-        paymentRequestResponse = $.ajax({
-            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
-            type: 'POST',
-            data: JSON.stringify(productData),
-            contentType: 'application/json',
-            async: false
-        }) || {};
-        paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
-        responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
+        let productData = helper.getInitProductData();
+        if (productData) {
+            paymentRequestResponse = $.ajax({
+                url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
+                type: 'POST',
+                data: JSON.stringify(productData),
+                contentType: 'application/json',
+                async: false
+            }) || {};
+            paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
+            responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
+        }
     } else {
         // testPaymentRequestResponse = $.ajax({
         //     url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
@@ -133,10 +139,9 @@ function initShopPaySession(paymentRequestInput) {
     }
     // =======================================================================================
 
-
-    if (!responseJSON.error && responseJSON.paymentRequest !== null) {
-        const initialPaymentRequest = window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest);
-        utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), responseJSON.error) // basket NOT empty. Update btn styles (remove opacity)
+    if (paymentRequest !== null || !responseJSON.error) {
+        const initialPaymentRequest = window.ShopPay.PaymentRequest.build(paymentRequest);
+            utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
         const shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
@@ -223,3 +228,6 @@ function buildPaymentRequest () {
     }
 }
 
+export {
+    initShopPaySession
+};
