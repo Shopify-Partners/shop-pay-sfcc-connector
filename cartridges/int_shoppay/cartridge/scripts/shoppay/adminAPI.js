@@ -25,11 +25,10 @@ function getOrderBySourceIdentifier(sourceIdentifier) {
             logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
         }
 
-        // Kristin TODO: Remove !response.object.data from third conditional if permissions issue is resolved
         if (!response.ok
             || !response.object
             || !response.object.data
-            || (response.object.errors && response.object.errors.length > 0 && !response.object.data)
+            || (response.object.errors && response.object.errors.length > 0)
         ) {
             return {
                 error: true,

@@ -294,7 +294,7 @@ function getStorefrontResponseLogMessage(response) {
             && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token
         ) {
             // mask payment token
-            jsonBody.data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
+            data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
         }
         return JSON.stringify(jsonBody);
     } catch (e) {
@@ -319,38 +319,52 @@ function getAdminRequestLogMessage(request) {
  * @returns {string} the filtered log message
  */
 function getAdminResponseLogMessage(response) {
-    var responseBody = response.text;
-    var jsonBody = JSON.parse(responseBody);
-    if (!jsonBody.data) {
-        return response.text;
-    }
-    var data = jsonBody.data;
-    // Orders Query - mask PII
-    if (data.orders && data.orders.edges.length > 0) {
-        var node = data.orders.edges[0].node;
-        if (node.email) {
-            node.email = "****";
+    try {
+        var responseBody = response.text;
+        var jsonBody = JSON.parse(responseBody);
+        if (!jsonBody.data) {
+            return response.text;
         }
-        if (node.billingAddress) {
-            if (node.billingAddress.firstName) {
-                node.billingAddress.firstName = "****";
+        var data = jsonBody.data;
+        // Orders Query - mask PII
+        if (data.orders && data.orders.edges.length > 0) {
+            var node = data.orders.edges[0].node;
+            if (node.email) {
+                node.email = "****";
             }
-            if (node.billingAddress.lastName) {
-                node.billingAddress.lastName = "****";
+            if (node.billingAddress) {
+                if (node.billingAddress.firstName) {
+                    node.billingAddress.firstName = "****";
+                }
+                if (node.billingAddress.lastName) {
+                    node.billingAddress.lastName = "****";
+                }
+                if (node.billingAddress.address1) {
+                    node.billingAddress.address1 = "****";
+                }
+                if (node.billingAddress.address2) {
+                    node.billingAddress.address2 = "****";
+                }
+                if (node.billingAddress.phone) {
+                    node.billingAddress.phone = "****";
+                }
             }
-            if (node.billingAddress.address1) {
-                node.billingAddress.address1 = "****";
-            }
-            if (node.billingAddress.address2) {
-                node.billingAddress.address2 = "****";
-            }
-            if (node.billingAddress.phone) {
-                node.billingAddress.phone = "****";
+            if (node.customer) {
+                if (node.customer.firstName) {
+                    node.customer.firstName = "****";
+                }
+                if (node.customer.lastName) {
+                    node.customer.lastName = "****";
+                }
+                if (node.customer.phone) {
+                    node.customer.phone = "****";
+                }
             }
         }
+        return JSON.stringify(jsonBody);
+    } catch (e) {
+        // no action - log response as is
     }
-
-    // Kristin TODO: Return the filtered response after API permissions issues are resolved and verified
     return response.text;
 };
 
