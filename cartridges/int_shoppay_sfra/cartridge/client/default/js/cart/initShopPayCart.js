@@ -11,24 +11,17 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-
         // =========================== FROM POC BRANCH (WIP ????) ===========================
         var readyToOrder = helper.isReadyToOrder();
         if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
-
-
             $('body').on('product:afterAttributeSelect', helper.initBuyNow); // receives the Event & Response
             // $('body').on('product:updateAddToCart', initBuyNow); // CHECK IF THIS EVENT IS ALSO NEEDED IN ADDITION TO THE AFTER ATTRIBUTE SELECT ABOVE??
         } else {
-            // initShopPaySession();
             session = initShopPaySession();
         }
         // ==================================================================================
 
         // session = initShopPaySession(); // COMMENTED OUT (ORIGINAL DEVELOP BRANCH SETS HERE...SETTING ABOVE IN ELSE WITH POC BRANCH)
-
-        // set up shopPay listeners ?????
-        // helper.setShopPaySessionListeners(session);
     }
 });
 
@@ -59,7 +52,7 @@ function initShopPayEmailRecognition() {
         .render('#shop-pay-login-container');
 }
 
-// product:updateAddToCart
+// product:updateAddToCart // DELETE product:updateAddToCart event if not needed here (???)
 $('body').on('cart:update product:afterAddToCart', function () {
     if (window.ShopPay) {
         if (!session) {
@@ -77,29 +70,24 @@ $('body').on('cart:update product:afterAddToCart', function () {
             }
 
             if (responseJSON && !responseJSON.error && responseJSON.paymentRequest !== null) {
-                // TODO: Rework this update to the session object. Need to update with a proper method rather than destroying / recreating a session after updates. (Note: previously attempted with session.completeDiscountCodeChange(responseJSON.paymentRequest), but was not working on Shopify Side)
-                // Awaiting Feedback from ShopPay team
                 session.close();
                 session = initShopPaySession();
 
                 // TODO: remove these debugging lines before final delivery
                 console.log('RESPONSE JSON >>>> ', responseJSON.paymentRequest)
                 console.log('SESSION Obj >>>> ', session.paymentRequest)
-
             }
         }
     }
 });
 
 
-// function initShopPaySession() {
+// function initShopPaySession() { // NOTE: this did not receive any params before the BuyNow POC. Delete this old line before PR (????)
 function initShopPaySession(paymentRequestInput, readyToOrder) {
-
     // =========================== FROM POC BRANCH ===========================
     const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
     let paymentRequest;
     let paymentRequestResponse;
-    let initShopPayPaymentRequestResponse;
     let responseJSON;
 
     if (isBuyNow && paymentRequestInput) {
@@ -118,16 +106,8 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
         }
     } else {
-        // testPaymentRequestResponse = $.ajax({
-        //     url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
-        //     type: 'GET',
-        //     contentType: 'application/json',
-        //     async: false
-        // }) || {};
-        // paymentRequest = testPaymentRequestResponse.responseJSON.paymentRequest;
-
-        initShopPayPaymentRequestResponse = buildPaymentRequest(); // buildPaymentRequest runs the same ajax call as above. Replacing with function call instead. (?????)
-        responseJSON = initShopPayPaymentRequestResponse ? initShopPayPaymentRequestResponse.responseJSON : null;
+        paymentRequest = buildPaymentRequest(); // buildPaymentRequest runs the same ajax call as above. Replacing with function call instead. (?????)
+        responseJSON = paymentRequest ? paymentRequest.responseJSON : null;
         // TODO: remove this debugging line before final delivery
         if (responseJSON) {
             if (responseJSON.error && responseJSON.errorMsg) {
@@ -140,8 +120,8 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     // =======================================================================================
 
     if (paymentRequest !== null || !responseJSON.error) {
-        const initialPaymentRequest = window.ShopPay.PaymentRequest.build(paymentRequest);
-            utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
+        const initialPaymentRequest = responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
+        utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
         const shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
@@ -176,7 +156,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         options: response.product.options
                     };
                 } else {
-                    // NOTE...ADD THE SUCCESS & ERROR FUNCTIONS INTO THE BUILD PAYMENT REQUEST FUNCTION AND USE INSTEAD...
+                    // NOTE...ADD THE SUCCESS & ERROR FUNCTIONS INTO THE buildPaymentRequest FUNCTION AND USE INSTEAD...
                     $.ajax({
                         url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
                         type: 'GET',

@@ -4,10 +4,14 @@ const helper = require('./helpers/shoppayHelper')
 
 // Enables & Disables Shop Pay's Buy Now button click based on whether the product is ready to order on the PDP
 function shopPayBtnDisabledStyle(elem, isReadyToOrder) {
+    let checkoutPage = document.querySelector('#checkout-main');
+    let cartPage = document.querySelector('.cart-page');
+    let pdpPage = document.querySelector('.product-detail');
     let readyToOrderPageLoad = helper.isReadyToOrder();
+    const isPDPcontext = !checkoutPage && !cartPage && pdpPage ? true : false;
 
     if (elem) {
-        if (isReadyToOrder || readyToOrderPageLoad) {
+        if (isPDPcontext || isReadyToOrder || readyToOrderPageLoad) {
             elem.style.pointerEvents = 'auto'; // DOUBLE CHECK IF WORKS ON MOBILE
         } else {
             elem.style.pointerEvents = 'none';
