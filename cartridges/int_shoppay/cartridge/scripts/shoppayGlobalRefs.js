@@ -54,6 +54,7 @@ var shoppayClientId             = function() { return currentSite.getCustomPrefe
 var shoppayAdminAPIVersion      = function() { return currentSite.getCustomPreferenceValue('shoppayAdminAPIVersion'); }
 var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPreferenceValue('shoppayStorefrontAPIVersion'); }
 var shoppayModalImageViewType   = function() { return currentSite.getCustomPreferenceValue('shoppayModalImageViewType'); }
+var shoppayModalDebugEnabled    = function() { return currentSite.getCustomPreferenceValue('shoppayModalDebugEnabled'); }
 
 /**
  * Core reference for whether the Shop Pay payment method is valid based on payment amount,
@@ -159,7 +160,8 @@ var getClientRefs = function(context, productId) {
             shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(productId),
             shoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
             shoppayStoreId: shoppayStoreId(),
-            shoppayClientId: shoppayClientId()
+            shoppayClientId: shoppayClientId(),
+            shoppayModalDebugEnabled: shoppayModalDebugEnabled()
         }
     }
 }
@@ -175,6 +177,7 @@ module.exports = {
     shoppayAdminAPIVersion: shoppayAdminAPIVersion(),
     shoppayStorefrontAPIVersion: shoppayStorefrontAPIVersion(),
     shoppayModalImageViewType: shoppayModalImageViewType(),
+    shoppayModalDebugEnabled: shoppayModalDebugEnabled(),
     getClientRefs: getClientRefs,
     shoppayPaymentMethodId: shoppayPaymentMethodId
 };

@@ -172,6 +172,14 @@
                 <min-length>0</min-length>
                 <default-value>small</default-value>
             </attribute-definition>
+            <attribute-definition attribute-id="shoppayModalDebugEnabled">
+                <display-name xml:lang="x-default">Shop Pay Modal Debug Enabled</display-name>
+                <description xml:lang="x-default">Enables browser console logging from the Shop Pay modal for troubleshooting</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>false</default-value>
+            </attribute-definition>
         </custom-attribute-definitions>
         <group-definitions>
             <attribute-group group-id="ShopPay">
@@ -186,6 +194,7 @@
                 <attribute attribute-id="shoppayAdminAPIVersion"/>
                 <attribute attribute-id="shoppayStorefrontAPIVersion"/>
                 <attribute attribute-id="shoppayModalImageViewType"/>
+                <attribute attribute-id="shoppayModalDebugEnabled"/>
             </attribute-group>
         </group-definitions>
     </type-extension>
