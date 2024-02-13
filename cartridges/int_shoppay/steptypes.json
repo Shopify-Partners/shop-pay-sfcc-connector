@@ -61,7 +61,8 @@
                     "@name": "CallbackURL",
                     "description": "Optional: Can be used to override mapped callback URLs for special aliasing scenarios, etc.",
                     "@type": "string",
-                    "@required": "false"
+                    "@required": "false",
+                    "@trim": "true"
                 }]
             },
             "status-codes": {
@@ -89,7 +90,8 @@
                     "@name": "WebhookId",
                     "description": "GraphQL ID of the webhook to unsubscribe",
                     "@type": "string",
-                    "@required": "false"
+                    "@required": "false",
+                    "@trim": "true"
                 }]
             },
             "status-codes": {
