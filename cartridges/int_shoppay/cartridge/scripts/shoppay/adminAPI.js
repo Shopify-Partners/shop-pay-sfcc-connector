@@ -70,9 +70,13 @@ function subscribeWebhook(topic, callbackUrl) {
     var response = shoppayAdminService.call({
         body: bodyObj || {}
     });
-    // Kristin TODO: Add some response header logging for troubleshooting purposes?
-    var test = shoppayAdminService.client.responseHeaders;
-    var test2 = shoppayAdminService.client.allResponseHeaders;
+
+    var responseHeaders = shoppayAdminService.client.responseHeaders;
+    var shopifyRequestID = responseHeaders.get('X-Request-ID');
+    if (shopifyRequestID && shopifyRequestID.length > 0) {
+        logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+    }
+
     if (!response.ok
         || !response.object
         || !response.object.data
@@ -103,6 +107,12 @@ function getExistingWebhook(topic, callbackUrl) {
     var response = shoppayAdminService.call({
         body: bodyObj || {}
     });
+
+    var responseHeaders = shoppayAdminService.client.responseHeaders;
+    var shopifyRequestID = responseHeaders.get('X-Request-ID');
+    if (shopifyRequestID && shopifyRequestID.length > 0) {
+        logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+    }
 
     if (!response.ok
         || !response.object
@@ -135,6 +145,13 @@ function unsubscribeWebhook(id) {
     var response = shoppayAdminService.call({
         body: bodyObj || {}
     });
+
+    var responseHeaders = shoppayAdminService.client.responseHeaders;
+    var shopifyRequestID = responseHeaders.get('X-Request-ID');
+    if (shopifyRequestID && shopifyRequestID.length > 0) {
+        logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+    }
+
     if (!response.ok
         || !response.object
         || !response.object.data
