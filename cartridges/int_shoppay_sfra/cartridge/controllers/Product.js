@@ -40,7 +40,6 @@ var contextTest = res;
     if (product.readyToOrder) {
         var buyNowInitData = {
             pid: product.id,
-            pidsObj: [],
             quantity: product.selectedQuantity
         };
         if (product.options) {
@@ -78,7 +77,6 @@ server.append('Variation', function (req, res, next) {
 
     var buyNowProduct = {
         pid: product.id,
-        pidsObj: [],
         quantity: product.selectedQuantity
     };
     if (product.options) {

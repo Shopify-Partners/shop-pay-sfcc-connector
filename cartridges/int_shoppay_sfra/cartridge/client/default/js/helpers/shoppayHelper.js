@@ -8,6 +8,7 @@ var sourceIdentifier = null;
 var token = null;
 var checkoutUrl = null;
 var productData = {};
+let selectedProduct;
 var buyNowResponse = null;
 // =======================================================================================
 
@@ -76,6 +77,11 @@ function getInitProductData() {
 // =====================================================================
 
 
+function setInitProductData(data) {
+    productData = data;
+}
+
+
 // Sets Up ShopPay listener Events
 function setSessionListeners(session) {
     // TODO: remove this debugging line before final delivery
@@ -109,23 +115,9 @@ function setSessionListeners(session) {
 
         // =========================== FROM POC BRANCH ===========================
         if (window.shoppayClientRefs.constants.isBuyNow) {
-            const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
             let paymentRequest;
             let paymentRequestResponse;
 
-            if (isBuyNow) {
-                productData = getInitProductData();
-                console.log('Calling ShopPay-BuyNowData controller:  ', productData);
-                paymentRequestResponse = $.ajax({
-                    url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
-                    type: 'POST',
-                    data: JSON.stringify(productData),
-                    contentType: 'application/json',
-                    async: false
-                }) || {};
-                paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
-                console.log('BUY NOW PAYMENT REQUEST ??? ', paymentRequest);
-            } 
             // ======== COMMENTED OUT ELSE BLOCK BELOW (pasted from initShipPayCart.js) ????? ========
             // else {
             //     paymentRequestResponse = $.ajax({
@@ -353,20 +345,20 @@ function initBuyNow(e, response) {
     console.log("EVT >>>>> ", e);
     console.log("RESPONSE >>>>> ", response);
     console.log('PRODUCT >>>>>> ', response.data.product)
-    let productData = response.data.product;
+    let responseProduct = response.data.product;
 
-    if (productData && productData.buyNow) { // ORIGINAL CONDITIONAL...response.product.buyNow {}
-        var readyToOrder = productData.readyToOrder;
+    // CONFIRM FUNCTIONALITY OF SIMPLE PDP VS COMPLEX PDP (PAGE INIT VS ATTRIBUTE SELECTION)
+    if (responseProduct && responseProduct.buyNow) {
+        var readyToOrder = responseProduct.readyToOrder;
         if (readyToOrder) {
-            var product = productData;
-            shopPayCart.initShopPaySession(product.buyNow, readyToOrder);
+            shopPayCart.initShopPaySession(responseProduct.buyNow, readyToOrder);
             productData = {
-                pid: product.id,
-                quantity: product.selectedQuantity,
-                options: product.options
+                pid: responseProduct.id,
+                quantity: responseProduct.selectedQuantity,
+                options: responseProduct.options
             };
-            if (product.childProducts) {
-                productData.childProducts = product.childProducts;
+            if (responseProduct.childProducts) {
+                productData.childProducts = responseProduct.childProducts;
             }
             // TODO: Handle sets if supported
         }
@@ -383,5 +375,6 @@ export {
     getInitProductData,
     isReadyToOrder,
     initBuyNow,
-    productData
+    productData,
+    setInitProductData
 };

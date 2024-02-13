@@ -2,6 +2,7 @@ const helper = require('../helpers/shoppayHelper');
 const utils = require('../utils');
 
 let session;
+let readyOnPageLoad; 
 
 $(document).ready(function () {
     if(window.ShopPay) {
@@ -11,6 +12,12 @@ $(document).ready(function () {
 
         initShopPayButton();
 
+        readyOnPageLoad = helper.isReadyToOrder();
+        if (readyOnPageLoad) {
+            let pageLoadData = helper.getInitProductData();
+            helper.setInitProductData(pageLoadData); // updates global prod data.
+        }
+
         // =========================== FROM POC BRANCH (WIP ????) ===========================
         var readyToOrder = helper.isReadyToOrder();
         if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
@@ -19,6 +26,9 @@ $(document).ready(function () {
         } else {
             session = initShopPaySession();
         }
+
+
+        
         // ==================================================================================
 
         // session = initShopPaySession(); // COMMENTED OUT (ORIGINAL DEVELOP BRANCH SETS HERE...SETTING ABOVE IN ELSE WITH POC BRANCH)
@@ -209,5 +219,6 @@ function buildPaymentRequest () {
 }
 
 export {
-    initShopPaySession
+    initShopPaySession,
+    readyOnPageLoad
 };

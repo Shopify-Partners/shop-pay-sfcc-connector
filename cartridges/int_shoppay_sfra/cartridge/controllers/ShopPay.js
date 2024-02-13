@@ -178,19 +178,8 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
     var shippingMethod = ShippingMgr.defaultShippingMethod;
 
     // Kristin TODO: Consider using OOTB cartHelper.js: addProductToCart for final version
-    var result;
     var paymentRequestModel;
-    if (product.pidsObj && product.pidsObj.length > 0) {
-        pidsObj.forEach(function (PIDObj) {
-            var PIDObjResult = shoppayCheckoutHelpers.addProductToTempBasket(product, basket);
-            if (PIDObjResult.error) {
-                result.error = PIDObjResult.error;
-                result.errorMsg = PIDObjResult.message;
-            }
-        });
-    } else {
-        result = shoppayCheckoutHelpers.addProductToTempBasket(product, basket);
-    }
+    var result = shoppayCheckoutHelpers.addProductToTempBasket(product, basket);
 
     if (result.error) {
         Transaction.wrap(function() {

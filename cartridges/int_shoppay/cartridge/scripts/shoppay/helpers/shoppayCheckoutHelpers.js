@@ -231,19 +231,8 @@ function getBuyNowData(product) {
     var shippingMethod = ShippingMgr.defaultShippingMethod;
 
     // Kristin TODO: Consider using OOTB cartHelper.js: addProductToCart for final version
-    var result;
     var paymentRequest;
-    if (product.pidsObj && product.pidsObj.length > 0) {
-        pidsObj.forEach(function (PIDObj) {
-            var PIDObjResult = addProductToTempBasket(product, basket);
-            if (PIDObjResult.error) {
-                result.error = PIDObjResult.error;
-                result.message = PIDObjResult.message;
-            }
-        });
-    } else {
-        result = addProductToTempBasket(product, basket);
-    }
+    var result = addProductToTempBasket(product, basket);
 
     Transaction.wrap(function () {
         try {
