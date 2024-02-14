@@ -56,8 +56,7 @@ function isCartEmptyOnLoad() {
 }
 
 
-// =========================== NEW HELPERS FROM SSPSC-38 POC ===========================
-function isReadyToOrder() {
+function isReadyToOrderOnPageLoad() {
     let readyToOrder = false;
     let $element = document.querySelector('[data-ready-to-order]');
     if ($element && $element.attributes['data-ready-to-order'] && $element.attributes['data-ready-to-order'].value) {
@@ -74,7 +73,6 @@ function getInitProductData() {
     }
     return productData;
 }
-// =====================================================================
 
 
 function setInitProductData(data) {
@@ -158,8 +156,6 @@ function setSessionListeners(session) {
             paymentRequest: sessionPaymentRequest,
             basketId: sourceIdentifier
         };
-
-        // ====================================================================================
         // ====================================================================================
 
         $.ajax({
@@ -188,16 +184,7 @@ function setSessionListeners(session) {
             discountCodes: ev.discountCodes
         }
 
-        // let responseJSON = $.ajax({
-        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.DiscountCodeChanged),
-        //     method: 'POST',
-        //     async: false,
-        //     data: JSON.stringify(requestData),
-        //     contentType: 'application/json',
-        // }).responseJSON;
-
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
-
         const { deliveryMethods, discountCodes, lineItems, shippingLines, subtotal, discounts, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         let updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
@@ -234,24 +221,16 @@ function setSessionListeners(session) {
             // =============================================================================
         };
 
-        // let responseJSON = $.ajax({
-        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.DeliveryMethodChanged),
-        //     method: 'POST',
-        //     async: false,
-        //     data: JSON.stringify(requestData),
-        //     contentType: 'application/json'
-        // }).responseJSON;
-
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
-
+        const { shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         // Update the payment request based on the delivery method change and update the total accordingly
         const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
             ...currentPaymentRequest,
-            shippingLines: responseJSON.paymentRequest.shippingLines,
-            totalShippingPrice: responseJSON.paymentRequest.totalShippingPrice,
-            totalTax: responseJSON.paymentRequest.totalTax,
-            total: responseJSON.paymentRequest.total
+            shippingLines: shippingLines,
+            totalShippingPrice: totalShippingPrice,
+            totalTax: totalTax,
+            total: total
         });
 
         session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
@@ -263,8 +242,6 @@ function setSessionListeners(session) {
 
     session.addEventListener("shippingaddresschanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
-        console.log('WHAT IS CURRENT PAYMENT REQUEST (shippingAddressChanged) >>> ', currentPaymentRequest);
-        console.log('WHAT IS PRODUCT DATA??? ', productData);
         const requestData = {
             shippingAddress: ev.shippingAddress,
             // ======= FROM POC....CHECK IF THESE ARE NEEDED IN CONTROLLER CALL ???? =======
@@ -273,21 +250,13 @@ function setSessionListeners(session) {
             // =============================================================================
         };
 
-        // let responseJSON = $.ajax({
-        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.ShippingAddressChanged),
-        //     method: 'POST',
-        //     async: false,
-        //     data: JSON.stringify(requestData),
-        //     contentType: 'application/json'
-        // }).responseJSON;
-
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
-
+        const { deliveryMethods } = responseJSON.paymentRequest;
 
         // Update the payment request based on the shipping address change
         const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
             ...currentPaymentRequest,
-            deliveryMethods: responseJSON.paymentRequest.deliveryMethods
+            deliveryMethods: deliveryMethods
         });
 
         session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
@@ -307,14 +276,6 @@ function setSessionListeners(session) {
             basketId: sourceIdentifier
             // =============================================================================
         };
-
-        // let responseJSON = $.ajax({
-        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.SubmitPayment),
-        //     method: 'POST',
-        //     async: false,
-        //     data: JSON.stringify(requestData),
-        //     contentType: 'application/json'
-        // }).responseJSON;
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
 
@@ -348,7 +309,6 @@ function setSessionListeners(session) {
 }
 
 
-// ================================== FROM POC BRANCH ==================================
 function initBuyNow(e, response) {
     console.log("EVT >>>>> ", e);
     console.log("RESPONSE >>>>> ", response);
@@ -371,7 +331,6 @@ function initBuyNow(e, response) {
         }
     }
 }
-// =============================================================================
 
 
 export {
@@ -380,7 +339,7 @@ export {
     isCartEmptyOnLoad,
     setSessionListeners,
     getInitProductData,
-    isReadyToOrder,
+    isReadyToOrderOnPageLoad,
     initBuyNow,
     productData,
     setInitProductData

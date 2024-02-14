@@ -2,7 +2,7 @@ const helper = require('../helpers/shoppayHelper');
 const utils = require('../utils');
 
 let session;
-let readyOnPageLoad; 
+let readyOnPageLoad;
 
 $(document).ready(function () {
     if(window.ShopPay) {
@@ -12,23 +12,20 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-        readyOnPageLoad = helper.isReadyToOrder();
+        readyOnPageLoad = helper.isReadyToOrderOnPageLoad();
         if (readyOnPageLoad) {
             let pageLoadData = helper.getInitProductData();
             helper.setInitProductData(pageLoadData); // updates global prod data.
         }
 
         // =========================== FROM POC BRANCH (WIP ????) ===========================
-        var readyToOrder = helper.isReadyToOrder();
+        var readyToOrder = helper.isReadyToOrderOnPageLoad();
         if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
             $('body').on('product:afterAttributeSelect', helper.initBuyNow); // receives the Event & Response
             // $('body').on('product:updateAddToCart', initBuyNow); // CHECK IF THIS EVENT IS ALSO NEEDED IN ADDITION TO THE AFTER ATTRIBUTE SELECT ABOVE??
         } else {
             session = initShopPaySession();
         }
-
-
-        
         // ==================================================================================
 
         // session = initShopPaySession(); // COMMENTED OUT (ORIGINAL DEVELOP BRANCH SETS HERE...SETTING ABOVE IN ELSE WITH POC BRANCH)
@@ -133,7 +130,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
         const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
         utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
-        const shopPaySession = window.ShopPay.PaymentRequest.createSession({
+        let shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
         });
 
@@ -143,28 +140,45 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             if (shopPaySession && shopPaySession.paymentRequest){
                 console.log(shopPaySession.paymentRequest);
             }
-            $('body').off('product:updateAddToCart', helper.initBuyNow);
+            // $('body').off('product:updateAddToCart', helper.initBuyNow); // REMOVE WHEN SURE NOT NEEDED (BEFORE PR ??????)
+            $('body').off('product:afterAttributeSelect', helper.initBuyNow);
 
-            $('body').on('product:updateAddToCart', function(e, response) {
-                console.log("EVENT IN NEW WATCHER >>>>> ", e);
-
-                if (window.shoppayClientRefs.constants.isBuyNow && response.product.buyNow) {
+            // $('body').on('product:updateAddToCart', function(e, response) { // REMOVE WHEN SURE NOT NEEDED (BEFORE PR ??????)
+            $('body').on('product:afterAttributeSelect', function(e, response) {
+                let responseProduct = response.data.product;
+                if (window.shoppayClientRefs.constants.isBuyNow && responseProduct.buyNow) {
+                    var selectedAndReadyToOrder = responseProduct.readyToOrder;
+                    let selectedProdData = {
+                        pid: responseProduct.id,
+                        quantity: responseProduct.selectedQuantity,
+                        options: responseProduct.options
+                    };
+                    helper.setInitProductData(selectedProdData) // UPDATE GLOBAL VAR FROM SHOPPAYHELPER.JS (????)
                     if (shopPaySession) {
                         shopPaySession.close();
                     }
-                    var PR = window.ShopPay.PaymentRequest.build(response.product.buyNow);
-                    shopPaySession = window.ShopPay.PaymentRequest.createSession({
-                        paymentRequest: PR
-                    });
-                    helper.setSessionListeners(shopPaySession);
+                    // initShopPaySession(responseProduct.buyNow, selectedAndReadyToOrder);
 
-                    console.log(shopPaySession.paymentRequest);
-                    // UPDATE GLOBAL VAR FROM SHOPPAYHELPER.JS (????)
-                    helper.productData = {
-                        pid: response.product.id,
-                        quantity: response.product.selectedQuantity,
-                        options: response.product.options
-                    };
+                    var adjustedPaymentRequest = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
+                    shopPaySession = window.ShopPay.PaymentRequest.createSession({ // isn't initializing the session as expected....says shopPaySession is read only?
+                        paymentRequest: adjustedPaymentRequest
+                    });
+
+
+
+                    // =========================== ORIGINAL POC BRANCH APPROACH ===========================
+                    // var PR = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
+                    // shopPaySession = window.ShopPay.PaymentRequest.createSession({ // isn't initializing the session as expected....says shopPaySession is read only?
+                    //     paymentRequest: PR
+                    // });
+                    // helper.setSessionListeners(shopPaySession); // ERRORS OUT BEFORE ENTERING LOGIC TO SET SESSION LISTENERS
+                    // console.log(shopPaySession.paymentRequest);
+                    // helper.productData = {
+                    //     pid: response.product.id,
+                    //     quantity: response.product.selectedQuantity,
+                    //     options: response.product.options
+                    // };
+                    //  ====================================================================================
                 } else {
                     // NOTE...ADD THE SUCCESS & ERROR FUNCTIONS INTO THE buildPaymentRequest FUNCTION AND USE INSTEAD...
                     $.ajax({
@@ -221,15 +235,15 @@ function buildPaymentRequest () {
 
 // Handles AJAX call to create / update the payment response needed for the ShopPay.PaymentRequest.build() method.
 function createResponse (requestObj, controllerURL) {
-    let response = $.ajax({
+    let responseJSON = $.ajax({
         url: helper.getUrlWithCsrfToken(controllerURL),
         method: 'POST',
         async: false,
         data: JSON.stringify(requestObj),
         contentType: 'application/json'
-    }).response;
+    }).responseJSON;
 
-    return response
+    return responseJSON
 }
 
 

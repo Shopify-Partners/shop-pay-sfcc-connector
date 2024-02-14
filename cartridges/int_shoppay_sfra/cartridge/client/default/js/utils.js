@@ -7,7 +7,7 @@ function shopPayBtnDisabledStyle(elem, isReadyToOrder) {
     let checkoutPage = document.querySelector('#checkout-main');
     let cartPage = document.querySelector('.cart-page');
     let pdpPage = document.querySelector('.product-detail');
-    let readyToOrderPageLoad = helper.isReadyToOrder();
+    let readyToOrderPageLoad = helper.isReadyToOrderOnPageLoad();
     const isPDPcontext = !checkoutPage && !cartPage && pdpPage ? true : false;
 
     if (elem) {
