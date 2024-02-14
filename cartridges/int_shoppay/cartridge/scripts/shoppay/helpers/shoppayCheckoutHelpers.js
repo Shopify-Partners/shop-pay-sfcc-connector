@@ -94,6 +94,9 @@ function validatePaymentRequest(clientRequest, serverRequest) {
         if (clientRequest.shippingAddress.id && !serverRequest.shippingAddress.id) {
             serverRequest.shippingAddress.id = clientRequest.shippingAddress.id;
         }
+        // INSERT CONDITIONAL HERE FOR THIRD CASE. (???)
+        // if address 2 doesn't exist in one...but doesn't exist in the other (or vice-versa)
+
         return common.matchObjects(clientRequest, serverRequest);
     } catch (e) {
         logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
