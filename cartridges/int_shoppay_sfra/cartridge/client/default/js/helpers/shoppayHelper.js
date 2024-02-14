@@ -131,8 +131,6 @@ function setSessionListeners(session) {
             // =======================================================================================
             // =======================================================================================
 
-
-            console.log('CALLING ShopPay-PrepareBasket controller:  ', productData);
             $.ajax({
                 url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.PrepareBasket),
                 method: 'POST',
@@ -164,7 +162,6 @@ function setSessionListeners(session) {
         // ====================================================================================
         // ====================================================================================
 
-        console.log('CALLING ShopPay-BeginSession controller:  ', requestData);
         $.ajax({
             url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
             method: 'POST',
@@ -191,13 +188,16 @@ function setSessionListeners(session) {
             discountCodes: ev.discountCodes
         }
 
-        let responseJSON = $.ajax({
-            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.DiscountCodeChanged),
-            method: 'POST',
-            async: false,
-            data: JSON.stringify(requestData),
-            contentType: 'application/json',
-        }).responseJSON;
+        // let responseJSON = $.ajax({
+        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.DiscountCodeChanged),
+        //     method: 'POST',
+        //     async: false,
+        //     data: JSON.stringify(requestData),
+        //     contentType: 'application/json',
+        // }).responseJSON;
+
+        let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
+
         const { deliveryMethods, discountCodes, lineItems, shippingLines, subtotal, discounts, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         let updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
@@ -234,13 +234,16 @@ function setSessionListeners(session) {
             // =============================================================================
         };
 
-        let responseJSON = $.ajax({
-            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.DeliveryMethodChanged),
-            method: 'POST',
-            async: false,
-            data: JSON.stringify(requestData),
-            contentType: 'application/json'
-        }).responseJSON;
+        // let responseJSON = $.ajax({
+        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.DeliveryMethodChanged),
+        //     method: 'POST',
+        //     async: false,
+        //     data: JSON.stringify(requestData),
+        //     contentType: 'application/json'
+        // }).responseJSON;
+
+        let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
+
 
         // Update the payment request based on the delivery method change and update the total accordingly
         const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
@@ -270,13 +273,16 @@ function setSessionListeners(session) {
             // =============================================================================
         };
 
-        let responseJSON = $.ajax({
-            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.ShippingAddressChanged),
-            method: 'POST',
-            async: false,
-            data: JSON.stringify(requestData),
-            contentType: 'application/json'
-        }).responseJSON;
+        // let responseJSON = $.ajax({
+        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.ShippingAddressChanged),
+        //     method: 'POST',
+        //     async: false,
+        //     data: JSON.stringify(requestData),
+        //     contentType: 'application/json'
+        // }).responseJSON;
+
+        let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
+
 
         // Update the payment request based on the shipping address change
         const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
@@ -302,13 +308,15 @@ function setSessionListeners(session) {
             // =============================================================================
         };
 
-        let responseJSON = $.ajax({
-            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.SubmitPayment),
-            method: 'POST',
-            async: false,
-            data: JSON.stringify(requestData),
-            contentType: 'application/json'
-        }).responseJSON;
+        // let responseJSON = $.ajax({
+        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.SubmitPayment),
+        //     method: 'POST',
+        //     async: false,
+        //     data: JSON.stringify(requestData),
+        //     contentType: 'application/json'
+        // }).responseJSON;
+
+        let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
 
         orderConfirmationData = {
             orderID: responseJSON.orderID,
@@ -344,7 +352,6 @@ function setSessionListeners(session) {
 function initBuyNow(e, response) {
     console.log("EVT >>>>> ", e);
     console.log("RESPONSE >>>>> ", response);
-    console.log('PRODUCT >>>>>> ', response.data.product)
     let responseProduct = response.data.product;
 
     // CONFIRM FUNCTIONALITY OF SIMPLE PDP VS COMPLEX PDP (PAGE INIT VS ATTRIBUTE SELECTION)

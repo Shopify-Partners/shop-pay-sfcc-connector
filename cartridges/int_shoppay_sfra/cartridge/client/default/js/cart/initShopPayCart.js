@@ -39,7 +39,6 @@ function initShopPayConfig() {
     window.ShopPay.PaymentRequest.configure({
         shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
         clientId: window.shoppayClientRefs.preferences.shoppayClientId,
-        debug: window.shoppayClientRefs.preferences.shoppayModalDebugEnabled
     });
 }
 
@@ -203,6 +202,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     }
 }
 
+// Handles AJAX call to get the payment response
 function buildPaymentRequest () {
     let token = document.querySelector('[data-csrf-token]');
     if (token) {
@@ -219,7 +219,22 @@ function buildPaymentRequest () {
     }
 }
 
+// Handles AJAX call to create / update the payment response needed for the ShopPay.PaymentRequest.build() method.
+function createResponse (requestObj, controllerURL) {
+    let response = $.ajax({
+        url: helper.getUrlWithCsrfToken(controllerURL),
+        method: 'POST',
+        async: false,
+        data: JSON.stringify(requestObj),
+        contentType: 'application/json'
+    }).response;
+
+    return response
+}
+
+
 export {
     initShopPaySession,
-    readyOnPageLoad
+    readyOnPageLoad,
+    createResponse
 };
