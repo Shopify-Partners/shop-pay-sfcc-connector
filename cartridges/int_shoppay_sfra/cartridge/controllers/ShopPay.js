@@ -215,7 +215,7 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
     try {
         paymentRequestModel = new PaymentRequestModel(basket);
     } catch (e) {
-        logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
+        logger.error('[ShopPay-PrepareBasket] error: \n\r' + e.message + '\n\r' + e.stack);
         res.json({
             error: true,
             errorMsg: e.message,
@@ -318,9 +318,14 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
     var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    var currentBasket = BasketMgr.getCurrentBasket();
-
+    var currentBasket;
     var data = JSON.parse(req.body);
+
+    if (data.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(data.basketId);
+    } else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
 
     var inputValidation = validateInputs(req, currentBasket, ['discountCodes']);
     if (!inputValidation || inputValidation.error) {
@@ -534,10 +539,10 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
 
 
     // =========================== FROM SSPSC-38 POC ===========================
+    // TODO: check this conditional against other controllers. (NEED CONSISTENCY)
     if (data.basketId) {
         currentBasket = BasketMgr.getTemporaryBasket(data.basketId);
-    }
-    else {
+    } else {
         currentBasket = BasketMgr.getCurrentBasket();
     }
 
