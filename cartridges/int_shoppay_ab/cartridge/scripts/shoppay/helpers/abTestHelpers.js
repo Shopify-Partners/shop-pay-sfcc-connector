@@ -1,21 +1,25 @@
 var ABTestMgr = require('dw/campaign/ABTestMgr');
 var abTests = ['shoppayAA', 'shoppayAB'];
-var segmanetTypes = ['Control', 'Treatment'];
+var segmentTypes = ['Control', 'Treatment'];
 
 /**
  * Helper function to retrieve the active shoppay test segment
+ * @param {boolean} shoppayApplicable is shoppay applicable to basket
  * @returns {string} the active shoppay ab test segment
  */
-function getAssignmentGroup() {
+function getAssignmentGroup(shoppayApplicable) {
     var activeSegment = 'excluded';
-    abTests.forEach(function(abTest) {
-        segmanetTypes.forEach(function(segmanetType) {
-            var segment = abTest + segmanetType;
-            if(ABTestMgr.isParticipant(abTest, segment)) {
-                activeSegment = segmanetType.toLowerCase();
-            }
+
+    if(shoppayApplicable) {
+        abTests.forEach(function(abTest) {
+            segmentTypes.forEach(function(segmentType) {
+                var segment = abTest + segmentType;
+                if(ABTestMgr.isParticipant(abTest, segment)) {
+                    activeSegment = segmentType.toLowerCase();
+                }
+            });
         });
-    });
+    }
 
     return activeSegment;
 }
