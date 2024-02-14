@@ -202,7 +202,7 @@ function setSessionListeners(session) {
     });
 }
 
-export {
+module.exports = {
     getCsrfToken,
     getUrlWithCsrfToken,
     isCartEmptyOnLoad,
