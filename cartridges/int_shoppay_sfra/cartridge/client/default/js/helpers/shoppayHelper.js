@@ -181,7 +181,8 @@ function setSessionListeners(session) {
     session.addEventListener("discountcodechanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
         let requestData = {
-            discountCodes: ev.discountCodes
+            discountCodes: ev.discountCodes,
+            basketId: sourceIdentifier
         }
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
