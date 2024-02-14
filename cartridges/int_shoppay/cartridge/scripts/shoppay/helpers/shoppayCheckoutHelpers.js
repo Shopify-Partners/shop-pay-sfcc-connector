@@ -95,14 +95,14 @@ function validatePaymentRequest(clientRequest, serverRequest) {
             serverRequest.shippingAddress.id = clientRequest.shippingAddress.id;
         }
         // shippingAddress.address2 is sometimes, but not always, excluded if empty/null
-        if (!clientRequest.shippingAddress.address2
-            && serverRequest.shippingAddress.address2
+        if (typeof clientRequest.shippingAddress.address2 == 'undefined'
+            && typeof serverRequest.shippingAddress.address2 != 'undefined'
             && common.isNull(serverRequest.shippingAddress.address2)
         ) {
             delete serverRequest.shippingAddress.address2;
-        } else if (clientRequest.shippingAddress.address2
-            && !serverRequest.shippingAddress.address2 &&
-            common.isNull(clientRequest.shippingAddress.address2)
+        } else if (clientRequest.shippingAddress.address2 != 'undefined'
+            && typeof serverRequest.shippingAddress.address2 == 'undefined'
+            && common.isNull(clientRequest.shippingAddress.address2)
         ) {
             serverRequest.shippingAddress.address2 = clientRequest.shippingAddress.address2;
         }
