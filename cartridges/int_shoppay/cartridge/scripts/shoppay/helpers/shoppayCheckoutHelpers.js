@@ -94,9 +94,18 @@ function validatePaymentRequest(clientRequest, serverRequest) {
         if (clientRequest.shippingAddress.id && !serverRequest.shippingAddress.id) {
             serverRequest.shippingAddress.id = clientRequest.shippingAddress.id;
         }
-        // INSERT CONDITIONAL HERE FOR THIRD CASE. (???)
-        // if address 2 doesn't exist in one...but doesn't exist in the other (or vice-versa)
-
+        // shippingAddress.address2 is sometimes, but not always, excluded if empty/null
+        if (!clientRequest.shippingAddress.address2
+            && serverRequest.shippingAddress.address2
+            && common.isNull(serverRequest.shippingAddress.address2)
+        ) {
+            delete serverRequest.shippingAddress.address2;
+        } else if (clientRequest.shippingAddress.address2
+            && !serverRequest.shippingAddress.address2 &&
+            common.isNull(clientRequest.shippingAddress.address2)
+        ) {
+            serverRequest.shippingAddress.address2 = clientRequest.shippingAddress.address2;
+        }
         return common.matchObjects(clientRequest, serverRequest);
     } catch (e) {
         logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
