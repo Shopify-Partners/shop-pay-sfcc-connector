@@ -116,7 +116,7 @@
     "zip-folder": "^1.0.0"
   },
   "dependencies": {
-    "bootstrap": "^4.6.1",
+    "bootstrap": "^4.6.2",
     "cleave.js": "^1.5.3",
     "flag-icon-css": "^2.9.0",
     "font-awesome": "^4.7.0",
