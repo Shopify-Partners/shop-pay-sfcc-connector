@@ -24,7 +24,7 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
     try {
         logger.debug(req.body);
     } catch (e) {
-        logger.error('[Webhooks-OrdersCreate] error: \n\r' + e.message + '\n\r' + e.stack);
+        logger.error('[ShopPayWebhooks-OrdersCreate] error: \n\r' + e.message + '\n\r' + e.stack);
     }
     res.json({
         success: true
