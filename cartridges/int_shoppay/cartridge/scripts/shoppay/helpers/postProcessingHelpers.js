@@ -4,6 +4,8 @@ var Order = require('dw/order/Order');
 var OrderMgr = require('dw/order/OrderMgr');
 var Status = require('dw/system/Status');
 
+var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+
 /* Attribute IDs differ between the ORDERS_CREATE webhook payload and the GraphQL Orders response payload. This
    object maps the attributes for both payload types to the appropriate SFCC billing address attribute. */
 const addressElements = {
@@ -86,7 +88,7 @@ var placeOrder = function(order) {
     try {
         var placeOrderStatus = OrderMgr.placeOrder(order);
         if (placeOrderStatus === Status.ERROR) {
-            throw new Error();
+            throw new Error(placeOrderStatus.message);
         }
 
         order.setConfirmationStatus(Order.CONFIRMATION_STATUS_CONFIRMED);
@@ -94,6 +96,7 @@ var placeOrder = function(order) {
         order.setExportStatus(Order.EXPORT_STATUS_READY);
     } catch (e) {
         result.error = true;
+        logger.error('[postProcessingHelpers.js] error: \n\r' + e.message + '\n\r' + (e.stack ? e.stack : ''));
     }
 
     return result;
