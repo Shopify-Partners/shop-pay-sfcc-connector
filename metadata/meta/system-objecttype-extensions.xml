@@ -30,10 +30,9 @@
             </attribute-definition>
             <attribute-definition attribute-id="shoppayOrderCreateWebhookReceived">
                 <display-name xml:lang="x-default">Order Create Webhook Received</display-name>
-                <type>string</type>
+                <type>boolean</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
-                <min-length>0</min-length>
             </attribute-definition>
             <attribute-definition attribute-id="shoppayOrderNumber">
                 <display-name xml:lang="x-default">Shop Pay Order Number</display-name>

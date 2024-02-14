@@ -19,10 +19,16 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
                 paymentRequest: paymentRequest
             }
         };
-        var shopPayStorefrontService = require('*/cartridge/scripts/shoppay/service/shopPayStorefrontService')();
-        var response = shopPayStorefrontService.call({
+        var shoppayStorefrontService = require('*/cartridge/scripts/shoppay/service/shoppayStorefrontService')();
+        var response = shoppayStorefrontService.call({
             body: bodyObj || {}
         });
+
+        var responseHeaders = shoppayStorefrontService.client.responseHeaders;
+        var shopifyRequestID = responseHeaders.get('X-Request-ID');
+        if (shopifyRequestID && shopifyRequestID.length > 0) {
+            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+        }
 
         if (!response.ok
             || !response.object
@@ -50,7 +56,6 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
  * @returns {Object} The GraphQL service response body
  */
 function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
-    var shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
     /* shippingAddress.id is a Shop Pay specific/provided element and is not a valid input for the GraphQL session
        submit request, but is included in the payment request object from the client-side Shop Pay session */
     if (paymentRequest.shippingAddress.id) {
@@ -65,10 +70,16 @@ function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
                 paymentRequest: paymentRequest
             }
         };
-        var shopPayStorefrontService = require('*/cartridge/scripts/shoppay/service/shopPayStorefrontService')();
-        var response = shopPayStorefrontService.call({
+        var shoppayStorefrontService = require('*/cartridge/scripts/shoppay/service/shoppayStorefrontService')();
+        var response = shoppayStorefrontService.call({
             body: bodyObj || {}
         });
+
+        var responseHeaders = shoppayStorefrontService.client.responseHeaders;
+        var shopifyRequestID = responseHeaders.get('X-Request-ID');
+        if (shopifyRequestID && shopifyRequestID.length > 0) {
+            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+        }
 
         if (!response.ok
             || !response.object
