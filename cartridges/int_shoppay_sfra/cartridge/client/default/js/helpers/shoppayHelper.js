@@ -1,4 +1,5 @@
 const shopPayCart = require('../cart/initShopPayCart');
+const utils = require('../utils');
 
 // Global Variables
 let orderConfirmationData;
@@ -179,7 +180,11 @@ function setSessionListeners(session) {
         const currentPaymentRequest = session.paymentRequest;
         let requestData = {
             discountCodes: ev.discountCodes,
-            basketId: sourceIdentifier
+        };
+        // HANDLES DATA NEEDED FOR BUY NOW SCENARIOS (--- CONFIRM BEFORE PR [?????] ---)
+        const isPDP = utils.isPDPcontext();
+        if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
+            requestData.basketId = sourceIdentifier;
         }
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
@@ -211,11 +216,15 @@ function setSessionListeners(session) {
 
     session.addEventListener("deliverymethodchanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
-        const requestData = {
+        let requestData = {
             deliveryMethod: ev.deliveryMethod,
             paymentRequest: currentPaymentRequest,
-            basketId: sourceIdentifier
         };
+        // HANDLES DATA NEEDED FOR BUY NOW SCENARIOS (--- CONFIRM BEFORE PR [?????] ---)
+        const isPDP = utils.isPDPcontext();
+        if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
+            requestData.basketId = sourceIdentifier;
+        }
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
         const { shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -238,11 +247,15 @@ function setSessionListeners(session) {
 
     session.addEventListener("shippingaddresschanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
-        const requestData = {
+        let requestData = {
             shippingAddress: ev.shippingAddress,
             paymentRequest: currentPaymentRequest,
-            basketId: sourceIdentifier
         };
+        // HANDLES DATA NEEDED FOR BUY NOW SCENARIOS (--- CONFIRM BEFORE PR [?????] ---)
+        const isPDP = utils.isPDPcontext();
+        if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
+            requestData.basketId = sourceIdentifier;
+        }
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
         const { deliveryMethods } = responseJSON.paymentRequest;
@@ -263,11 +276,15 @@ function setSessionListeners(session) {
     session.addEventListener("paymentconfirmationrequested", function(ev) {
         // TODO: remove this debugging line before final delivery
         console.log('paymentconfirmationrequested', ev);
-        const requestData = {
+        let requestData = {
             token: session.token,
             paymentRequest: session.paymentRequest,
-            basketId: sourceIdentifier
         };
+        // HANDLES DATA NEEDED FOR BUY NOW SCENARIOS (--- CONFIRM BEFORE PR [?????] ---)
+        const isPDP = utils.isPDPcontext();
+        if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
+            requestData.basketId = sourceIdentifier;
+        }
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
 
