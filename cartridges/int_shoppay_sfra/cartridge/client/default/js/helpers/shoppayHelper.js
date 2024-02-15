@@ -3,13 +3,10 @@ const utils = require('../utils');
 
 // Global Variables
 let orderConfirmationData;
-
-// =========================== NEW GLOBAL VARS FROM POC BRANCH ===========================
 var sourceIdentifier = null;
 var token = null;
 var checkoutUrl = null;
 var productData = {};
-// =======================================================================================
 
 /**
  * Add csrf token param to url
@@ -56,31 +53,16 @@ function getInitProductData() {
 
 function setInitProductData(data) {
     productData = data;
+    console.log('GLOBAL PROD DATA UPDATED TO >>>>>> ', productData);
 }
 
 
 // Sets Up ShopPay listener Events
 function setSessionListeners(session) {
-    // TODO: remove this debugging line before final delivery
-    console.log('=== APPLYING SESSION LISTENERS ===');
-
     session.addEventListener("sessionrequested", function (ev) {
         let sessionPaymentRequest
 
         if (window.shoppayClientRefs.constants.isBuyNow) {
-            // ======== COMMENTED OUT ELSE BLOCK BELOW (pasted from initShipPayCart.js) ????? ========
-            // else {
-            //     paymentRequestResponse = $.ajax({
-            //         url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
-            //         type: 'GET',
-            //         contentType: 'application/json',
-            //         async: false
-            //     }) || {};
-            //     paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
-            // }
-            // =======================================================================================
-            // =======================================================================================
-
             $.ajax({
                 url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.PrepareBasket),
                 method: 'POST',
@@ -103,7 +85,7 @@ function setSessionListeners(session) {
             sessionPaymentRequest = session.paymentRequest
         }
 
-         var requestData = {
+        let requestData = {
             paymentRequest: sessionPaymentRequest,
             basketId: sourceIdentifier
         };
@@ -115,7 +97,6 @@ function setSessionListeners(session) {
             data: JSON.stringify(requestData),
             contentType: 'application/json',
             success: function (data) {
-                console.log("DATA (to send in completeSessionRequest) >>>> ", data);
                 token = data.token;
                 checkoutUrl = data.checkoutUrl;
                 sourceIdentifier = data.sourceIdentifier;
@@ -133,7 +114,6 @@ function setSessionListeners(session) {
         let requestData = {
             discountCodes: ev.discountCodes,
         };
-        // HANDLES DATA NEEDED FOR BUY NOW SCENARIOS (--- CONFIRM BEFORE PR [?????] ---)
         const isPDP = utils.isPDPcontext();
         if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
@@ -172,7 +152,6 @@ function setSessionListeners(session) {
             deliveryMethod: ev.deliveryMethod,
             paymentRequest: currentPaymentRequest,
         };
-        // HANDLES DATA NEEDED FOR BUY NOW SCENARIOS (--- CONFIRM BEFORE PR [?????] ---)
         const isPDP = utils.isPDPcontext();
         if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
@@ -202,7 +181,6 @@ function setSessionListeners(session) {
             shippingAddress: ev.shippingAddress,
             paymentRequest: currentPaymentRequest,
         };
-        // HANDLES DATA NEEDED FOR BUY NOW SCENARIOS (--- CONFIRM BEFORE PR [?????] ---)
         const isPDP = utils.isPDPcontext();
         if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
@@ -224,13 +202,10 @@ function setSessionListeners(session) {
     });
 
     session.addEventListener("paymentconfirmationrequested", function(ev) {
-        // TODO: remove this debugging line before final delivery
-        console.log('paymentconfirmationrequested', ev);
         let requestData = {
             token: session.token,
             paymentRequest: session.paymentRequest,
         };
-        // HANDLES DATA NEEDED FOR BUY NOW SCENARIOS (--- CONFIRM BEFORE PR [?????] ---)
         const isPDP = utils.isPDPcontext();
         if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
@@ -244,6 +219,8 @@ function setSessionListeners(session) {
             continueUrl: responseJSON.continueUrl
         };
         session.completePaymentConfirmationRequest();
+        // TODO: remove this debugging line before final delivery
+        console.log('paymentconfirmationrequested', ev);
     });
 
     session.addEventListener("paymentcomplete", function(ev) {
@@ -269,8 +246,6 @@ function setSessionListeners(session) {
 
 
 function initBuyNow(e, response) {
-    console.log("EVT >>>>> ", e);
-    console.log("RESPONSE >>>>> ", response);
     let responseProduct = response.data.product;
 
     if (responseProduct && responseProduct.buyNow) {

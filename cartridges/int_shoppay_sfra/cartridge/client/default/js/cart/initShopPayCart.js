@@ -21,7 +21,6 @@ $(document).ready(function () {
         var readyToOrder = utils.isReadyToOrderOnPageLoad();
         if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
             $('body').on('product:afterAttributeSelect', helper.initBuyNow); // receives the Event & Response
-            // $('body').on('product:updateAddToCart', initBuyNow); // CHECK IF THIS EVENT IS ALSO NEEDED IN ADDITION TO THE AFTER ATTRIBUTE SELECT ABOVE??
         } else {
             session = initShopPaySession();
         }
@@ -59,10 +58,6 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
     if (window.ShopPay) {
         if (!session) {
             session = initShopPaySession();
-            // TODO: remove this conditional / debugging line before final delivery
-            if (session) {
-                console.log('SESSION Obj >>>> ', session.paymentRequest);
-            }
         } else {
             const paymentRequestResponse = buildPaymentRequest();
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
@@ -102,14 +97,6 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     } else {
         paymentRequest = buildPaymentRequest();
         responseJSON = paymentRequest ? paymentRequest.responseJSON : null;
-        // TODO: remove this debugging line before final delivery
-        if (responseJSON) {
-            if (responseJSON.error && responseJSON.errorMsg) {
-                console.log(responseJSON.errorMsg);
-            } else {
-                console.log(JSON.stringify(responseJSON.paymentRequest));
-            }
-        }
     }
 
     if (paymentRequest || (responseJSON && !responseJSON.error)) {
@@ -122,9 +109,6 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
 
         if (shopPaySession) {
             helper.setSessionListeners(shopPaySession);
-            if (shopPaySession && shopPaySession.paymentRequest){
-                console.log(shopPaySession.paymentRequest);
-            }
             // $('body').off('product:updateAddToCart', helper.initBuyNow); // REMOVE WHEN SURE NOT NEEDED (BEFORE PR ??????)
             $('body').off('product:afterAttributeSelect', helper.initBuyNow);
 
@@ -132,12 +116,6 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             $('body').on('product:afterAttributeSelect', function(e, response) {
                 let responseProduct = response.data.product;
                 if (window.shoppayClientRefs.constants.isBuyNow && responseProduct.buyNow) {
-                    // var selectedAndReadyToOrder = responseProduct.readyToOrder;
-                    // let selectedProdData = {
-                    //     pid: responseProduct.id,
-                    //     quantity: responseProduct.selectedQuantity,
-                    //     options: responseProduct.options
-                    // };
                     helper.setInitProductData({
                         pid: responseProduct.id,
                         quantity: responseProduct.selectedQuantity,
@@ -177,9 +155,9 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                                 console.log(data.errorMsg);
                             }
                         },
-                        error: function () {
+                        error: function (err) {
                             // TODO
-                            console.log("ERROR HAPPENED!")
+                            console.log("ERROR:  ", err)
                         }
                     });
                 }
