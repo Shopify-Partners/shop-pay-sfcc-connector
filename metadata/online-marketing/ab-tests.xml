@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ab-tests xmlns="http://www.demandware.com/xml/impex/abtest/2010-04-01">
+    <ab-test test-id="shoppayAA">
+        <description>The main objectives of the A/A test are to make sure that assignment is evenly distributed between test and control and also to make sure that both groups are converting at the same rate.</description>
+        <enabled-flag>false</enabled-flag>
+        <key-metric>revenue</key-metric>
+        <participation>
+            <trigger>
+                <immediately/>
+            </trigger>
+            <expiration>never</expiration>
+        </participation>
+        <customer-groups match-mode="any">
+            <customer-group group-id="Everyone"/>
+        </customer-groups>
+        <test-segments>
+            <control-segment>
+                <allocation-percent>0</allocation-percent>
+            </control-segment>
+            <test-segment segment-id="shoppayAAControl">
+                <allocation-percent>50</allocation-percent>
+            </test-segment>
+            <test-segment segment-id="shoppayAATreatment">
+                <allocation-percent>50</allocation-percent>
+            </test-segment>
+        </test-segments>
+    </ab-test>
+    <ab-test test-id="shoppayAB">
+        <description>The A/B test is intended to measure the change in conversion rate due to Shop Pay Commerce Component compared to control.</description>
+        <enabled-flag>false</enabled-flag>
+        <key-metric>revenue</key-metric>
+        <participation>
+            <trigger>
+                <immediately/>
+            </trigger>
+            <expiration>never</expiration>
+        </participation>
+        <customer-groups match-mode="any">
+            <customer-group group-id="Everyone"/>
+        </customer-groups>
+        <test-segments>
+            <control-segment>
+                <allocation-percent>0</allocation-percent>
+            </control-segment>
+            <test-segment segment-id="shoppayABControl">
+                <allocation-percent>50</allocation-percent>
+            </test-segment>
+            <test-segment segment-id="shoppayABTreatment">
+                <allocation-percent>50</allocation-percent>
+            </test-segment>
+        </test-segments>
+    </ab-test>
+</ab-tests>
