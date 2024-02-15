@@ -124,6 +124,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     }
 
     if (paymentRequest || (responseJSON && !responseJSON.error)) {
+        // BUILD THE SHOPPAY REQUEST HERE....
         const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
         utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
@@ -131,6 +132,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
         // Error: There may only be one active session.
         console.log("OLD SESSION -- session >>>>> ", session)
 
+        // CREATE THE SHOPPAY REQUEST HERE....
         let shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
         });
@@ -161,6 +163,11 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         shopPaySession.close();
                         console.log("Existing -- shopPaySession.closed >>>>> ", shopPaySession.closed)
                         initShopPaySession(responseProduct.buyNow, selectedAndReadyToOrder);
+    
+                        // var PR = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
+                        // shopPaySession = window.ShopPay.PaymentRequest.createSession({ // isn't initializing the session as expected....says shopPaySession is read only?
+                        //     paymentRequest: PR
+                        // });
                     }
 
 
