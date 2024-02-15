@@ -91,7 +91,6 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
 
 
 function initShopPaySession(paymentRequestInput, readyToOrder) {
-    // =========================== FROM POC BRANCH ===========================
     const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
     let paymentRequest;
     let paymentRequestResponse;
@@ -124,11 +123,14 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             }
         }
     }
-    // =======================================================================================
 
     if (paymentRequest || (responseJSON && !responseJSON.error)) {
         const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
         utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
+
+        // ERRORS OUT HERE WHEN SELECTING MULTIPLE VARIANTS or PRODUCT OPTIONS (mutiple sessions at play....not properly closing / opening sessions?)
+        // Error: There may only be one active session.
+        console.log("OLD SESSION -- session >>>>> ", session)
 
         let shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
@@ -136,7 +138,6 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
 
         if (shopPaySession) {
             helper.setSessionListeners(shopPaySession);
-            // ================================== FROM POC BRANCH ==================================
             if (shopPaySession && shopPaySession.paymentRequest){
                 console.log(shopPaySession.paymentRequest);
             }
@@ -155,18 +156,13 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                     };
                     helper.setInitProductData(selectedProdData) // UPDATE GLOBAL VAR FROM SHOPPAYHELPER.JS (????)
                     if (shopPaySession) {
+                        // // Don't want to destroy existing basket (and don't want to create a second basket...)....so likley need to go with initShopPaySession to restart that again
+                        // // AVOID multiple baskets (once prepare basket is called - we want to make sure we're using the same basket id & not destroying / creating a second basket)
+
                         shopPaySession.close();
+                        console.log("Existing -- shopPaySession.closed >>>>> ", shopPaySession.closed)
                         initShopPaySession(responseProduct.buyNow, selectedAndReadyToOrder);
                     }
-                    // initShopPaySession(responseProduct.buyNow, selectedAndReadyToOrder);
-
-                    // // Don't want to destroy existing basket (and don't want to create a second basket...)....so likley need to go with initShopPaySession to restart that again
-                    // // AVOID multiple baskets (once prepare basket is called - we want to make sure we're using the same basket id & not destroying / creating a second basket)
-                    // var adjustedPaymentRequest = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
-                    // shopPaySession = window.ShopPay.PaymentRequest.createSession({ // isn't initializing the session as expected....says shopPaySession is read only?
-                    //     paymentRequest: adjustedPaymentRequest
-                    // });
-
 
 
                     // =========================== ORIGINAL POC BRANCH APPROACH ===========================
@@ -211,8 +207,6 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                     });
                 }
             });
-            // =====================================================================================
-
         }
 
         return shopPaySession;

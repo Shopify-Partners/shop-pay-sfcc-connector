@@ -9,8 +9,6 @@ var sourceIdentifier = null;
 var token = null;
 var checkoutUrl = null;
 var productData = {};
-let selectedProduct;
-var buyNowResponse = null;
 // =======================================================================================
 
 /**
@@ -45,15 +43,6 @@ function getCsrfToken() {
     return '';
 }
 
-// CHECK IF THIS HELPER IS STILL NEEDED --- HAVE COMMMENTED OUT CALL IN initShopPayCart.js ( === ????? === )
-function isCartEmptyOnLoad() {
-    let $element = document.querySelector('[data-empty-cart-load]');
-    if ($element && $element.attributes['data-empty-cart-load'] && $element.attributes['data-empty-cart-load'].value) {
-        return $element.attributes['data-empty-cart-load'].value === 'true';
-    }
-    return false;
-}
-
 
 function getInitProductData() {
     let productData = null;
@@ -77,35 +66,8 @@ function setSessionListeners(session) {
 
     session.addEventListener("sessionrequested", function (ev) {
         let sessionPaymentRequest
-        
-        // ====================================================================================
-        // ========== FROM ORIGINAL DEVELOP BRANCH (was full sessionrequested logic) ==========
-        // let requestData = {
-        //     paymentRequest: session.paymentRequest
-        // }
 
-        // let response = $.ajax({
-        //     url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
-        //     method: 'POST',
-        //     async: false,
-        //     data: JSON.stringify(requestData),
-        //     contentType: 'application/json',
-        // }).responseJSON;
-
-        // const { token, checkoutUrl, sourceIdentifier } = response;
-        // session.completeSessionRequest({ token, checkoutUrl, sourceIdentifier });
-        // // TODO: remove these debugging lines before final delivery
-        // console.log('sessionrequested', ev);
-        // console.log(response);
-        // ====================================================================================
-        // ====================================================================================
-
-
-        // =========================== FROM POC BRANCH ===========================
         if (window.shoppayClientRefs.constants.isBuyNow) {
-            let paymentRequest;
-            let paymentRequestResponse;
-
             // ======== COMMENTED OUT ELSE BLOCK BELOW (pasted from initShipPayCart.js) ????? ========
             // else {
             //     paymentRequestResponse = $.ajax({
@@ -141,12 +103,10 @@ function setSessionListeners(session) {
             sessionPaymentRequest = session.paymentRequest
         }
 
-         // TODO: only passing basketId for temp baskets right now.... try to add to all for robustness
          var requestData = {
             paymentRequest: sessionPaymentRequest,
             basketId: sourceIdentifier
         };
-        // ====================================================================================
 
         $.ajax({
             url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
@@ -233,7 +193,6 @@ function setSessionListeners(session) {
         session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
         // TODO: remove these debugging lines before final delivery
         console.log('deliverymethodchanged', ev);
-        console.log('Selected Delivery Method: ', ev.deliveryMethod);
         console.log("Updated Payment Req w/ entered Delivery Method: ", updatedPaymentRequest);
     });
 
@@ -261,7 +220,6 @@ function setSessionListeners(session) {
         session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
         // TODO: remove these debugging lines before final delivery
         console.log('shippingaddresschanged', ev);
-        console.log('Shipping Address: ', ev.shippingAddress);
         console.log("Updated Payment Req w/ entered Shipping Address: ", updatedPaymentRequest);
     });
 
@@ -336,7 +294,6 @@ function initBuyNow(e, response) {
 module.exports = {
     getCsrfToken: getCsrfToken,
     getUrlWithCsrfToken: getUrlWithCsrfToken,
-    isCartEmptyOnLoad: isCartEmptyOnLoad,
     setSessionListeners: setSessionListeners,
     getInitProductData: getInitProductData,
     initBuyNow: initBuyNow,
