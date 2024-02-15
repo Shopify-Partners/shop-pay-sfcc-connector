@@ -84,7 +84,6 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     var currentBasket;
     var paymentRequestModel;
     var httpParameterMap = req.httpParameterMap;
-    var test = req.httpParameterMap.basketId;
     if (req.httpParameterMap.basketId && req.httpParameterMap.basketId.value) {
         currentBasket = BasketMgr.getTemporaryBasket(req.httpParameterMap.basketId.value);
     }
@@ -196,7 +195,6 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
     Transaction.wrap(function () {
         try {
             // Set shipment shipping method
-            var test = basket;
             shippingHelpers.selectShippingMethod(basket.defaultShipment, shippingMethod.ID);
 
             // Calculate basket
