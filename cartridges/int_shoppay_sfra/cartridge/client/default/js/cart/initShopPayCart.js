@@ -44,7 +44,6 @@ function initShopPayButton() {
 
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
-    // const cartIsEmpty = helper.isCartEmptyOnLoad(); // DOUBLE CHECK IF THIS HELPER IS STILL NEEDED (?????)
     utils.shopPayMutationObserver(paymentSelector);  // set mutation observ. to apply correct btn styles when this element is rendered to the DOM (based on whether basket is empty or not)
 }
 
@@ -128,7 +127,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
         const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
         utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
-        // ERRORS OUT HERE WHEN SELECTING MULTIPLE VARIANTS or PRODUCT OPTIONS (mutiple sessions at play....not properly closing / opening sessions?)
+        // ERRORS OUT HERE WHEN TOGGLING MULTIPLE VARIANTS/PRODUCT OPTIONS (mutiple sessions at play....not properly closing / opening sessions?)
         // Error: There may only be one active session.
         console.log("OLD SESSION -- session >>>>> ", session)
 
