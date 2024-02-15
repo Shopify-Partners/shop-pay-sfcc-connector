@@ -18,7 +18,6 @@ $(document).ready(function () {
             helper.setInitProductData(pageLoadData); // updates global prod data.
         }
 
-        // =========================== FROM POC BRANCH (WIP ????) ===========================
         var readyToOrder = utils.isReadyToOrderOnPageLoad();
         if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
             $('body').on('product:afterAttributeSelect', helper.initBuyNow); // receives the Event & Response
@@ -26,9 +25,6 @@ $(document).ready(function () {
         } else {
             session = initShopPaySession();
         }
-        // ==================================================================================
-
-        // session = initShopPaySession(); // COMMENTED OUT (ORIGINAL DEVELOP BRANCH SETS HERE...SETTING ABOVE IN ELSE WITH POC BRANCH)
     }
 });
 
@@ -60,7 +56,6 @@ function initShopPayEmailRecognition() {
 
 // product:updateAddToCart // DELETE product:updateAddToCart event if not needed here (???)
 $('body').on('cart:update product:afterAddToCart promotion:success', function () {
-// $('body').on('cart:update product:afterAddToCart product:updateAddToCart promotion:success', function () {
     if (window.ShopPay) {
         if (!session) {
             session = initShopPaySession();
@@ -100,18 +95,12 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     } else if (isBuyNow && !paymentRequestInput) {
         let productData = helper.getInitProductData();
         if (productData) {
-            paymentRequestResponse = $.ajax({
-                url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.BuyNowData),
-                type: 'POST',
-                data: JSON.stringify(productData),
-                contentType: 'application/json',
-                async: false
-            }) || {};
-            paymentRequest = paymentRequestResponse.responseJSON.paymentRequest;
-            responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
+            paymentRequestResponse = createResponse(productData, window.shoppayClientRefs.urls.BuyNowData);
+            paymentRequest = paymentRequestResponse.paymentRequest;
+            responseJSON = paymentRequestResponse ? paymentRequestResponse : null;
         }
     } else {
-        paymentRequest = buildPaymentRequest(); // buildPaymentRequest runs the same ajax call as above. Replacing with function call instead. (?????)
+        paymentRequest = buildPaymentRequest();
         responseJSON = paymentRequest ? paymentRequest.responseJSON : null;
         // TODO: remove this debugging line before final delivery
         if (responseJSON) {
@@ -124,15 +113,9 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     }
 
     if (paymentRequest || (responseJSON && !responseJSON.error)) {
-        // BUILD THE SHOPPAY REQUEST HERE....
         const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
         utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
-        // ERRORS OUT HERE WHEN TOGGLING MULTIPLE VARIANTS/PRODUCT OPTIONS (mutiple sessions at play....not properly closing / opening sessions?)
-        // Error: There may only be one active session.
-        console.log("OLD SESSION -- session >>>>> ", session)
-
-        // CREATE THE SHOPPAY REQUEST HERE....
         let shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
         });
@@ -149,41 +132,29 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             $('body').on('product:afterAttributeSelect', function(e, response) {
                 let responseProduct = response.data.product;
                 if (window.shoppayClientRefs.constants.isBuyNow && responseProduct.buyNow) {
-                    var selectedAndReadyToOrder = responseProduct.readyToOrder;
-                    let selectedProdData = {
+                    // var selectedAndReadyToOrder = responseProduct.readyToOrder;
+                    // let selectedProdData = {
+                    //     pid: responseProduct.id,
+                    //     quantity: responseProduct.selectedQuantity,
+                    //     options: responseProduct.options
+                    // };
+                    helper.setInitProductData({
                         pid: responseProduct.id,
                         quantity: responseProduct.selectedQuantity,
                         options: responseProduct.options
-                    };
-                    helper.setInitProductData(selectedProdData) // UPDATE GLOBAL VAR FROM SHOPPAYHELPER.JS (????)
+                    })
                     if (shopPaySession) {
-                        // // Don't want to destroy existing basket (and don't want to create a second basket...)....so likley need to go with initShopPaySession to restart that again
-                        // // AVOID multiple baskets (once prepare basket is called - we want to make sure we're using the same basket id & not destroying / creating a second basket)
-
+                        // Don't want to destroy existing basket & don't want to create a second basket -- likley need to go with initShopPaySession to restart that again (creates errors...calling directly fixes issue with multiple sessions?)
+                        // AVOID multiple baskets (once prepare basket is called - we want to make sure we're using the same basket id & not destroying / creating a second basket)
                         shopPaySession.close();
-                        console.log("Existing -- shopPaySession.closed >>>>> ", shopPaySession.closed)
-                        initShopPaySession(responseProduct.buyNow, selectedAndReadyToOrder);
-    
-                        // var PR = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
-                        // shopPaySession = window.ShopPay.PaymentRequest.createSession({ // isn't initializing the session as expected....says shopPaySession is read only?
-                        //     paymentRequest: PR
-                        // });
+                        let updatedPaymentRequest = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
+                        shopPaySession = window.ShopPay.PaymentRequest.createSession({
+                            paymentRequest: updatedPaymentRequest
+                        });
+
+                        helper.setSessionListeners(shopPaySession);
                     }
 
-
-                    // =========================== ORIGINAL POC BRANCH APPROACH ===========================
-                    // var PR = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
-                    // shopPaySession = window.ShopPay.PaymentRequest.createSession({ // isn't initializing the session as expected....says shopPaySession is read only?
-                    //     paymentRequest: PR
-                    // });
-                    // helper.setSessionListeners(shopPaySession); // ERRORS OUT BEFORE ENTERING LOGIC TO SET SESSION LISTENERS
-                    // console.log(shopPaySession.paymentRequest);
-                    // helper.productData = {
-                    //     pid: response.product.id,
-                    //     quantity: response.product.selectedQuantity,
-                    //     options: response.product.options
-                    // };
-                    //  ====================================================================================
                 } else {
                     // NOTE...ADD THE SUCCESS & ERROR FUNCTIONS INTO THE buildPaymentRequest FUNCTION AND USE INSTEAD...
                     $.ajax({
