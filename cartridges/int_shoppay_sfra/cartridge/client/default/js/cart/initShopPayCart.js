@@ -89,7 +89,6 @@ $('body').on('cart:update product:afterAddToCart', function () {
 });
 
 
-// function initShopPaySession() { // NOTE: this did not receive any params before the BuyNow POC. Delete this old line before PR (????)
 function initShopPaySession(paymentRequestInput, readyToOrder) {
     // =========================== FROM POC BRANCH ===========================
     const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
@@ -156,9 +155,12 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                     helper.setInitProductData(selectedProdData) // UPDATE GLOBAL VAR FROM SHOPPAYHELPER.JS (????)
                     if (shopPaySession) {
                         shopPaySession.close();
+                        // initShopPaySession(responseProduct.buyNow, selectedAndReadyToOrder);
                     }
                     // initShopPaySession(responseProduct.buyNow, selectedAndReadyToOrder);
 
+                    /// Don't want to destroy existing basket (and don't want to create a second basket...)....so likley need to go with initShopPaySession to restart that again
+                    // AVOID multiple baskets (once prepare basket is called - we want to make sure we're using the same basket id & not destroying / creating a second basket)
                     var adjustedPaymentRequest = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
                     shopPaySession = window.ShopPay.PaymentRequest.createSession({ // isn't initializing the session as expected....says shopPaySession is read only?
                         paymentRequest: adjustedPaymentRequest

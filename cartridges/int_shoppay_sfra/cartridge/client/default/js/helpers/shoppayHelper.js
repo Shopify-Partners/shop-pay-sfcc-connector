@@ -23,12 +23,9 @@ function getUrlWithCsrfToken(url, basketId) {
 
     urlInstance.searchParams.append('csrf_token', getCsrfToken());
 
-    
-    // ================== ADDING NEW BASKET ID -- FROM POC BRANCH ==================
     if (basketId) {
         urlInstance.searchParams.append('basketId', basketId);
     }
-    // =============================================================================
 
     return urlInstance.toString();
 }
@@ -47,6 +44,7 @@ function getCsrfToken() {
     return '';
 }
 
+// CHECK IF THIS HELPER IS STILL NEEDED --- HAVE COMMMENTED OUT CALL IN initShopPayCart.js ( === ????? === )
 function isCartEmptyOnLoad() {
     let $element = document.querySelector('[data-empty-cart-load]');
     if ($element && $element.attributes['data-empty-cart-load'] && $element.attributes['data-empty-cart-load'].value) {
@@ -54,7 +52,6 @@ function isCartEmptyOnLoad() {
     }
     return false;
 }
-
 
 function isReadyToOrderOnPageLoad() {
     let readyToOrder = false;
@@ -216,10 +213,8 @@ function setSessionListeners(session) {
         const currentPaymentRequest = session.paymentRequest;
         const requestData = {
             deliveryMethod: ev.deliveryMethod,
-            // ======= FROM POC....CHECK IF THESE ARE NEEDED IN CONTROLLER CALL ???? =======
             paymentRequest: currentPaymentRequest,
             basketId: sourceIdentifier
-            // =============================================================================
         };
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
@@ -245,10 +240,8 @@ function setSessionListeners(session) {
         const currentPaymentRequest = session.paymentRequest;
         const requestData = {
             shippingAddress: ev.shippingAddress,
-            // ======= FROM POC....CHECK IF THESE ARE NEEDED IN CONTROLLER CALL ???? =======
             paymentRequest: currentPaymentRequest,
             basketId: sourceIdentifier
-            // =============================================================================
         };
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
@@ -273,9 +266,7 @@ function setSessionListeners(session) {
         const requestData = {
             token: session.token,
             paymentRequest: session.paymentRequest,
-            // ======= FROM POC....CHECK IF THESE ARE NEEDED IN CONTROLLER CALL ???? =======
             basketId: sourceIdentifier
-            // =============================================================================
         };
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
@@ -315,7 +306,6 @@ function initBuyNow(e, response) {
     console.log("RESPONSE >>>>> ", response);
     let responseProduct = response.data.product;
 
-    // CONFIRM FUNCTIONALITY OF SIMPLE PDP VS COMPLEX PDP (PAGE INIT VS ATTRIBUTE SELECTION)
     if (responseProduct && responseProduct.buyNow) {
         var readyToOrder = responseProduct.readyToOrder;
         if (readyToOrder) {
