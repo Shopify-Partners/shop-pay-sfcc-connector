@@ -199,6 +199,8 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
 
             // Calculate basket
             basketCalculationHelpers.calculateTotals(basket);
+            var testing = basket;
+            var test = 'testing';
         } catch (e) {
             BasketMgr.deleteTemporaryBasket(basket);
             res.json({

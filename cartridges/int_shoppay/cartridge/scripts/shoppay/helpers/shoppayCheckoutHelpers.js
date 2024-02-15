@@ -211,14 +211,17 @@ function addProductToTempBasket(product, basket) {
             pli.setQuantityValue(quantity);
 
             // Update product line item option model
-            var optionModel = pli.optionModel;
+            var testPLI = pli;
+            // var optionModel = pli.optionModel;
             optionsArray.forEach(function (option) {
-                var productOption = optionModel.getOption(option.id);
+                var productOption = pli.optionModel.getOption(option.id);
                 if (productOption) {
-                    var productOptionValue = optionModel.getOptionValue(productOption, option.valueId);
+                    var productOptionValue = pli.optionModel.getOptionValue(productOption, option.valueId);
                     if (productOptionValue) {
                         // Update selected value for product option
-                        optionModel.setSelectedOptionValue(productOption, productOptionValue);
+                        pli.optionModel.setSelectedOptionValue(productOption, productOptionValue);
+                        var test = pli.optionProductLineItems[0];
+                        var testTwo = 'test';
                     }
                 }
             });
@@ -231,6 +234,7 @@ function addProductToTempBasket(product, basket) {
             errorMsg: e.message
         };
     }
+    var testB = basket;
     return {
         success: true,
         errorMsg: null
