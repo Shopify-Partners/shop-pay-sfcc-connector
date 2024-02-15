@@ -1,10 +1,9 @@
 'use strict';
 
-const helper = require('./helpers/shoppayHelper')
 
 // Enables & Disables Shop Pay's Buy Now button click based on whether the product is ready to order on the PDP
 function shopPayBtnDisabledStyle(elem, isReadyToOrder) {
-    let readyToOrderPageLoad = helper.isReadyToOrderOnPageLoad();
+    let readyToOrderPageLoad = isReadyToOrderOnPageLoad();
     const isPDP = isPDPcontext();
 
     if (elem) {
@@ -39,9 +38,20 @@ function shopPayMutationObserver(elemSelector) {
     observer.observe(document.body, { childList: true, subtree: true });
 }
 
+// Checks whether a Buy Now product is ready on page load or not (ex: simple products vs. variants with multiple options to choose from, etc.)
+function isReadyToOrderOnPageLoad() {
+    let readyToOrder = false;
+    let $element = document.querySelector('[data-ready-to-order]');
+    if ($element && $element.attributes['data-ready-to-order'] && $element.attributes['data-ready-to-order'].value) {
+        readyToOrder = $element.attributes['data-ready-to-order'].value === "true";
+    }
+    return readyToOrder;
+}
+
 
 module.exports = {
     shopPayBtnDisabledStyle: shopPayBtnDisabledStyle,
     shopPayMutationObserver: shopPayMutationObserver,
-    isPDPcontext: isPDPcontext
+    isPDPcontext: isPDPcontext,
+    isReadyToOrderOnPageLoad: isReadyToOrderOnPageLoad
 };

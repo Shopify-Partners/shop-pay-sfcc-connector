@@ -2,7 +2,7 @@
 
 const serviceName = 'shoppay.api.storefront';
 const LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
-const shopPayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
+const shoppayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
 
 /** Creates 'createRequest' callback for a service
  * @param  {dw.svc.Service} service service instance
@@ -36,14 +36,14 @@ module.exports = function () {
             return JSON.parse(response.text);
         },
         getRequestLogMessage: function (request) {
-            return (shopPayServiceHelper.getStorefrontRequestLogMessage(request));
+            return (shoppayServiceHelper.getStorefrontRequestLogMessage(request));
         },
         getResponseLogMessage: function (response) {
-            return (shopPayServiceHelper.getStorefrontResponseLogMessage(response));
+            return (shoppayServiceHelper.getStorefrontResponseLogMessage(response));
         },
         mockCall: function (service, params) {
             var data = JSON.parse(params);
-            const mockResponse = shopPayServiceHelper.getMockResponse(data.variables.token ? 'sessionSubmit' : 'createSession');
+            const mockResponse = shoppayServiceHelper.getMockResponse(data.variables.token ? 'sessionSubmit' : 'createSession');
             return {
                 statusCode: 200,
                 statusMessage: 'success',

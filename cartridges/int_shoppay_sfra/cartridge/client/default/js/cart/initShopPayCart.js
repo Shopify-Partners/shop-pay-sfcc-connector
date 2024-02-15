@@ -12,14 +12,14 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-        readyOnPageLoad = helper.isReadyToOrderOnPageLoad();
+        readyOnPageLoad = utils.isReadyToOrderOnPageLoad();
         if (readyOnPageLoad) {
             let pageLoadData = helper.getInitProductData();
             helper.setInitProductData(pageLoadData); // updates global prod data.
         }
 
         // =========================== FROM POC BRANCH (WIP ????) ===========================
-        var readyToOrder = helper.isReadyToOrderOnPageLoad();
+        var readyToOrder = utils.isReadyToOrderOnPageLoad();
         if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
             $('body').on('product:afterAttributeSelect', helper.initBuyNow); // receives the Event & Response
             // $('body').on('product:updateAddToCart', initBuyNow); // CHECK IF THIS EVENT IS ALSO NEEDED IN ADDITION TO THE AFTER ATTRIBUTE SELECT ABOVE??
@@ -60,7 +60,8 @@ function initShopPayEmailRecognition() {
 }
 
 // product:updateAddToCart // DELETE product:updateAddToCart event if not needed here (???)
-$('body').on('cart:update product:afterAddToCart', function () {
+$('body').on('cart:update product:afterAddToCart promotion:success', function () {
+// $('body').on('cart:update product:afterAddToCart product:updateAddToCart promotion:success', function () {
     if (window.ShopPay) {
         if (!session) {
             session = initShopPaySession();

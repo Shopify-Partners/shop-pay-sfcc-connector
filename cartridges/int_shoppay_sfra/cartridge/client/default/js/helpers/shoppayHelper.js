@@ -54,14 +54,6 @@ function isCartEmptyOnLoad() {
     return false;
 }
 
-function isReadyToOrderOnPageLoad() {
-    let readyToOrder = false;
-    let $element = document.querySelector('[data-ready-to-order]');
-    if ($element && $element.attributes['data-ready-to-order'] && $element.attributes['data-ready-to-order'].value) {
-        readyToOrder = $element.attributes['data-ready-to-order'].value === "true";
-    }
-    return readyToOrder;
-}
 
 function getInitProductData() {
     let productData = null;
@@ -341,14 +333,13 @@ function initBuyNow(e, response) {
 }
 
 
-export {
-    getCsrfToken,
-    getUrlWithCsrfToken,
-    isCartEmptyOnLoad,
-    setSessionListeners,
-    getInitProductData,
-    isReadyToOrderOnPageLoad,
-    initBuyNow,
-    productData,
-    setInitProductData
+module.exports = {
+    getCsrfToken: getCsrfToken,
+    getUrlWithCsrfToken: getUrlWithCsrfToken,
+    isCartEmptyOnLoad: isCartEmptyOnLoad,
+    setSessionListeners: setSessionListeners,
+    getInitProductData: getInitProductData,
+    initBuyNow: initBuyNow,
+    productData: productData,
+    setInitProductData: setInitProductData
 };

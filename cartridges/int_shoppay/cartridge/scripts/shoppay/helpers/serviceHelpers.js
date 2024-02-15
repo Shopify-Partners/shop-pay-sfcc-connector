@@ -170,6 +170,39 @@ const mockShopPayPaymentRequestSessionSubmitResponse = {
     }
 }
 
+const mockOrderDetailsResponse = {
+    "data": {
+        "orders": {
+            "edges": [
+                {
+                    "node": {
+                        "billingAddress": {
+                            "firstName": "Jane",
+                            "lastName": "Doe",
+                            "address1": "100 W Main St",
+                            "address2": null,
+                            "city": "Chicago",
+                            "provinceCode": "IL",
+                            "zip": "60661",
+                            "countryCodeV2": "US",
+                            "phone": "+3125555555"
+                        },
+                        "email": "janedoe521@yopmail.com",
+                        "id": "gid://shopify/Order/5745722753349",
+                        "name": "#1011",
+                        "sourceIdentifier": "4d187167221f39d4fea6e5f1d3",
+                        "customer": {
+                            "firstName": "Jane",
+                            "lastName": "Doe",
+                            "phone": "+3125555555"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+};
+
 /**
  * return mock payment request
  * @param {string} mockType type of mock payment request to be recieved
@@ -206,6 +239,10 @@ function getMockResponse (mockType) {
 
         case 'sessionSubmit':
             response = mockShopPayPaymentRequestSessionSubmitResponse;
+            break;
+
+        case 'orderDetails':
+            response = mockOrderDetailsResponse;
             break;
 
         default:
@@ -262,7 +299,7 @@ function getStorefrontResponseLogMessage(response) {
             && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token
         ) {
             // mask payment token
-            jsonBody.data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
+            data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
         }
         return JSON.stringify(jsonBody);
     } catch (e) {
@@ -271,9 +308,76 @@ function getStorefrontResponseLogMessage(response) {
     return response.text;
 }
 
+/**
+ * Filters the HTTP service response to remove sensitive information before logging the request
+ * @param {Object} request
+ * @returns {string} the filtered log message
+ */
+function getAdminRequestLogMessage(request) {
+    // No PII to filter in the Admin requests
+    return request;
+};
+
+/**
+ * Filters the HTTP service response to remove sensitive information before logging the response
+ * @param {Object} response
+ * @returns {string} the filtered log message
+ */
+function getAdminResponseLogMessage(response) {
+    try {
+        var responseBody = response.text;
+        var jsonBody = JSON.parse(responseBody);
+        if (!jsonBody.data) {
+            return response.text;
+        }
+        var data = jsonBody.data;
+        // Orders Query - mask PII
+        if (data.orders && data.orders.edges.length > 0) {
+            var node = data.orders.edges[0].node;
+            if (node.email) {
+                node.email = "****";
+            }
+            if (node.billingAddress) {
+                if (node.billingAddress.firstName) {
+                    node.billingAddress.firstName = "****";
+                }
+                if (node.billingAddress.lastName) {
+                    node.billingAddress.lastName = "****";
+                }
+                if (node.billingAddress.address1) {
+                    node.billingAddress.address1 = "****";
+                }
+                if (node.billingAddress.address2) {
+                    node.billingAddress.address2 = "****";
+                }
+                if (node.billingAddress.phone) {
+                    node.billingAddress.phone = "****";
+                }
+            }
+            if (node.customer) {
+                if (node.customer.firstName) {
+                    node.customer.firstName = "****";
+                }
+                if (node.customer.lastName) {
+                    node.customer.lastName = "****";
+                }
+                if (node.customer.phone) {
+                    node.customer.phone = "****";
+                }
+            }
+        }
+        return JSON.stringify(jsonBody);
+    } catch (e) {
+        // no action - log response as is
+    }
+    return response.text;
+};
+
 module.exports = {
     getMockPaymentRequest: getMockPaymentRequest,
     getMockResponse: getMockResponse,
     getStorefrontRequestLogMessage: getStorefrontRequestLogMessage,
-    getStorefrontResponseLogMessage: getStorefrontResponseLogMessage
+    getStorefrontResponseLogMessage: getStorefrontResponseLogMessage,
+    getAdminRequestLogMessage: getAdminRequestLogMessage,
+    getAdminResponseLogMessage: getAdminResponseLogMessage
 };
