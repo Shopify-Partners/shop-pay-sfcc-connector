@@ -78,9 +78,6 @@ function validateInputs(req, currentBasket, inputParams) {
 server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-
-    // var currentBasket = BasketMgr.getCurrentBasket();  // COMMENTING OUT (SETTING VALUE BELOW IN CONDITIONAL -- DOUBLE CHECK ????)
-// =========================== FROM SSPSC-38 POC ===========================
     var currentBasket;
     var paymentRequestModel;
     var httpParameterMap = req.httpParameterMap;
@@ -90,8 +87,6 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     else {
         currentBasket = BasketMgr.getCurrentBasket();
     }
-    // =====================================================================
-
 
     var inputValidation = validateInputs(req, currentBasket, []);
     if (!inputValidation || inputValidation.error) {
@@ -104,7 +99,6 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     }
 
     try {
-        // var paymentRequestModel = new PaymentRequestModel(currentBasket); // COMMENTING OUT (PREVIOUS HANDLING ON DEVEVLOP BRANCH VS. POC HANDLING ON FOLLOWING LINE ????)
         paymentRequestModel = new PaymentRequestModel(currentBasket);
     } catch (e) {
         logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
@@ -123,9 +117,6 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     });
     next();
 });
-
-
-// =========================== NEW CONTROLLERS FROM SSPSC-38 POC ===========================
 
 /**
  * The ShopPay-BuyNowData controller
@@ -147,7 +138,6 @@ server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRe
     })
     next();
 });
-
 
 /**
  * The ShopPay-PrepareBasket controller
@@ -233,9 +223,6 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
 
     return next();
 });
-
-// =====================================================================================
-
 
 /**
  * The ShopPay-BeginSession controller initializes the Shop Pay payment request session with the
@@ -397,9 +384,6 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
     var Transaction = require('dw/system/Transaction');
     var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    // var currentBasket = BasketMgr.getCurrentBasket(); // COMMENTING OUT (DECLARING BELOW IN CONDITIONAL -- DOUBLE CHECK ????)
-
-    // =========================== FROM SSPSC-38 POC ===========================
     var currentBasket;
     var inputs = JSON.parse(req.body);
 
@@ -409,8 +393,6 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
     else {
         currentBasket = BasketMgr.getCurrentBasket();
     }
-    // ==========================================================================
-
 
     var data = JSON.parse(req.body);
 
@@ -437,27 +419,9 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
     var inputAddress = inputs.selectedAddress;
     Transaction.wrap(function () {
 
-        // =========================== FROM SSPSC-38 POC ===========================
-        // var shipment = currentBasket.defaultShipment;
-        // if (!shipment.shippingAddress) {
-        //     shipment.createShippingAddress();
-        // }
-
-        // var address = shipment.shippingAddress;
-        // address.firstName = inputAddress.firstName;
-        // address.lastName = inputAddress.lastName;
-        // address.address1 = inputAddress.address1;
-        // address.city = inputAddress.city;
-        // address.stateCode = inputAddress.provinceCode;
-        // address.postalCode = inputAddress.postalCode;
-        // address.countryCode = inputAddress.postalCode;
-        // address.phone = inputAddress.phone;
-        // address.companyName = inputAddress.companyName;
-
-        // currentBasket.customerEmail = inputAddress.email;
+        // =========================== FROM SSPSC-38 POC =========================== (????????)
         // basketCalculationHelpers.calculateTotals(currentBasket);
-    // ==========================================================================
-
+        // ==========================================================================
 
         // Get or create shipment shipping address
         var shippingAddress = shipment.shippingAddress;
@@ -514,33 +478,26 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
  */
 server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
-
-    // =========================== FROM POC BRANCH ===========================
     var ShippingMgr = require('dw/order/ShippingMgr');
     var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
     var collections = require('*/cartridge/scripts/util/collections');
-    // =======================================================================
-
     var SalesforcePaymentRequest = require('dw/extensions/payments/SalesforcePaymentRequest');
     var Transaction = require('dw/system/Transaction');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    // var currentBasket = BasketMgr.getCurrentBasket();  // COMMENTING OUT (DECLARING BELOW IN CONDITIONAL -- DOUBLE CHECK ????)
     var currentBasket;
-
     var array = require('*/cartridge/scripts/util/array');
     var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
 
     var data = JSON.parse(req.body);
 
 
-    // =========================== FROM SSPSC-38 POC ===========================
-    // TODO: check this conditional against other controllers. (NEED CONSISTENCY)
     if (data.basketId) {
         currentBasket = BasketMgr.getTemporaryBasket(data.basketId);
     } else {
         currentBasket = BasketMgr.getCurrentBasket();
     }
 
+    // =========================== FROM SSPSC-38 POC ===========================  (????????)
     // var inputValidation = validateInputs(req, currentBasket, ['selectedDeliveryMethod']);
     // ==========================================================================
 
@@ -553,21 +510,17 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
         return next();
     }
 
-
-    // =========================== FROM SSPSC-38 POC ===========================
     var deliveryMethodInput = data.selectedDeliveryMethod;
     var shippingMethods = ShippingMgr.getAllShippingMethods();
     var newShippingMethod = collections.find(shippingMethods, function (shippingMethod) {
         if (deliveryMethodInput && deliveryMethodInput.code) {
             return shippingMethod.ID === deliveryMethodInput.code;
         }
-        // return shippingMethod.ID === deliveryMethodInput.code;
     });
     Transaction.wrap(function() {
         currentBasket.defaultShipment.setShippingMethod(newShippingMethod);
         basketCalculationHelpers.calculateTotals(currentBasket);
     });
-    // ==========================================================================
 
 
     var shipment = currentBasket.defaultShipment;
@@ -634,18 +587,15 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
     var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
     var validationHelpers = require('*/cartridge/scripts/helpers/basketValidationHelpers');
-
-    var currentBasket = BasketMgr.getCurrentBasket();
-
-    // =========================== FROM SSPSC-38 POC ===========================
+    var currentBasket;
     var inputs = JSON.parse(req.body);
+
     if (inputs.basketId) {
         currentBasket = BasketMgr.getTemporaryBasket(inputs.basketId);
     }
     else {
         currentBasket = BasketMgr.getCurrentBasket();
     }
-    // ==========================================================================
 
     var inputValidation = validateInputs(req, currentBasket, ['paymentRequest','token']);
     if (!inputValidation || inputValidation.error) {
@@ -659,17 +609,13 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
     // var inputs = JSON.parse(req.body);
     var paymentRequest = inputs['paymentRequest'];
 
-    // =========================== FROM SSPSC-38 POC ===========================
     /* shippingAddress.id is not a valid input for the GraphQL request, but is included in the payment request object from client-side */
     if (paymentRequest.shippingAddress.id) {
         delete paymentRequest.shippingAddress.id;
     }
-    // ==========================================================================
 
     var token = inputs['token'];
 
-
-    // =========================== FROM SSPSC-38 POC ===========================
     Transaction.wrap(function() {
         if (!currentBasket.billingAddress) {
             currentBasket.createBillingAddress();
@@ -689,7 +635,6 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
 
     var paymentMethodID = shoppayGlobalRefs.shoppayPaymentMethodId;
     var paymentProcessor = PaymentMgr.getPaymentMethod(paymentMethodID).paymentProcessor;
-    // ==========================================================================
 
     shoppayCheckoutHelpers.ensureNoEmptyShipments(currentBasket, req);
     COHelpers.recalculateBasket(currentBasket);

@@ -4,15 +4,11 @@ var Transaction = require('dw/system/Transaction');
 var collections = require('*/cartridge/scripts/util/collections');
 var common = require('*/cartridge/scripts/shoppay/common');
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
-
-
-// =========================== FROM POC BRANCH ===========================
 var BasketMgr = require('dw/order/BasketMgr');
 var ShippingMgr = require('dw/order/ShippingMgr');
 var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
 var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
 var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
-// =======================================================================
 
 /**
  * Ensures that no shipment exists with 0 product line items in the customer's basket.
@@ -129,6 +125,7 @@ function validateShippingMethods(basket) {
     });
     return shipmentsValid;
 }
+
 /**
  * Sets the minimum required billing address data for SFCC order creation from payment request data. This
  * data will be updated with the Shop Pay billing data in the ORDERS_CREATE webhook handler payload after
@@ -172,8 +169,6 @@ function failOrder(order) {
     }
 }
 
-
-// =========================== FROM POC BRANCH ===========================
 /**
  * Creates a temporary basket to use for Buy Now.
  * @returns {dw.order.Basket} basket to use for Buy Now
@@ -266,8 +261,6 @@ function getBuyNowData(product) {
     });
     return paymentRequest;
 }
-// =====================================================================
-
 
 
 module.exports = {

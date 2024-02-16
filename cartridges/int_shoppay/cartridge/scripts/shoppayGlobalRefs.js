@@ -141,13 +141,11 @@ function shoppayElementsApplicable(context, productId) {
  * @returns {object} - js client refs
  */
 
-// ================================= FUNC PARAMS ON DEVELOP BRANCH. CONFIRM BEFORE REMOVING (???) =================================
+// ================================= FUNC PARAMS ON DEVELOP BRANCH. CONFIRM BEFORE REMOVING (??????) =================================
 // var getClientRefs = function(initShopPayEmailRecognition, productId) {
 // ================================================================================================================================
 
 var getClientRefs = function(context, productId) {
-    let test = context;
-    let testTwo = productId;
     return {
         urls: urls,
         constants: {

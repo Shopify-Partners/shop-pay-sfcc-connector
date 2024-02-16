@@ -17,9 +17,6 @@ server.append('Show', csrfProtection.generateToken, function (req, res, next) {
     var currentBasket = BasketMgr.getCurrentBasket();
     var shoppayApplicable = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);
     res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('cart') && shoppayApplicable;
-    // // =================================== FROM POC PR - STILL NEEDED ?????? ===================================
-    // res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs('cart'));
-    // // =========================================================================================================
     res.viewData.shoppayClientRefs = res.viewData.includeShopPayJS
         ? JSON.stringify(shoppayGlobalRefs.getClientRefs())
         : JSON.stringify({});

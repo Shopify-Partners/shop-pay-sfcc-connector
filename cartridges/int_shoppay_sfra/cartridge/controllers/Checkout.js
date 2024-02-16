@@ -16,9 +16,6 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
     var currentBasket = BasketMgr.getCurrentBasket();
     var shoppayApplicable = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);
-    // // =================================== FROM POC PR - STILL NEEDED ?????? ===================================
-    // res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs('checkout'));
-    // // =========================================================================================================
     res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('checkout') && shoppayApplicable;
     res.viewData.shoppayClientRefs = res.viewData.includeShopPayJS
         ? JSON.stringify(shoppayGlobalRefs.getClientRefs(true))

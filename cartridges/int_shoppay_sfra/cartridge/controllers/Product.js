@@ -14,18 +14,13 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
  * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS
  */
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
-
-    // =========================== FROM SSPSC-38 POC ===========================
     var product = res.viewData.product;
     if (product.productType === 'set') {
         return next();
     }
-    // ==========================================================================
-
-var contextTest = res;
 
     res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('pdp', res.viewData.product.id);
-    // res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs(false, res.viewData.product.id)); // COMMENTING OUT...WAS LINE ON DEVELOP USING false COMPARED TO POC BRANCH USING 'pdp' (????)
+    // res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs(false, res.viewData.product.id)); // COMMENTING OUT...WAS LINE ON DEVELOP USING false COMPARED TO POC BRANCH USING 'pdp' (??????)
     var currentBasket = BasketMgr.getCurrentBasket();
     var isEmptyCart = false;
     if (!currentBasket
@@ -35,7 +30,6 @@ var contextTest = res;
     }
     res.viewData.isEmptyCart = isEmptyCart;
 
-    // =========================== FROM SSPSC-38 POC ===========================
     res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs('pdp', res.viewData.product.id));
     if (product.readyToOrder) {
         var buyNowInitData = {
@@ -64,7 +58,6 @@ var contextTest = res;
         }
         res.viewData.buyNowInitData = JSON.stringify(buyNowInitData);
     }
-    // ==========================================================================
 
     next();
 });
