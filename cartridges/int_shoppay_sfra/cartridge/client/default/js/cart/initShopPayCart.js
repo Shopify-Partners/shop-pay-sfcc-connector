@@ -39,7 +39,7 @@ function initShopPayButton() {
 
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
-    utils.shopPayMutationObserver(paymentSelector);  // set mutation observ. to apply correct btn styles when this element is rendered to the DOM (based on whether basket is empty or not)
+    utils.shopPayMutationObserver(paymentSelector);
 }
 
 function initShopPayEmailRecognition() {
