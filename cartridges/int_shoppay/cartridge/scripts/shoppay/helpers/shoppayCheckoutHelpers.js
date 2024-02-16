@@ -238,8 +238,6 @@ function getBuyNowData(product) {
     // Create a temporary basket for payment request options calculation
     var basket = Transaction.wrap(createBuyNowBasket);
     var shippingMethod = ShippingMgr.defaultShippingMethod;
-
-    // Kristin TODO: Consider using OOTB cartHelper.js: addProductToCart for final version
     var paymentRequest;
     var result = addProductToTempBasket(product, basket);
 

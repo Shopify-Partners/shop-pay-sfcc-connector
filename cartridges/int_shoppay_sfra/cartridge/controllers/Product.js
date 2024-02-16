@@ -10,9 +10,7 @@ var BasketMgr = require('dw/order/BasketMgr');
 
 const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 
-/**
- * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS
- */
+
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
     var product = res.viewData.product;
     if (product.productType === 'set') {

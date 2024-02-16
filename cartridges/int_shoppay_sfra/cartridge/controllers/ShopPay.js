@@ -165,7 +165,6 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
     var basket = Transaction.wrap(shoppayCheckoutHelpers.createBuyNowBasket);
     var shippingMethod = ShippingMgr.defaultShippingMethod;
 
-    // Kristin TODO: Consider using OOTB cartHelper.js: addProductToCart for final version
     var paymentRequestModel;
     var result = shoppayCheckoutHelpers.addProductToTempBasket(product, basket);
 
@@ -383,10 +382,10 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
     var Transaction = require('dw/system/Transaction');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
     var currentBasket;
-    var inputs = JSON.parse(req.body);
+    var data = JSON.parse(req.body);
 
-    if (inputs.basketId) {
-        currentBasket = BasketMgr.getTemporaryBasket(inputs.basketId);
+    if (data.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(data.basketId);
     } else {
         currentBasket = BasketMgr.getCurrentBasket();
     }
