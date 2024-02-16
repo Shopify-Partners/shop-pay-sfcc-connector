@@ -575,12 +575,6 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
     }
 
     var paymentRequest = inputs['paymentRequest'];
-
-    /* shippingAddress.id is not a valid input for the GraphQL request, but is included in the payment request object from client-side */
-    if (paymentRequest.shippingAddress.id) {
-        delete paymentRequest.shippingAddress.id;
-    }
-
     var token = inputs['token'];
 
     shoppayCheckoutHelpers.ensureNoEmptyShipments(currentBasket, req);
