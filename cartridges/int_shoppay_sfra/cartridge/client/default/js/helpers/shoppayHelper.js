@@ -67,7 +67,7 @@ function setInitProductData(data) {
  */
 function setSessionListeners(session) {
     session.addEventListener("sessionrequested", function (ev) {
-        let sessionPaymentRequest
+        let sessionPaymentRequest;
 
         if (window.shoppayClientRefs.constants.isBuyNow) {
             $.ajax({
@@ -89,7 +89,7 @@ function setSessionListeners(session) {
                 }
             });
         } else {
-            sessionPaymentRequest = session.paymentRequest
+            sessionPaymentRequest = session.paymentRequest;
         }
 
         let requestData = {
@@ -267,7 +267,6 @@ function initBuyNow(e, response) {
             if (responseProduct.childProducts) {
                 productData.childProducts = responseProduct.childProducts;
             }
-            // TODO: Handle sets if supported
         }
     }
 }

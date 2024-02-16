@@ -134,7 +134,7 @@ server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRe
         error: false,
         errorMsg: null,
         paymentRequest: buyNowPaymentRequest
-    })
+    });
     next();
 });
 

@@ -102,7 +102,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
 
     if (paymentRequest || (responseJSON && !responseJSON.error)) {
         const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
-        utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder) // Enable BuyNow Button Click on PDP if Product is Ready To Order
+        utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder); // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
         let shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
@@ -119,7 +119,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         pid: responseProduct.id,
                         quantity: responseProduct.selectedQuantity,
                         options: responseProduct.options
-                    })
+                    });
                     if (shopPaySession) {
                         shopPaySession.close();
                         let updatedPaymentRequest = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
@@ -131,7 +131,6 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                     }
 
                 } else {
-                    // NOTE...ADD THE SUCCESS & ERROR FUNCTIONS INTO THE buildPaymentRequest FUNCTION AND USE INSTEAD...???
                     $.ajax({
                         url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
                         type: 'GET',
@@ -153,8 +152,8 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                             }
                         },
                         error: function (err) {
-                            // TODO
-                            console.log("ERROR:  ", err)
+                            // TODO:
+                            console.log("ERROR:  ", err);
                         }
                     });
                 }
@@ -165,7 +164,10 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     }
 }
 
-// Handles AJAX call to get the payment response
+/**
+ * Handles AJAX call to get the payment response.
+ * @returns {Object} paymentResponse - an response object.
+ */
 function buildPaymentRequest () {
     let token = document.querySelector('[data-csrf-token]');
     if (token) {
@@ -182,7 +184,12 @@ function buildPaymentRequest () {
     }
 }
 
-// Handles AJAX call to create / update the payment response needed for the ShopPay.PaymentRequest.build() method.
+/**
+ * Handles AJAX call to create / update the payment response needed for the ShopPay.PaymentRequest.build() method.
+ * @param {Object} requestObj - a request object that contains relevant event data & session data.
+ * @param {string} controllerURL - String url of the targeted controller (based on the urls Obj set in shopPayGlobalRefs.js)
+ * @returns {Object} responseJSON - an updated response object to be used in the build & on the ShopPay.PaymentRequest object.
+ */
 function createResponse (requestObj, controllerURL) {
     let responseJSON = $.ajax({
         url: helper.getUrlWithCsrfToken(controllerURL),
@@ -192,7 +199,7 @@ function createResponse (requestObj, controllerURL) {
         contentType: 'application/json'
     }).responseJSON;
 
-    return responseJSON
+    return responseJSON;
 }
 
 
