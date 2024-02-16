@@ -46,7 +46,7 @@ var contextTest = res;
             var options = [];
             product.options.forEach(function(option) {
                 options.push({
-                    optionId: option.id,
+                    id: option.id,
                     selectedValueId: option.selectedValueId
                 })
             });
@@ -83,7 +83,7 @@ server.append('Variation', function (req, res, next) {
         var options = [];
         product.options.forEach(function(option) {
             options.push({
-                optionId: option.id,
+                id: option.id,
                 selectedValueId: option.selectedValueId
             })
         });

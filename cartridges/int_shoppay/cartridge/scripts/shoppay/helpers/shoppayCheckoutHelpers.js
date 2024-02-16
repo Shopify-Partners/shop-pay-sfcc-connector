@@ -189,6 +189,7 @@ function createBuyNowBasket() {
 }
 
 function addProductToTempBasket(product, basket) {
+    var ProductMgr = require('dw/catalog/ProductMgr');
     var sku = product.pid;
     var options = product.options;
     var quantity = product.quantity;
@@ -206,35 +207,32 @@ function addProductToTempBasket(product, basket) {
             optionsArray = [];
         }
         var result = Transaction.wrap(function () {
-            // Add product line item
-            var pli = basket.createProductLineItem(sku, basket.defaultShipment);
-            pli.setQuantityValue(quantity);
+            var apiProduct = ProductMgr.getProduct(sku);
+            var optionModel = apiProduct.optionModel;
 
-            // Update product line item option model
-            var testPLI = pli;
-            // var optionModel = pli.optionModel;
+            // Set selected product option on product option model
             optionsArray.forEach(function (option) {
-                var productOption = pli.optionModel.getOption(option.id);
+                var productOption = optionModel.getOption(option.id);
                 if (productOption) {
-                    var productOptionValue = pli.optionModel.getOptionValue(productOption, option.valueId);
+                    var productOptionValue = optionModel.getOptionValue(productOption, option.valueId);
                     if (productOptionValue) {
                         // Update selected value for product option
-                        pli.optionModel.setSelectedOptionValue(productOption, productOptionValue);
-                        var test = pli.optionProductLineItems[0];
-                        var testTwo = 'test';
+                        optionModel.setSelectedOptionValue(productOption, productOptionValue);
                     }
                 }
             });
+
+            // Add product line item to temporary basket
+            var pli = basket.createProductLineItem(apiProduct, optionModel, basket.defaultShipment);
+            pli.setQuantityValue(quantity);
         });
     } catch (e) {
-        var test = e;
         dw.system.Logger.error(e.message);
         return {
             error: true,
             errorMsg: e.message
         };
     }
-    var testB = basket;
     return {
         success: true,
         errorMsg: null
