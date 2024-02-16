@@ -53,7 +53,6 @@ function getInitProductData() {
 
 function setInitProductData(data) {
     productData = data;
-    console.log('GLOBAL PROD DATA UPDATED TO >>>>>> ', productData);
 }
 
 

@@ -8,7 +8,7 @@ function shopPayBtnDisabledStyle(elem, isReadyToOrder) {
 
     if (elem) {
         if (!isBuyNow || (isBuyNow && (isReadyToOrder || readyToOrderPageLoad))) {
-            elem.style.pointerEvents = 'auto'; // DOUBLE CHECK IF WORKS ON MOBILE
+            elem.style.pointerEvents = 'auto';
         } else {
             elem.style.pointerEvents = 'none';
         }

@@ -251,9 +251,6 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
  */
 server.post('BeginSession', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
-    // var currentBasket = BasketMgr.getCurrentBasket(); // COMMENTING OUT (DECLARING BELOW IN CONDITIONAL -- DOUBLE CHECK ????)
-    
-    // =========================== FROM SSPSC-38 POC BRANCH ===========================
     var currentBasket;
     var inputs = JSON.parse(req.body);
 
@@ -262,8 +259,6 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
     } else {
         currentBasket = BasketMgr.getCurrentBasket();
     }
-    // ================================================================================
-
 
     var inputValidation = validateInputs(req, currentBasket, ['paymentRequest']);
     if (!inputValidation || inputValidation.error) {

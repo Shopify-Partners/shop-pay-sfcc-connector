@@ -53,7 +53,6 @@ function initShopPayEmailRecognition() {
         .render('#shop-pay-login-container');
 }
 
-// product:updateAddToCart // DELETE product:updateAddToCart event if not needed here (???)
 $('body').on('cart:update product:afterAddToCart promotion:success', function () {
     /* Only interested in cart updates on Cart page (cart updates are not triggered in checkout). Buy Now already
     has a separate event handler for changes to attribute selections */
@@ -111,10 +110,8 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
 
         if (shopPaySession) {
             helper.setSessionListeners(shopPaySession);
-            // $('body').off('product:updateAddToCart', helper.initBuyNow); // REMOVE WHEN SURE NOT NEEDED (BEFORE PR ??????)
             $('body').off('product:afterAttributeSelect', helper.initBuyNow);
 
-            // $('body').on('product:updateAddToCart', function(e, response) { // REMOVE WHEN SURE NOT NEEDED (BEFORE PR ??????)
             $('body').on('product:afterAttributeSelect', function(e, response) {
                 let responseProduct = response.data.product;
                 if (window.shoppayClientRefs.constants.isBuyNow && responseProduct.buyNow) {
@@ -124,8 +121,6 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         options: responseProduct.options
                     })
                     if (shopPaySession) {
-                        // Don't want to destroy existing basket & don't want to create a second basket -- likley need to go with initShopPaySession to restart that again (creates errors...calling directly fixes issue with multiple sessions?)
-                        // AVOID multiple baskets (once prepare basket is called - we want to make sure we're using the same basket id & not destroying / creating a second basket)
                         shopPaySession.close();
                         let updatedPaymentRequest = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
                         shopPaySession = window.ShopPay.PaymentRequest.createSession({
@@ -136,7 +131,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                     }
 
                 } else {
-                    // NOTE...ADD THE SUCCESS & ERROR FUNCTIONS INTO THE buildPaymentRequest FUNCTION AND USE INSTEAD...
+                    // NOTE...ADD THE SUCCESS & ERROR FUNCTIONS INTO THE buildPaymentRequest FUNCTION AND USE INSTEAD...???
                     $.ajax({
                         url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
                         type: 'GET',
