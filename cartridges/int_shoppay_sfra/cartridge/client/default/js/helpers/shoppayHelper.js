@@ -199,7 +199,11 @@ function setSessionListeners(session) {
         // Update the payment request based on the shipping address change
         const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
             ...currentPaymentRequest,
-            deliveryMethods: deliveryMethods
+            deliveryMethods: deliveryMethods,
+            shippingLines: responseJSON.paymentRequest.shippingLines,
+            totalShippingPrice: responseJSON.paymentRequest.totalShippingPrice,
+            totalTax: responseJSON.paymentRequest.totalTax,
+            total: responseJSON.paymentRequest.total
         });
 
         session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
