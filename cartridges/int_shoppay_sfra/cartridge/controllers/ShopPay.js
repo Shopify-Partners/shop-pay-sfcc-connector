@@ -491,10 +491,6 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
         currentBasket = BasketMgr.getCurrentBasket();
     }
 
-    // =========================== FROM SSPSC-38 POC ===========================  (????????)
-    // var inputValidation = validateInputs(req, currentBasket, ['selectedDeliveryMethod']);
-    // ==========================================================================
-
     var inputValidation = validateInputs(req, currentBasket, ['deliveryMethod']);
     if (!inputValidation || inputValidation.error) {
         res.json({
@@ -504,7 +500,7 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
         return next();
     }
 
-    var deliveryMethodInput = data.selectedDeliveryMethod;
+    var deliveryMethodInput = data.deliveryMethod;
     var shippingMethods = ShippingMgr.getAllShippingMethods();
     var newShippingMethod = collections.find(shippingMethods, function (shippingMethod) {
         if (deliveryMethodInput && deliveryMethodInput.code) {
