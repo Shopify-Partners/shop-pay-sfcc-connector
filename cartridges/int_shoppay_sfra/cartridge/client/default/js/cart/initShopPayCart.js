@@ -55,7 +55,9 @@ function initShopPayEmailRecognition() {
 
 // product:updateAddToCart // DELETE product:updateAddToCart event if not needed here (???)
 $('body').on('cart:update product:afterAddToCart promotion:success', function () {
-    if (window.ShopPay) {
+    /* Only interested in cart updates on Cart page (cart updates are not triggered in checkout). Buy Now already
+    has a separate event handler for changes to attribute selections */
+    if (window.ShopPay && !window.shoppayClientRefs.constants.isBuyNow) {
         if (!session) {
             session = initShopPaySession();
         } else {
@@ -80,7 +82,7 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
 
 
 function initShopPaySession(paymentRequestInput, readyToOrder) {
-    const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
+    let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
     let paymentRequest;
     let paymentRequestResponse;
     let responseJSON;

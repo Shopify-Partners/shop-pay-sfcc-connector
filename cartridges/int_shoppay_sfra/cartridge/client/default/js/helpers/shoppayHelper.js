@@ -114,8 +114,8 @@ function setSessionListeners(session) {
         let requestData = {
             discountCodes: ev.discountCodes,
         };
-        const isPDP = utils.isPDPcontext();
-        if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
+        let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
+        if (isBuyNow && window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
         }
 
@@ -152,8 +152,8 @@ function setSessionListeners(session) {
             deliveryMethod: ev.deliveryMethod,
             paymentRequest: currentPaymentRequest,
         };
-        const isPDP = utils.isPDPcontext();
-        if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
+
+        if (window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
         }
 
@@ -181,8 +181,8 @@ function setSessionListeners(session) {
             shippingAddress: ev.shippingAddress,
             paymentRequest: currentPaymentRequest,
         };
-        const isPDP = utils.isPDPcontext();
-        if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
+
+        if (window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
         }
 
@@ -206,8 +206,8 @@ function setSessionListeners(session) {
             token: session.token,
             paymentRequest: session.paymentRequest,
         };
-        const isPDP = utils.isPDPcontext();
-        if (isPDP && window.shoppayClientRefs.constants.isBuyNow) {
+
+        if (window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
         }
 
