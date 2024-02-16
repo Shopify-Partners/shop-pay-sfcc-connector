@@ -40,7 +40,10 @@ function getCsrfToken() {
     return '';
 }
 
-
+/**
+ * Get Init Product Data (page load and captures data available on page load)
+ * @returns {Object} - productData witht he following structure: { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
+ */
 function getInitProductData() {
     let productData = null;
     let $element = document.querySelector('[data-buy-now-init]');
@@ -50,13 +53,18 @@ function getInitProductData() {
     return productData;
 }
 
-
+/**
+ * Set Init Product Data
+ * @param {Object} data - accepts product data obj & updates global productData variable.  { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
+ */
 function setInitProductData(data) {
     productData = data;
 }
 
-
-// Sets Up ShopPay listener Events
+/**
+ * Sets Up ShopPay listener Events
+ * @param {Object} session - Accepts the Shop Pay session object and establishes necessary event listeners on the session.
+ */
 function setSessionListeners(session) {
     session.addEventListener("sessionrequested", function (ev) {
         let sessionPaymentRequest
