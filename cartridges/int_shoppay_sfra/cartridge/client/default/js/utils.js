@@ -7,7 +7,7 @@ function shopPayBtnDisabledStyle(elem, isReadyToOrder) {
     let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
 
     if (elem) {
-        if (isBuyNow || isReadyToOrder || readyToOrderPageLoad) {
+        if (!isBuyNow || (isBuyNow && (isReadyToOrder || readyToOrderPageLoad))) {
             elem.style.pointerEvents = 'auto'; // DOUBLE CHECK IF WORKS ON MOBILE
         } else {
             elem.style.pointerEvents = 'none';
