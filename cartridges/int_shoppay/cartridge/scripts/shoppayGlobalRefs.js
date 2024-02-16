@@ -135,22 +135,17 @@ function shoppayElementsApplicable(context, productId) {
 */
 /**
  * Add csrf token param to url
- * ---- @param {boolean || undefined} initShopPayEmailRecognition - should email recognition be initialized ---- (ORIGINAL COMMENT...REMOVE IN FAVOR OF CONTEXT INSTEAD ?????)
  * @param {string} productId - productID of the SFCC product for PDP context (optional)
- * @param {string} context - 'pdp', 'cart', or 'checkout' - used to set global constants in the window  --> (UPDATED COMMENT FROM POC BRANCH -- CONFIRM???)
+ * @param {string} context - 'pdp', 'cart', or 'checkout' - used to set global constants in the window
  * @returns {object} - js client refs
  */
 
-// ================================= FUNC PARAMS ON DEVELOP BRANCH. CONFIRM BEFORE REMOVING (??????) =================================
-// var getClientRefs = function(initShopPayEmailRecognition, productId) {
-// ================================================================================================================================
 
 var getClientRefs = function(context, productId) {
     return {
         urls: urls,
         constants: {
             shoppayEnabled: shoppayEnabled(),
-            // initShopPayEmailRecognition: initShopPayEmailRecognition || false, // FROM ORIGINAL DEVELOP BRANCH. CONFIRM BEFORE REMOVING (???)
             initShopPayEmailRecognition: context === 'checkout',
             isBuyNow: context === 'pdp'
         },

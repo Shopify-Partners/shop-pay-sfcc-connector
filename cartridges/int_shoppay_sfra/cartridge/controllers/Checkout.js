@@ -18,7 +18,7 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
     var shoppayApplicable = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);
     res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('checkout') && shoppayApplicable;
     res.viewData.shoppayClientRefs = res.viewData.includeShopPayJS
-        ? JSON.stringify(shoppayGlobalRefs.getClientRefs(true))
+        ? JSON.stringify(shoppayGlobalRefs.getClientRefs('checkout'))
         : JSON.stringify({});
     next();
 });
