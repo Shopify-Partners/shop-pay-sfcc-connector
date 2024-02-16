@@ -114,5 +114,6 @@ function matchObjects(object1, object2) {
 module.exports = {
     getPriceObject: getPriceObject,
     getDiscountsObject: getDiscountsObject,
+    isNull: isNull,
     matchObjects: matchObjects
 }
