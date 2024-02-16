@@ -382,7 +382,6 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
 server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
     var Transaction = require('dw/system/Transaction');
-    var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
     var currentBasket;
     var inputs = JSON.parse(req.body);
@@ -418,11 +417,6 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
 
     var inputAddress = inputs.selectedAddress;
     Transaction.wrap(function () {
-
-        // =========================== FROM SSPSC-38 POC =========================== (????????)
-        // basketCalculationHelpers.calculateTotals(currentBasket);
-        // ==========================================================================
-
         // Get or create shipment shipping address
         var shippingAddress = shipment.shippingAddress;
         if (!shippingAddress) {
