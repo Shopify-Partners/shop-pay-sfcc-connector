@@ -194,16 +194,16 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
-        const { deliveryMethods } = responseJSON.paymentRequest;
+        const { deliveryMethods, shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         // Update the payment request based on the shipping address change
         const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
             ...currentPaymentRequest,
             deliveryMethods: deliveryMethods,
-            shippingLines: responseJSON.paymentRequest.shippingLines,
-            totalShippingPrice: responseJSON.paymentRequest.totalShippingPrice,
-            totalTax: responseJSON.paymentRequest.totalTax,
-            total: responseJSON.paymentRequest.total
+            shippingLines: shippingLines,
+            totalShippingPrice: totalShippingPrice,
+            totalTax: totalTax,
+            total: total
         });
 
         session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
