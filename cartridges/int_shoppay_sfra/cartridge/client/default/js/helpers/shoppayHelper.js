@@ -1,5 +1,5 @@
+// Imported Files
 const shopPayCart = require('../cart/initShopPayCart');
-const utils = require('../utils');
 
 // Global Variables
 let orderConfirmationData;
