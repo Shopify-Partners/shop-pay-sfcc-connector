@@ -468,9 +468,6 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
  */
 server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
-    // var ShippingMgr = require('dw/order/ShippingMgr');
-    // var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
-    // var collections = require('*/cartridge/scripts/util/collections');
     var SalesforcePaymentRequest = require('dw/extensions/payments/SalesforcePaymentRequest');
     var Transaction = require('dw/system/Transaction');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
