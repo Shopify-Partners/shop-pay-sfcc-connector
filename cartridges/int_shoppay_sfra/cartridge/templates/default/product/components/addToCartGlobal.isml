@@ -5,6 +5,7 @@
 
         button {
             margin-bottom: 16px;
+            height: 40px
         }
     }
 </style>
@@ -12,7 +13,7 @@
 <div class="row cart-and-ipay  ${pdict.includeShopPayJS ? 'pdp-actions--shoppay-atc' : ''}">
     <div class="col-sm-12">
         <input type="hidden" class="add-to-cart-url" value="${pdict.addToCartUrl}">
-        <button class="add-to-cart-global btn btn-primary"
+        <button class="add-to-cart-global btn btn-primary col-sm-8"
                 data-pid="${product.id}"
                 ${!product.available ? "disabled" : ""}>
             <i class="fa fa-shopping-bag"></i>
