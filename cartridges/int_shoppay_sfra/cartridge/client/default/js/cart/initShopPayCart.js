@@ -1,5 +1,4 @@
 const helper = require('../helpers/shoppayHelper');
-const utils = require('../utils');
 
 let session;
 
@@ -11,7 +10,7 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-        let readyOnPageLoad = utils.isReadyToOrderOnPageLoad();
+        let readyOnPageLoad = helper.isReadyToOrderOnPageLoad();
         if (readyOnPageLoad) {
             let pageLoadData = helper.getInitProductData();
             helper.setInitProductData(pageLoadData); // updates global prod data.
@@ -42,7 +41,7 @@ function initShopPayButton() {
 
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
-    utils.shopPayMutationObserver(paymentSelector);
+    helper.shopPayMutationObserver(paymentSelector);
 }
 
 function initShopPayEmailRecognition() {
@@ -67,7 +66,7 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
 
             if (responseJSON) {
-                utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"));
+                helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"));
             }
 
             if (responseJSON && !responseJSON.error && responseJSON.paymentRequest !== null) {
@@ -105,7 +104,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
 
     if (paymentRequest || (responseJSON && !responseJSON.error)) {
         const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
-        utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder); // Enable BuyNow Button Click on PDP if Product is Ready To Order
+        helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder); // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
         let shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
@@ -155,8 +154,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                             }
                         },
                         error: function (err) {
-                            // TODO:
-                            console.log("ERROR:  ", err);
+                            console.error("Ajax Error! Check GetCartSummary call:  ", err);
                         }
                     });
                 }
