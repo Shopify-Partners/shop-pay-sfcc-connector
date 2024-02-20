@@ -2,7 +2,6 @@ const helper = require('../helpers/shoppayHelper');
 const utils = require('../utils');
 
 let session;
-let readyOnPageLoad;
 
 $(document).ready(function () {
     if(window.ShopPay) {
@@ -12,14 +11,18 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-        readyOnPageLoad = utils.isReadyToOrderOnPageLoad();
+        let readyOnPageLoad = utils.isReadyToOrderOnPageLoad();
         if (readyOnPageLoad) {
             let pageLoadData = helper.getInitProductData();
             helper.setInitProductData(pageLoadData); // updates global prod data.
         }
 
-        var readyToOrder = utils.isReadyToOrderOnPageLoad();
-        if (window.shoppayClientRefs.constants.isBuyNow && !readyToOrder) {
+        /*
+        /* The below code triggers if a product is a Buy Now item, but is not ready to order on page load (ex: required product attributes like color or size are not yet chosen).
+        /* Here, a watcher is set to capture user interactions when product attributes are selected. Helper scripts will be triggered by these interactions to determine if the item
+        /* is ready to order when all required attributes are selected.
+        */
+        if (window.shoppayClientRefs.constants.isBuyNow && !readyOnPageLoad) {
             $('body').on('product:afterAttributeSelect', helper.initBuyNow); // receives the Event & Response
         } else {
             session = initShopPaySession();
@@ -141,9 +144,9 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                                 if (shopPaySession) {
                                     shopPaySession.close();
                                 }
-                                var PR = window.ShopPay.PaymentRequest.build(response.product.buyNow);
+                                let paymentRequest = window.ShopPay.PaymentRequest.build(response.product.buyNow);
                                 shopPaySession = window.ShopPay.PaymentRequest.createSession({
-                                    paymentRequest: PR
+                                    paymentRequest: paymentRequest
                                 });
                                 helper.setSessionListeners(shopPaySession);
                                 console.log(shopPaySession.paymentRequest);
@@ -205,6 +208,5 @@ function createResponse (requestObj, controllerURL) {
 
 export {
     initShopPaySession,
-    readyOnPageLoad,
     createResponse
 };

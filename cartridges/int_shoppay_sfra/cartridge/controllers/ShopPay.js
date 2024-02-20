@@ -125,9 +125,8 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
  * @memberOf ShopPay
  */
 server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var product = JSON.parse(req.body);
     var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
-
+    var product = JSON.parse(req.body);
     var buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(product);
 
     res.json({
@@ -187,8 +186,6 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
 
             // Calculate basket
             basketCalculationHelpers.calculateTotals(basket);
-            var testing = basket;
-            var test = 'testing';
         } catch (e) {
             BasketMgr.deleteTemporaryBasket(basket);
             res.json({

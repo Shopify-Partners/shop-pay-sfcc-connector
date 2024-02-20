@@ -84,8 +84,9 @@ function setSessionListeners(session) {
                         console.log(data.errorMsg);
                     }
                 },
-                error: function () {
+                error: function (err) {
                     // TODO
+                    console.log("ERROR:  ", err);
                 }
             });
         } else {
@@ -119,7 +120,7 @@ function setSessionListeners(session) {
     session.addEventListener("discountcodechanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
         let requestData = {
-            discountCodes: ev.discountCodes,
+            discountCodes: ev.discountCodes
         };
         let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
         if (isBuyNow && window.shoppayClientRefs.constants.isBuyNow) {
@@ -213,7 +214,7 @@ function setSessionListeners(session) {
     });
 
     session.addEventListener("paymentconfirmationrequested", function(ev) {
-        let requestData = {
+        const requestData = {
             token: session.token,
             paymentRequest: session.paymentRequest,
         };
@@ -258,18 +259,18 @@ function setSessionListeners(session) {
 
 function initBuyNow(e, response) {
     let responseProduct = response.data.product;
+    const { buyNow, readyToOrder, id, selectedQuantity, options, childProducts } = responseProduct;
 
-    if (responseProduct && responseProduct.buyNow) {
-        var readyToOrder = responseProduct.readyToOrder;
+    if (responseProduct && buyNow) {
         if (readyToOrder) {
-            shopPayCart.initShopPaySession(responseProduct.buyNow, readyToOrder);
+            shopPayCart.initShopPaySession(buyNow, readyToOrder);
             productData = {
-                pid: responseProduct.id,
-                quantity: responseProduct.selectedQuantity,
-                options: responseProduct.options
+                pid: id,
+                quantity: selectedQuantity,
+                options: options
             };
-            if (responseProduct.childProducts) {
-                productData.childProducts = responseProduct.childProducts;
+            if (childProducts) {
+                productData.childProducts = childProducts;
             }
         }
     }
