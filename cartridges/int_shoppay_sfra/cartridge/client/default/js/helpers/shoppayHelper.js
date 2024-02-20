@@ -263,11 +263,11 @@ function initBuyNow(e, response) {
     if (responseProduct && buyNow) {
         if (readyToOrder) {
             shopPayCart.initShopPaySession(buyNow, readyToOrder);
-            productData = {
+            setInitProductData({
                 pid: id,
                 quantity: selectedQuantity,
                 options: options
-            };
+            });
             if (childProducts) {
                 productData.childProducts = childProducts;
             }
