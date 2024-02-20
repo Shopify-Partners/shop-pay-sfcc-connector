@@ -85,7 +85,7 @@ function setSessionListeners(session) {
                     }
                 },
                 error: function (err) {
-                    console.error("Ajax Error! Check PrepareBasket call:  ", err);
+                    console.error("Ajax Error - Check PrepareBasket call:  ", err);
                 }
             });
         } else {
