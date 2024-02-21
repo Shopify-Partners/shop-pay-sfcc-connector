@@ -5,7 +5,7 @@
 
         button {
             margin-bottom: 16px;
-            height: 40px
+            height: 40px;
         }
     }
 </style>
