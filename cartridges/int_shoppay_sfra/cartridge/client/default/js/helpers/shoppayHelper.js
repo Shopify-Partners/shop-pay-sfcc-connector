@@ -126,7 +126,7 @@ function setSessionListeners(session) {
             requestData.basketId = sourceIdentifier;
         }
 
-        let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
+        let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
         const { deliveryMethods, discountCodes, lineItems, shippingLines, subtotal, discounts, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         let updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
@@ -164,7 +164,7 @@ function setSessionListeners(session) {
             requestData.basketId = sourceIdentifier;
         }
 
-        let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
+        let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
         const { shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         // Update the payment request based on the delivery method change and update the total accordingly
@@ -193,7 +193,7 @@ function setSessionListeners(session) {
             requestData.basketId = sourceIdentifier;
         }
 
-        let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
+        let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
         const { deliveryMethods, shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         // Update the payment request based on the shipping address change
@@ -222,7 +222,7 @@ function setSessionListeners(session) {
             requestData.basketId = sourceIdentifier;
         }
 
-        let responseJSON = shopPayCart.createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
+        let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
 
         orderConfirmationData = {
             orderID: responseJSON.orderID,
@@ -253,26 +253,6 @@ function setSessionListeners(session) {
         });
         redirect.submit();
     });
-}
-
-
-function initBuyNow(e, response) {
-    let responseProduct = response.data.product;
-    const { buyNow, readyToOrder, id, selectedQuantity, options, childProducts } = responseProduct;
-
-    if (responseProduct && buyNow) {
-        if (readyToOrder) {
-            shopPayCart.initShopPaySession(buyNow, readyToOrder);
-            setInitProductData({
-                pid: id,
-                quantity: selectedQuantity,
-                options: options
-            });
-            if (childProducts) {
-                productData.childProducts = childProducts;
-            }
-        }
-    }
 }
 
 /**
@@ -318,16 +298,34 @@ function isReadyToOrderOnPageLoad() {
     return readyToOrder;
 }
 
+/**
+ * Handles AJAX call to create / update the payment response needed for the ShopPay.PaymentRequest.build() method.
+ * @param {Object} requestObj - a request object that contains relevant event data & session data.
+ * @param {string} controllerURL - String url of the targeted controller (based on the urls Obj set in shopPayGlobalRefs.js)
+ * @returns {Object} responseJSON - an updated response object to be used in the build & on the ShopPay.PaymentRequest object.
+ */
+function createResponse (requestObj, controllerURL) {
+    let responseJSON = $.ajax({
+        url: getUrlWithCsrfToken(controllerURL),
+        method: 'POST',
+        async: false,
+        data: JSON.stringify(requestObj),
+        contentType: 'application/json'
+    }).responseJSON;
+
+    return responseJSON;
+}
+
 
 module.exports = {
     getCsrfToken: getCsrfToken,
     getUrlWithCsrfToken: getUrlWithCsrfToken,
     setSessionListeners: setSessionListeners,
     getInitProductData: getInitProductData,
-    initBuyNow: initBuyNow,
     productData: productData,
     setInitProductData: setInitProductData,
     shopPayBtnDisabledStyle: shopPayBtnDisabledStyle,
     shopPayMutationObserver: shopPayMutationObserver,
-    isReadyToOrderOnPageLoad: isReadyToOrderOnPageLoad
+    isReadyToOrderOnPageLoad: isReadyToOrderOnPageLoad,
+    createResponse: createResponse
 };
