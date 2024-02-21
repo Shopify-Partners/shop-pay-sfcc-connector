@@ -14,6 +14,8 @@ var urls = {
     DeliveryMethodChanged: URLUtils.https('ShopPay-DeliveryMethodChanged').toString(),
     SubmitPayment: URLUtils.https('ShopPay-SubmitPayment').toString(),
     ShippingAddressChanged: URLUtils.https('ShopPay-ShippingAddressChanged').toString(),
+    PrepareBasket: URLUtils.https('ShopPay-PrepareBasket').toString(),
+    BuyNowData: URLUtils.https('ShopPay-BuyNowData').toString(),
 };
 
 // core reference for if Shop Pay is enabled, controlled by
@@ -52,6 +54,7 @@ var shoppayClientId             = function() { return currentSite.getCustomPrefe
 var shoppayAdminAPIVersion      = function() { return currentSite.getCustomPreferenceValue('shoppayAdminAPIVersion'); }
 var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPreferenceValue('shoppayStorefrontAPIVersion'); }
 var shoppayModalImageViewType   = function() { return currentSite.getCustomPreferenceValue('shoppayModalImageViewType'); }
+var shoppayModalDebugEnabled    = function() { return currentSite.getCustomPreferenceValue('shoppayModalDebugEnabled'); }
 
 /**
  * Core reference for whether the Shop Pay payment method is valid based on payment amount,
@@ -62,6 +65,8 @@ var shoppayModalImageViewType   = function() { return currentSite.getCustomPrefe
  */
 function shoppayApplicable(req, currentBasket) {
     var shoppayPaymentMethod = PaymentMgr.getPaymentMethod(shoppayPaymentMethodId);
+        /* TODO: Consider changing this to check merchanidise + gift certificate total in case shipping is not
+    yet assigned. OOTB assigns shipping method at add to cart, but customer may have customized? */
     var paymentAmount = 0;
     if (currentBasket) {
         paymentAmount = currentBasket.totalGrossPrice.value;
@@ -130,22 +135,26 @@ function shoppayElementsApplicable(context, productId) {
 */
 /**
  * Add csrf token param to url
- * @param {boolean || undefined} initShopPayEmailRecognition - should email recognition be initialized
  * @param {string} productId - productID of the SFCC product for PDP context (optional)
+ * @param {string} context - 'pdp', 'cart', or 'checkout' - used to set global constants in the window
  * @returns {object} - js client refs
  */
-var getClientRefs = function(initShopPayEmailRecognition, productId) {
+
+
+var getClientRefs = function(context, productId) {
     return {
         urls: urls,
         constants: {
             shoppayEnabled: shoppayEnabled(),
-            initShopPayEmailRecognition: initShopPayEmailRecognition || false
+            initShopPayEmailRecognition: context === 'checkout',
+            isBuyNow: context === 'pdp'
         },
         preferences: {
             shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(productId),
             shoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
             shoppayStoreId: shoppayStoreId(),
-            shoppayClientId: shoppayClientId()
+            shoppayClientId: shoppayClientId(),
+            shoppayModalDebugEnabled: shoppayModalDebugEnabled()
         }
     }
 }
@@ -161,6 +170,7 @@ module.exports = {
     shoppayAdminAPIVersion: shoppayAdminAPIVersion(),
     shoppayStorefrontAPIVersion: shoppayStorefrontAPIVersion(),
     shoppayModalImageViewType: shoppayModalImageViewType(),
+    shoppayModalDebugEnabled: shoppayModalDebugEnabled(),
     getClientRefs: getClientRefs,
     shoppayPaymentMethodId: shoppayPaymentMethodId
 };

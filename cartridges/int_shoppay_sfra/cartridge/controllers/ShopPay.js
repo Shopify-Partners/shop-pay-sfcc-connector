@@ -78,8 +78,14 @@ function validateInputs(req, currentBasket, inputParams) {
 server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-
-    var currentBasket = BasketMgr.getCurrentBasket();
+    var currentBasket;
+    var httpParameterMap = req.httpParameterMap;
+    if (req.httpParameterMap.basketId && req.httpParameterMap.basketId.value) {
+        currentBasket = BasketMgr.getTemporaryBasket(req.httpParameterMap.basketId.value);
+    }
+    else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
 
     var inputValidation = validateInputs(req, currentBasket, []);
     if (!inputValidation || inputValidation.error) {
@@ -112,6 +118,108 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
 });
 
 /**
+ * The ShopPay-BuyNowData controller
+ * listener event.
+ * @name Base/ShopPay-BuyNowData
+ * @function
+ * @memberOf ShopPay
+ */
+server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
+    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
+    var product = JSON.parse(req.body);
+    var buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(product);
+
+    res.json({
+        error: false,
+        errorMsg: null,
+        paymentRequest: buyNowPaymentRequest
+    });
+    next();
+});
+
+/**
+ * The ShopPay-PrepareBasket controller
+ * listener event.
+ * @name Base/ShopPay-PrepareBasket
+ * @function
+ * @memberOf ShopPay
+ */
+server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
+    var BasketMgr = require('dw/order/BasketMgr');
+    var ProductMgr = require('dw/catalog/ProductMgr');
+    var ShippingMgr = require('dw/order/ShippingMgr');
+    var Transaction = require('dw/system/Transaction');
+
+    var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
+    var cartHelper = require('*/cartridge/scripts/cart/cartHelpers');
+    var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
+    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
+    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+    var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
+    var paymentRequestModel;
+    var currentBasket;
+
+    var product = JSON.parse(req.body);
+
+    var basket = Transaction.wrap(shoppayCheckoutHelpers.createBuyNowBasket);
+    var shippingMethod = ShippingMgr.defaultShippingMethod;
+
+    var paymentRequestModel;
+    var result = shoppayCheckoutHelpers.addProductToTempBasket(product, basket);
+
+    if (result.error) {
+        Transaction.wrap(function() {
+            BasketMgr.deleteTemporaryBasket(basket);
+        });
+        res.json({
+            error: true,
+            errorMsg: result.errorMsg,
+            paymentRequest: null
+        });
+        return next();
+    }
+
+    Transaction.wrap(function () {
+        try {
+            // Set shipment shipping method
+            shippingHelpers.selectShippingMethod(basket.defaultShipment, shippingMethod.ID);
+
+            // Calculate basket
+            basketCalculationHelpers.calculateTotals(basket);
+        } catch (e) {
+            BasketMgr.deleteTemporaryBasket(basket);
+            res.json({
+                error: true,
+                errorMsg: e.message,
+                paymentRequest: null
+            });
+            return next();
+        }
+    });
+
+    try {
+        paymentRequestModel = new PaymentRequestModel(basket);
+    } catch (e) {
+        logger.error('[ShopPay-PrepareBasket] error: \n\r' + e.message + '\n\r' + e.stack);
+        res.json({
+            error: true,
+            errorMsg: e.message,
+            paymentRequest: null
+        });
+        return next();
+    }
+
+    res.json({
+        error: false,
+        errorMsg: null,
+        basketId: basket.UUID,
+        paymentRequest: paymentRequestModel
+    });
+
+    return next();
+});
+
+/**
  * The ShopPay-BeginSession controller initializes the Shop Pay payment request session with the
  * Shop Pay GraphQL API and returns the data needed to verify the Shop Pay session client-side.
  * @name Base/ShopPay-BeginSession
@@ -125,7 +233,14 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
  */
 server.post('BeginSession', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
-    var currentBasket = BasketMgr.getCurrentBasket();
+    var currentBasket;
+    var inputs = JSON.parse(req.body);
+
+    if (inputs.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(inputs.basketId);
+    } else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
 
     var inputValidation = validateInputs(req, currentBasket, ['paymentRequest']);
     if (!inputValidation || inputValidation.error) {
@@ -136,7 +251,6 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         return next();
     }
 
-    var inputs = JSON.parse(req.body);
     var paymentRequest = inputs.paymentRequest;
 
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
@@ -181,9 +295,14 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
     var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    var currentBasket = BasketMgr.getCurrentBasket();
-
+    var currentBasket;
     var data = JSON.parse(req.body);
+
+    if (data.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(data.basketId);
+    } else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
 
     var inputValidation = validateInputs(req, currentBasket, ['discountCodes']);
     if (!inputValidation || inputValidation.error) {
@@ -259,7 +378,14 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
     var BasketMgr = require('dw/order/BasketMgr');
     var Transaction = require('dw/system/Transaction');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    var currentBasket = BasketMgr.getCurrentBasket();
+    var currentBasket;
+    var data = JSON.parse(req.body);
+
+    if (data.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(data.basketId);
+    } else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
 
     var data = JSON.parse(req.body);
 
@@ -341,11 +467,18 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
     var SalesforcePaymentRequest = require('dw/extensions/payments/SalesforcePaymentRequest');
     var Transaction = require('dw/system/Transaction');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    var currentBasket = BasketMgr.getCurrentBasket();
+    var currentBasket;
     var array = require('*/cartridge/scripts/util/array');
     var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
 
     var data = JSON.parse(req.body);
+
+
+    if (data.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(data.basketId);
+    } else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
 
     var inputValidation = validateInputs(req, currentBasket, ['deliveryMethod']);
     if (!inputValidation || inputValidation.error) {
@@ -420,8 +553,14 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
     var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
     var validationHelpers = require('*/cartridge/scripts/helpers/basketValidationHelpers');
+    var currentBasket;
+    var inputs = JSON.parse(req.body);
 
-    var currentBasket = BasketMgr.getCurrentBasket();
+    if (inputs.basketId) {
+        currentBasket = BasketMgr.getTemporaryBasket(inputs.basketId);
+    } else {
+        currentBasket = BasketMgr.getCurrentBasket();
+    }
 
     var inputValidation = validateInputs(req, currentBasket, ['paymentRequest','token']);
     if (!inputValidation || inputValidation.error) {
@@ -432,7 +571,6 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
         return next();
     }
 
-    var inputs = JSON.parse(req.body);
     var paymentRequest = inputs['paymentRequest'];
     var token = inputs['token'];
 

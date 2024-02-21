@@ -4,6 +4,11 @@ var Transaction = require('dw/system/Transaction');
 var collections = require('*/cartridge/scripts/util/collections');
 var common = require('*/cartridge/scripts/shoppay/common');
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+var BasketMgr = require('dw/order/BasketMgr');
+var ShippingMgr = require('dw/order/ShippingMgr');
+var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
+var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
 
 /**
  * Ensures that no shipment exists with 0 product line items in the customer's basket.
@@ -120,6 +125,7 @@ function validateShippingMethods(basket) {
     });
     return shipmentsValid;
 }
+
 /**
  * Sets the minimum required billing address data for SFCC order creation from payment request data. This
  * data will be updated with the Shop Pay billing data in the ORDERS_CREATE webhook handler payload after
@@ -163,10 +169,105 @@ function failOrder(order) {
     }
 }
 
+/**
+ * Creates a temporary basket to use for Buy Now.
+ * @returns {dw.order.Basket} basket to use for Buy Now
+ */
+function createBuyNowBasket() {
+    // Delete any existing open temporary baskets
+    BasketMgr.getTemporaryBaskets().toArray().forEach(function (basket) {
+        BasketMgr.deleteTemporaryBasket(basket);
+    });
+
+    // Create a new temporary basket
+    return BasketMgr.createTemporaryBasket();
+}
+
+function addProductToTempBasket(product, basket) {
+    var ProductMgr = require('dw/catalog/ProductMgr');
+    var sku = product.pid;
+    var options = product.options;
+    var quantity = product.quantity;
+    var childProducts = product.childProducts;
+    var optionsArray;
+    try {
+        if (options && options.length > 0) {
+            optionsArray = options.map(function (option) {
+                return {
+                    id: option.id,
+                    valueId: option.selectedValueId
+                };
+            });
+        } else {
+            optionsArray = [];
+        }
+        var result = Transaction.wrap(function () {
+            var apiProduct = ProductMgr.getProduct(sku);
+            var optionModel = apiProduct.optionModel;
+
+            // Set selected product option on product option model
+            optionsArray.forEach(function (option) {
+                var productOption = optionModel.getOption(option.id);
+                if (productOption) {
+                    var productOptionValue = optionModel.getOptionValue(productOption, option.valueId);
+                    if (productOptionValue) {
+                        // Update selected value for product option
+                        optionModel.setSelectedOptionValue(productOption, productOptionValue);
+                    }
+                }
+            });
+
+            // Add product line item to temporary basket
+            var pli = basket.createProductLineItem(apiProduct, optionModel, basket.defaultShipment);
+            pli.setQuantityValue(quantity);
+        });
+    } catch (e) {
+        dw.system.Logger.error(e.message);
+        return {
+            error: true,
+            errorMsg: e.message
+        };
+    }
+    return {
+        success: true,
+        errorMsg: null
+    };
+}
+
+function getBuyNowData(product) {
+    // Create a temporary basket for payment request options calculation
+    var basket = Transaction.wrap(createBuyNowBasket);
+    var shippingMethod = ShippingMgr.defaultShippingMethod;
+    var paymentRequest;
+    var result = addProductToTempBasket(product, basket);
+
+    Transaction.wrap(function () {
+        try {
+            // Set shipment shipping method
+            shippingHelpers.selectShippingMethod(basket.defaultShipment, shippingMethod.ID);
+
+            // Calculate basket
+            basketCalculationHelpers.calculateTotals(basket);
+            paymentRequest = new PaymentRequestModel(basket);
+        } catch (e) {
+            var test = e;
+            dw.system.Logger.error(e.message);
+        } finally {
+            // Delete temporary basket after calculation
+            BasketMgr.deleteTemporaryBasket(basket);
+        }
+    });
+    return paymentRequest;
+}
+
+
 module.exports = {
     validatePaymentRequest: validatePaymentRequest,
     ensureNoEmptyShipments: ensureNoEmptyShipments,
     validateShippingMethods: validateShippingMethods,
     handleBillingAddress: handleBillingAddress,
-    failOrder: failOrder
+    failOrder: failOrder,
+    addProductToTempBasket: addProductToTempBasket,
+    createBuyNowBasket: createBuyNowBasket,
+    getBuyNowData: getBuyNowData
 }
