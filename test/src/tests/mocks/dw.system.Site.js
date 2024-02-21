@@ -8,7 +8,8 @@ let mockPreferences = {
     shoppayAdminAPIVersion: 'v1',
     shoppayStorefrontAPIVersion: 'v2',
     shoppayModalImageViewType: 'small',
-    shoppayPDPButtonEnabled: true
+    shoppayPDPButtonEnabled: true,
+    shoppayModalDebugEnabled: false
 }
 
 const preferences = {}

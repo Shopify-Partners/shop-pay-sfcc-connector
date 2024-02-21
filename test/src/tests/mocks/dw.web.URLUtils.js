@@ -13,6 +13,9 @@ URLUtils.https = function (path) {
         'ShopPay-DeliveryMethodChanged',
         'ShopPay-SubmitPayment',
         'ShopPay-ShippingAddressChanged',
+        'ShopPay-PrepareBasket',
+        'ShopPay-BuyNowData'
+
     ]
     for (let i = 0; i < controllers.length; i++) {
         for (let j = 0; j < urls.length; j++) {

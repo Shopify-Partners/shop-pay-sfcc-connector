@@ -155,17 +155,20 @@ describe('int_shoppay/cartridge/scripts/shoppayGlobalRefs.js', () => {
             urls: {
               GetCartSummary: 'https://zzys-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site/default/ShopPay-GetCartSummary',
               BeginSession: 'https://zzys-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site/default/ShopPay-BeginSession',
+              BuyNowData: 'https://zzys-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site/default/ShopPay-BuyNowData',
               DiscountCodeChanged: 'https://zzys-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site/default/ShopPay-DiscountCodeChanged',
               DeliveryMethodChanged: 'https://zzys-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site/default/ShopPay-DeliveryMethodChanged',
+              PrepareBasket: 'https://zzys-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site/default/ShopPay-PrepareBasket',
               SubmitPayment: 'https://zzys-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site/default/ShopPay-SubmitPayment',
               ShippingAddressChanged: 'https://zzys-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site/default/ShopPay-ShippingAddressChanged'
             },
-            constants: { shoppayEnabled: true, initShopPayEmailRecognition: false },
+            constants: { shoppayEnabled: true, initShopPayEmailRecognition: false, isBuyNow: false },
             preferences: {
               shoppayPDPButtonEnabled: true,
               shoppayCartButtonEnabled: true,
               shoppayStoreId: 'qwerty',
-              shoppayClientId: '999'
+              shoppayClientId: '999',
+              shoppayModalDebugEnabled: false
             }
         }
         const productId = basket.productLineItems[0].product.ID
