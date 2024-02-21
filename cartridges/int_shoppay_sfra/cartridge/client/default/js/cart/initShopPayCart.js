@@ -1,5 +1,4 @@
 const helper = require('../helpers/shoppayHelper');
-const utils = require('../utils');
 
 let session;
 
@@ -11,7 +10,22 @@ $(document).ready(function () {
 
         initShopPayButton();
 
-        session = initShopPaySession();
+        let readyOnPageLoad = helper.isReadyToOrderOnPageLoad();
+        if (readyOnPageLoad) {
+            let pageLoadData = helper.getInitProductData();
+            helper.setInitProductData(pageLoadData); // updates global prod data.
+        }
+
+        /*
+        /* The below code triggers if a product is a Buy Now item, but is not ready to order on page load (ex: required product attributes like color or size are not yet chosen).
+        /* Here, a watcher is set to capture user interactions when product attributes are selected. Helper scripts will be triggered by these interactions to determine if the item
+        /* is ready to order when all required attributes are selected.
+        */
+        if (window.shoppayClientRefs.constants.isBuyNow && !readyOnPageLoad) {
+            $('body').on('product:afterAttributeSelect', helper.initBuyNow); // receives the Event & Response
+        } else {
+            session = initShopPaySession();
+        }
     }
 });
 
@@ -27,8 +41,7 @@ function initShopPayButton() {
 
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
-    const cartIsEmpty = helper.isCartEmptyOnLoad();
-    utils.shopPayMutationObserver(paymentSelector, cartIsEmpty);  // set mutation observ. to apply correct btn styles when this element is rendered to the DOM (based on whether basket is empty or not)
+    helper.shopPayMutationObserver(paymentSelector);
 }
 
 function initShopPayEmailRecognition() {
@@ -42,67 +55,120 @@ function initShopPayEmailRecognition() {
         .render('#shop-pay-login-container');
 }
 
-$('body').on('cart:update product:afterAddToCart product:updateAddToCart promotion:success', function () {
-    if (window.ShopPay) {
+$('body').on('cart:update product:afterAddToCart promotion:success', function () {
+    /* Only interested in cart updates on Cart page (cart updates are not triggered in checkout). Buy Now already
+    has a separate event handler for changes to attribute selections */
+    if (window.ShopPay && !window.shoppayClientRefs.constants.isBuyNow) {
         if (!session) {
             session = initShopPaySession();
-            // TODO: remove this conditional / debugging line before final delivery
-            if (session) {
-                console.log('SESSION Obj >>>> ', session.paymentRequest);
-            }
         } else {
             const paymentRequestResponse = buildPaymentRequest();
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
 
             if (responseJSON) {
-                utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), responseJSON.error);
+                helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"));
             }
 
             if (responseJSON && !responseJSON.error && responseJSON.paymentRequest !== null) {
-                // TODO: Rework this update to the session object. Need to update with a proper method rather than destroying / recreating a session after updates. (Note: previously attempted with session.completeDiscountCodeChange(responseJSON.paymentRequest), but was not working on Shopify Side)
-                // Awaiting Feedback from ShopPay team
                 session.close();
                 session = initShopPaySession();
 
                 // TODO: remove these debugging lines before final delivery
                 console.log('RESPONSE JSON >>>> ', responseJSON.paymentRequest)
                 console.log('SESSION Obj >>>> ', session.paymentRequest)
-
             }
         }
     }
 });
 
 
-function initShopPaySession() {
-    const paymentRequestResponse = buildPaymentRequest();
-    const responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
-    // TODO: remove this debugging line before final delivery
-    if (responseJSON) {
-        if (responseJSON.error && responseJSON.errorMsg) {
-            console.log(responseJSON.errorMsg);
-        } else {
-            console.log(JSON.stringify(responseJSON.paymentRequest));
+function initShopPaySession(paymentRequestInput, readyToOrder) {
+    let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
+    let paymentRequest;
+    let paymentRequestResponse;
+    let responseJSON;
+
+    if (isBuyNow && paymentRequestInput) {
+        paymentRequest = paymentRequestInput;
+    } else if (isBuyNow && !paymentRequestInput) {
+        let productData = helper.getInitProductData();
+        if (productData) {
+            paymentRequestResponse = createResponse(productData, window.shoppayClientRefs.urls.BuyNowData);
+            paymentRequest = paymentRequestResponse.paymentRequest;
+            responseJSON = paymentRequestResponse ? paymentRequestResponse : null;
         }
+    } else {
+        paymentRequest = buildPaymentRequest();
+        responseJSON = paymentRequest ? paymentRequest.responseJSON : null;
     }
 
-    if (!responseJSON.error && responseJSON.paymentRequest !== null) {
-        const initialPaymentRequest = window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest);
-        utils.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), responseJSON.error) // basket NOT empty. Update btn styles (remove opacity)
+    if (paymentRequest || (responseJSON && !responseJSON.error)) {
+        const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
+        helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder); // Enable BuyNow Button Click on PDP if Product is Ready To Order
 
-        const shopPaySession = window.ShopPay.PaymentRequest.createSession({
+        let shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
         });
 
         if (shopPaySession) {
             helper.setSessionListeners(shopPaySession);
+            $('body').off('product:afterAttributeSelect', helper.initBuyNow);
+
+            $('body').on('product:afterAttributeSelect', function(e, response) {
+                let responseProduct = response.data.product;
+                if (window.shoppayClientRefs.constants.isBuyNow && responseProduct.buyNow) {
+                    helper.setInitProductData({
+                        pid: responseProduct.id,
+                        quantity: responseProduct.selectedQuantity,
+                        options: responseProduct.options
+                    });
+                    if (shopPaySession) {
+                        shopPaySession.close();
+                        let updatedPaymentRequest = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
+                        shopPaySession = window.ShopPay.PaymentRequest.createSession({
+                            paymentRequest: updatedPaymentRequest
+                        });
+
+                        helper.setSessionListeners(shopPaySession);
+                    }
+
+                } else {
+                    $.ajax({
+                        url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+                        type: 'GET',
+                        contentType: 'application/json',
+                        async: false,
+                        success: function (data) {
+                            if (!data.error) {
+                                if (shopPaySession) {
+                                    shopPaySession.close();
+                                }
+                                let paymentRequest = window.ShopPay.PaymentRequest.build(response.product.buyNow);
+                                shopPaySession = window.ShopPay.PaymentRequest.createSession({
+                                    paymentRequest: paymentRequest
+                                });
+                                helper.setSessionListeners(shopPaySession);
+                                console.log(shopPaySession.paymentRequest);
+                            } else {
+                                console.log(data.errorMsg);
+                            }
+                        },
+                        error: function (err) {
+                            console.error("Ajax Error - Check GetCartSummary call:  ", err);
+                        }
+                    });
+                }
+            });
         }
 
         return shopPaySession;
-
     }
 }
 
+/**
+ * Handles AJAX call to get the payment response.
+ * @returns {Object} paymentResponse - an response object.
+ */
 function buildPaymentRequest () {
     let token = document.querySelector('[data-csrf-token]');
     if (token) {
@@ -119,3 +185,26 @@ function buildPaymentRequest () {
     }
 }
 
+/**
+ * Handles AJAX call to create / update the payment response needed for the ShopPay.PaymentRequest.build() method.
+ * @param {Object} requestObj - a request object that contains relevant event data & session data.
+ * @param {string} controllerURL - String url of the targeted controller (based on the urls Obj set in shopPayGlobalRefs.js)
+ * @returns {Object} responseJSON - an updated response object to be used in the build & on the ShopPay.PaymentRequest object.
+ */
+function createResponse (requestObj, controllerURL) {
+    let responseJSON = $.ajax({
+        url: helper.getUrlWithCsrfToken(controllerURL),
+        method: 'POST',
+        async: false,
+        data: JSON.stringify(requestObj),
+        contentType: 'application/json'
+    }).responseJSON;
+
+    return responseJSON;
+}
+
+
+export {
+    initShopPaySession,
+    createResponse
+};
