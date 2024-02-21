@@ -3,6 +3,14 @@
     assets.addJs('/js/cart/initShopPayCart.js');
 </isscript>
 
+<style>
+    shop-pay-payment-request-button {
+        --shop-pay-button-width: 100%; 
+        --shop-pay-button-height: 40px;
+        --shop-pay-button-border-radius: 0.1875rem;
+    }
+</style>
+
 <div class="shop-pay-container"
     data-csrf-name="${pdict.csrf.tokenName}"
     data-csrf-token="${pdict.csrf.token}"
@@ -10,5 +18,5 @@
     data-ready-to-order="${pdict.product ? pdict.product.readyToOrder : true}"
     data-buy-now-init="${pdict.buyNowInitData}"
     >
-    <div id="shop-pay-button-container"></div>
+    <div id="shop-pay-button-container" class="${pdict.action === 'Product-Show' ? 'btn col-sm-8' : 'btn col-sm-12'}" style="padding:0"></div>
 </div>
