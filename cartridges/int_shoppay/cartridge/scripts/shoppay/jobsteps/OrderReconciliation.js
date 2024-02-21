@@ -64,8 +64,8 @@ exports.Run = function(params, stepExecution) {
             orders.close();
         }
         logger.error('[OrderReconciliation.js] error: \n\r' + e.message + '\n\r' + e.stack);
-        return new Status(Status.ERROR, null, 'Exception thrown: ' + e.message);
+        return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
 
-    return new Status(Status.OK, null, 'Successfully processed {0} / {1} orders', successCount, orderCount);
+    return new Status(Status.OK, 'OK', 'Successfully processed {0} / {1} orders', successCount, orderCount);
 };

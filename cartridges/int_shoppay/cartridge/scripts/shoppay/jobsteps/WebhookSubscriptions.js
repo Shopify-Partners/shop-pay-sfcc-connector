@@ -85,7 +85,7 @@ exports.Subscribe = function(params, stepExecution) {
         var topic = params.WebhookTopic;
         var webhookData;
         if (!topic) {
-            return new Status(Status.ERROR, 'No webhook topic provided for subscribe action');
+            return new Status(Status.ERROR, 'ERROR', 'No webhook topic provided for subscribe action');
         }
         var callbackUrl = params.CallbackURL;
         if (!callbackUrl) {
@@ -94,11 +94,11 @@ exports.Subscribe = function(params, stepExecution) {
 
         var response = adminAPI.subscribeWebhook(topic, callbackUrl);
         if (response.error || !response.webhookSubscriptionCreate) {
-            return new Status(Status.ERROR, 'Webhook subscribe failed: ' + topic);
+            return new Status(Status.ERROR, 'ERROR', 'Webhook subscribe failed: ' + topic);
         } else if (response.webhookSubscriptionCreate.userErrors.length > 0) {
             var subscribed = isAlreadySubscribedError(response.webhookSubscriptionCreate.userErrors);
             if (!subscribed) {
-                return new Status(Status.ERROR, 'Webhook subscribe failed: ' + topic);
+                return new Status(Status.ERROR, 'ERROR', 'Webhook subscribe failed: ' + topic);
             }
             // Get the details of the already subscribed webhook to create/update custom object in SFCC
             var webhookSearchResponse = adminAPI.getExistingWebhook(topic, callbackUrl);
@@ -106,7 +106,7 @@ exports.Subscribe = function(params, stepExecution) {
                 || !webhookSearchResponse.webhookSubscriptions
                 || webhookSearchResponse.webhookSubscriptions.edges.length == 0
             ) {
-                return new Status(Status.ERROR, 'Webhook subscribe failed: ' + topic);
+                return new Status(Status.ERROR, 'ERROR', 'Webhook subscribe failed: ' + topic);
             }
             webhookData = webhookSearchResponse.webhookSubscriptions.edges[0].node;
         } else {
@@ -121,7 +121,7 @@ exports.Subscribe = function(params, stepExecution) {
         setSubscriptionObjectData(webhookObj, webhookData);
     } catch (e) {
         logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
-        return new Status(Status.ERROR, 'Exception thrown: ' + e.message);
+        return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
 
     return new Status(Status.OK);
@@ -138,16 +138,16 @@ exports.Unsubscribe = function(params, stepExecution) {
     try {
         var id = params.WebhookId;
         if (!id) {
-            return new Status(Status.ERROR, 'No webhook ID provided for unsubscribe action');
+            return new Status(Status.ERROR, 'ERROR', 'No webhook ID provided for unsubscribe action');
         }
 
         var response = adminAPI.unsubscribeWebhook('gid://shopify/WebhookSubscription/' + id);
         if (response.error || !response.webhookSubscriptionDelete) {
-            return new Status(Status.ERROR, 'Webhook unsubscribe failed: ' + id);
+            return new Status(Status.ERROR, 'ERROR', 'Webhook unsubscribe failed: ' + id);
         } else if (response.webhookSubscriptionDelete.userErrors.length > 0) {
             var subscriptionNotFoundError = isSubscriptionNotFoundError(response.webhookSubscriptionDelete.userErrors);
             if (!subscriptionNotFoundError) {
-                return new Status(Status.ERROR, 'Webhook unsubscribe failed: ' + id);
+                return new Status(Status.ERROR, 'ERROR', 'Webhook unsubscribe failed: ' + id);
             }
             // If webhook subscription did not exist, continue as though unsubscribe was successful
         }
@@ -158,7 +158,7 @@ exports.Unsubscribe = function(params, stepExecution) {
         }
     } catch (e) {
         logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
-        return new Status(Status.ERROR, 'Exception thrown: ' + e.message);
+        return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
 
     return new Status(Status.OK);
