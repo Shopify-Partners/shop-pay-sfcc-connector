@@ -33,6 +33,7 @@ function initShopPayConfig() {
     window.ShopPay.PaymentRequest.configure({
         shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
         clientId: window.shoppayClientRefs.preferences.shoppayClientId,
+        debug: window.shoppayClientRefs.preferences.shoppayModalDebugEnabled
     });
 }
 
