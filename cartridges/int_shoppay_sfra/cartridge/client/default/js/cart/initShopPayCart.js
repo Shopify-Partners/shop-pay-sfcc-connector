@@ -22,7 +22,7 @@ $(document).ready(function () {
         /* is ready to order when all required attributes are selected.
         */
         if (window.shoppayClientRefs.constants.isBuyNow && !readyOnPageLoad) {
-            $('body').on('product:afterAttributeSelect', helper.initBuyNow); // receives the Event & Response
+            $('body').on('product:afterAttributeSelect', initBuyNow); // receives the Event & Response
         } else {
             session = initShopPaySession();
         }
@@ -42,6 +42,26 @@ function initShopPayButton() {
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
     helper.shopPayMutationObserver(paymentSelector);
+}
+
+
+function initBuyNow(e, response) {
+    let responseProduct = response.data.product;
+    const { buyNow, readyToOrder, id, selectedQuantity, options, childProducts } = responseProduct;
+
+    if (responseProduct && buyNow) {
+        if (readyToOrder) {
+            initShopPaySession(buyNow, readyToOrder);
+            helper.setInitProductData({
+                pid: id,
+                quantity: selectedQuantity,
+                options: options
+            });
+            if (childProducts) {
+                helper.productData.childProducts = childProducts;
+            }
+        }
+    }
 }
 
 function initShopPayEmailRecognition() {
@@ -93,7 +113,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     } else if (isBuyNow && !paymentRequestInput) {
         let productData = helper.getInitProductData();
         if (productData) {
-            paymentRequestResponse = createResponse(productData, window.shoppayClientRefs.urls.BuyNowData);
+            paymentRequestResponse = helper.createResponse(productData, window.shoppayClientRefs.urls.BuyNowData);
             paymentRequest = paymentRequestResponse.paymentRequest;
             responseJSON = paymentRequestResponse ? paymentRequestResponse : null;
         }
@@ -112,7 +132,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
 
         if (shopPaySession) {
             helper.setSessionListeners(shopPaySession);
-            $('body').off('product:afterAttributeSelect', helper.initBuyNow);
+            $('body').off('product:afterAttributeSelect', initBuyNow);
 
             $('body').on('product:afterAttributeSelect', function(e, response) {
                 let responseProduct = response.data.product;
@@ -185,26 +205,6 @@ function buildPaymentRequest () {
     }
 }
 
-/**
- * Handles AJAX call to create / update the payment response needed for the ShopPay.PaymentRequest.build() method.
- * @param {Object} requestObj - a request object that contains relevant event data & session data.
- * @param {string} controllerURL - String url of the targeted controller (based on the urls Obj set in shopPayGlobalRefs.js)
- * @returns {Object} responseJSON - an updated response object to be used in the build & on the ShopPay.PaymentRequest object.
- */
-function createResponse (requestObj, controllerURL) {
-    let responseJSON = $.ajax({
-        url: helper.getUrlWithCsrfToken(controllerURL),
-        method: 'POST',
-        async: false,
-        data: JSON.stringify(requestObj),
-        contentType: 'application/json'
-    }).responseJSON;
-
-    return responseJSON;
-}
-
-
-export {
-    initShopPaySession,
-    createResponse
+module.exports = {
+    initShopPaySession: initShopPaySession
 };
