@@ -204,7 +204,7 @@ function createResponse (requestObj, controllerURL) {
 }
 
 
-module.exports = {
+export {
     initShopPaySession,
     createResponse
 };
