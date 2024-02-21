@@ -1,6 +1,3 @@
-// Imported Files
-const shopPayCart = require('../cart/initShopPayCart');
-
 // Global Variables
 let orderConfirmationData;
 var sourceIdentifier = null;
