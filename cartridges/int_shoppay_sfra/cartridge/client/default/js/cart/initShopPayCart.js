@@ -58,7 +58,7 @@ function initBuyNow(e, response) {
                 options: options
             });
             if (childProducts) {
-                productData.childProducts = childProducts;
+                helper.productData.childProducts = childProducts;
             }
         }
     }
