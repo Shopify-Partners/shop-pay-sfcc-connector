@@ -1,0 +1,23 @@
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+
+  shutdown:
+    name: Shutdown Dev06
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download and install sfcc-ci binary
+        run: |
+          sudo curl -sL https://github.com/SalesforceCommerceCloud/sfcc-ci/releases/download/v2.11.0/sfcc-ci-linux -o /usr/local/bin/sfcc-ci
+          sudo chmod +x /usr/local/bin/sfcc-ci
+
+      - name: Shut it down
+        env:
+          SFCC_OAUTH_CLIENT_ID: ${{ secrets.SFCC_OAUTH_CLIENT_ID }}
+          SFCC_OAUTH_CLIENT_SECRET: ${{ secrets.SFCC_OAUTH_CLIENT_SECRET }}
+        run: |
+          sfcc-ci client:auth
+          sfcc-ci sandbox:stop -s ${{ secrets.DEV06_ID }}
