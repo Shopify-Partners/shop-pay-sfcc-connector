@@ -90,7 +90,7 @@ var placeOrder = function(order) {
 
     try {
         var placeOrderStatus = OrderMgr.placeOrder(order);
-        if (placeOrderStatus === Status.ERROR) {
+        if (placeOrderStatus.status === Status.ERROR) {
             throw new Error(placeOrderStatus.message);
         }
 
