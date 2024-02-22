@@ -82,7 +82,7 @@ function setSessionListeners(session) {
                     }
                 },
                 error: function (err) {
-                    if (err.responseJSON.csrfError || err.status !== 200) {
+                    if (err.responseJSON || err.status !== 200) {
                         session.close();
                         return;
                     }
