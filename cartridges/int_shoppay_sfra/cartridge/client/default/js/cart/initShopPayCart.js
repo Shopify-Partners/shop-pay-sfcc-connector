@@ -175,7 +175,10 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                             }
                         },
                         error: function (err) {
-                            console.error("Ajax Error - Check GetCartSummary call:  ", err);
+                            if (err.responseJSON || err.status !== 200) {
+                                session.close();
+                                return;
+                            }
                         }
                     });
                 }
