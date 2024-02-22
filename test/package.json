@@ -14,7 +14,7 @@
   "author": "Erik Marty",
   "license": "UNLICENSED",
   "devDependencies": {
-    "@playwright/test": "^1.32.1",
+    "@playwright/test": "^1.41.2",
     "@types/node-fetch": "^2.6.3",
     "app-module-path": "^2.2.0",
     "axios": "^1.6.7",

@@ -27,7 +27,15 @@ test.beforeEach(async ({ page, isMobile }) => {
 })
 
 test.describe('Test Checkout', () => {
-    test('Enter checkout flow and verify order submission', async ({ page }) => {
+    test('Checkout using ShopPay and verify order submission', async ({ page }) => {
+        email = await checkoutPage.generateEmail()
+        testData.email = email
+        await checkoutPage.productPage.getProduct()
+        await checkoutPage.productPage.addToCart()
+        await checkoutPage.productPage.shopPayPayment(email)
+    })
+
+    test('Enter standard checkout flow and verify order submission', async ({ page }) => {
         email = await checkoutPage.generateEmail()
         testData.email = email
         await checkoutPage.productPage.getProduct()

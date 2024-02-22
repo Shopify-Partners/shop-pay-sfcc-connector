@@ -20,6 +20,8 @@ exports.ProductPage = class ProductPage extends BasePage {
         this.sizeSelect = page.locator('#size-1')
         this.widthSelect = page.locator('#width-1')
         this.addToCartLocator = page.locator('.add-to-cart')
+
+        this.shopPayFrameSelector = 'iframe[title="Shop Pay Quick Checkout"]'
     }
 
     async getProduct() {
@@ -39,6 +41,27 @@ exports.ProductPage = class ProductPage extends BasePage {
         await this.selectSize()
         await this.selectWidth()
         await this.addToCartLocator.click()
+    }
+
+    async shopPayPayment(email) {
+        const pagePromise = this.page.waitForEvent('popup')
+        await this.page.getByLabel('Buy with Shop Pay').click();
+        const shopPayWindow = await pagePromise
+
+        await shopPayWindow
+            .frameLocator(this.shopPayFrameSelector)
+            .getByPlaceholder('Email')
+            .click()
+
+        await shopPayWindow
+            .frameLocator(this.shopPayFrameSelector)
+            .getByLabel('Email')
+            .fill(email)
+
+        await shopPayWindow
+            .frameLocator(this.shopPayFrameSelector)
+            .getByRole('button', { name: 'Continue with Shop Pay' })
+            .click()
     }
 
     async selectSize() {
