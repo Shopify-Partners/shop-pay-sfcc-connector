@@ -62,6 +62,8 @@ exports.ProductPage = class ProductPage extends BasePage {
             .frameLocator(this.shopPayFrameSelector)
             .getByRole('button', { name: 'Continue with Shop Pay' })
             .click()
+
+        return shopPayWindow
     }
 
     async selectSize() {
