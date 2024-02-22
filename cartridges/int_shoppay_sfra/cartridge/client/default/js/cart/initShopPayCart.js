@@ -1,6 +1,7 @@
 const helper = require('../helpers/shoppayHelper');
 
 let session;
+let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
 
 $(document).ready(function () {
     if(window.ShopPay) {
@@ -21,7 +22,7 @@ $(document).ready(function () {
         /* Here, a watcher is set to capture user interactions when product attributes are selected. Helper scripts will be triggered by these interactions to determine if the item
         /* is ready to order when all required attributes are selected.
         */
-        if (window.shoppayClientRefs.constants.isBuyNow && !readyOnPageLoad) {
+        if (isBuyNow && !readyOnPageLoad) {
             $('body').on('product:afterAttributeSelect', initBuyNow); // receives the Event & Response
         } else {
             session = initShopPaySession();
@@ -41,7 +42,7 @@ function initShopPayButton() {
     initShopPayConfig();
 
     let paymentSelector = '#shop-pay-button-container';
-    window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
+    window.ShopPay.PaymentRequest.createButton({buyWith: isBuyNow}).render(paymentSelector);
     helper.shopPayMutationObserver(paymentSelector);
 }
 
@@ -79,7 +80,7 @@ function initShopPayEmailRecognition() {
 $('body').on('cart:update product:afterAddToCart promotion:success', function () {
     /* Only interested in cart updates on Cart page (cart updates are not triggered in checkout). Buy Now already
     has a separate event handler for changes to attribute selections */
-    if (window.ShopPay && !window.shoppayClientRefs.constants.isBuyNow) {
+    if (window.ShopPay && !isBuyNow) {
         if (!session) {
             session = initShopPaySession();
         } else {
@@ -100,7 +101,6 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
 
 
 function initShopPaySession(paymentRequestInput, readyToOrder) {
-    let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
     let paymentRequest;
     let paymentRequestResponse;
     let responseJSON;
@@ -133,7 +133,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
 
             $('body').on('product:afterAttributeSelect', function(e, response) {
                 let responseProduct = response.data.product;
-                if (window.shoppayClientRefs.constants.isBuyNow && responseProduct.buyNow) {
+                if (isBuyNow && responseProduct.buyNow) {
                     helper.setInitProductData({
                         pid: responseProduct.id,
                         quantity: responseProduct.selectedQuantity,
