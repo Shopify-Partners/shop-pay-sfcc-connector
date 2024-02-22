@@ -22,7 +22,7 @@ function processOrder(order) {
     var sourceIdentifier = order.custom.shoppaySourceIdentifier;
     var response = adminAPI.getOrderBySourceIdentifier(sourceIdentifier);
     if (response.error || response.orders.edges.length == 0) {
-        logger.error('Shopify order not found for SFCC order ' + order.orderNo);
+        logger.error('[OrderReconciliation.js] Shopify order not found for SFCC order ' + order.orderNo);
         // This order will be reattempted on next run
         return;
     }
@@ -32,7 +32,7 @@ function processOrder(order) {
     postProcessingHelpers.handleBillingInfo(order, node);
     var placeOrderResult = postProcessingHelpers.placeOrder(order);
     if (placeOrderResult.error) {
-        logger.error('Unable to place order ' + order.orderNo);
+        logger.error('[OrderReconciliation.js] Unable to place order ' + order.orderNo);
         // This order will be reattempted on next run
         return;
     }
