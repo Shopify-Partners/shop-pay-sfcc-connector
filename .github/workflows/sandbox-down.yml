@@ -20,4 +20,4 @@ jobs:
           SFCC_OAUTH_CLIENT_SECRET: ${{ secrets.SFCC_OAUTH_CLIENT_SECRET }}
         run: |
           sfcc-ci client:auth
-          sfcc-ci sandbox:stop -s ${{ secrets.DEV06_ID }}
+          sfcc-ci sandbox:stop -s 76208719-5aaf-4dfb-bcf7-00ac268ec846
