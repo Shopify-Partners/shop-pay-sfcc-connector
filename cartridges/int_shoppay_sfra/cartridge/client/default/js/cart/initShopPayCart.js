@@ -18,9 +18,9 @@ $(document).ready(function () {
         }
 
         /*
-        /* The below code triggers if a product is a Buy Now item, but is not ready to order on page load (ex: required product attributes like color or size are not yet chosen).
-        /* Here, a watcher is set to capture user interactions when product attributes are selected. Helper scripts will be triggered by these interactions to determine if the item
-        /* is ready to order when all required attributes are selected.
+        The below code triggers if a product is a Buy Now item, but is not ready to order on page load (ex: required product attributes like color or size are not yet chosen).
+        Here, a watcher is set to capture user interactions when product attributes are selected.
+        Helper scripts will be triggered by these interactions to determine if the item is ready to order when all required attributes are selected.
         */
         if (isBuyNow && !readyOnPageLoad) {
             $('body').on('product:afterAttributeSelect', initBuyNow); // receives the Event & Response
@@ -70,8 +70,8 @@ function initShopPayEmailRecognition() {
     initShopPayConfig();
 
     /*
-    /* If your checkout is not built with SFRA or you have custimized and removed the 'email-guest'
-    /* id on the email input you will need to update the id value for emailInputId
+    If your checkout is not built with SFRA or you have custimized and removed the 'email-guest'
+    id on the email input you will need to update the id value for emailInputId
     */
     window.ShopPay.PaymentRequest.createLogin({emailInputId: 'email-guest'})
         .render('#shop-pay-login-container');
