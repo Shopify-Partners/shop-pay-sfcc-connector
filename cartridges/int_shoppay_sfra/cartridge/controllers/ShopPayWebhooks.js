@@ -37,7 +37,7 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
                On dev/test environments this is likely not indicative of a true error as it likely would be on a
                production environment.
             */
-            logger.error('[ShopPayWebhooks-OrdersCreate] order not found for source_identifier {1}.', payload.source_identifier);
+            logger.error('[ShopPayWebhooks-OrdersCreate] order not found for source_identifier {0}.', payload.source_identifier);
             res.json({});
             return next();
         }
@@ -48,7 +48,7 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
             placeOrderResult = postProcessingHelpers.placeOrder(order);
         });
         if (placeOrderResult.error) {
-            logger.error('Unable to place order ' + order.orderNo);
+            logger.error('Unable to place order {0}.', order.orderNo);
             // This order will be reattempted by the Order Reconciliation job
             res.json({});
             return next();
