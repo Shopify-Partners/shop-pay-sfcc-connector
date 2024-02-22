@@ -301,10 +301,15 @@ function createResponse (requestObj, controllerURL) {
         async: false,
         data: JSON.stringify(requestObj),
         contentType: 'application/json',
-        success: function() {
-            // ...expected result with (happy path)
-
-            // add exception = false in the returned value & also response.json on the value.
+        success: function(data) {
+            console.log("SUCCESS DATA >>>> ", data);
+            if (!data.error) {
+                // sessionPaymentRequest = data.paymentRequest; // REWORK THIS...DOESN'T APPEAR TO BE NEEDED (consider alter values that should be stored on the response?)
+                data.exception = false; // consider whether this is to be used elsewhere for some checks? (ex: check for responseJSON.exception in the returned value? Or maybe also see if response.json is on the value.)
+            } else {
+                data.exception = true;
+                console.log(data.errorMsg);
+            }
         },
         error: function (err) {
 
