@@ -82,7 +82,10 @@ function setSessionListeners(session) {
                     }
                 },
                 error: function (err) {
-                    console.error("Ajax Error - Check PrepareBasket call:  ", err);
+                    if (err.responseJSON.csrfError || err.status !== 200) {
+                        session.close();
+                        return;
+                    }
                 }
             });
         } else {
@@ -107,7 +110,10 @@ function setSessionListeners(session) {
                 session.completeSessionRequest({token, checkoutUrl, sourceIdentifier});
             },
             error: function (err) {
-                console.log(err);
+                if (err.responseJSON || err.status !== 200) {
+                    session.close();
+                    return;
+                }
             }
 
         });
