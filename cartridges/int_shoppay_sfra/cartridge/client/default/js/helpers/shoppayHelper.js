@@ -151,9 +151,6 @@ function setSessionListeners(session) {
         }
 
         session.completeDiscountCodeChange({ updatedPaymentRequest: updatedPaymentRequest });
-        // TODO: remove these debugging lines before final delivery
-        console.log('discountcodechanged', ev);
-        console.log("Updated Payment Req w/ entered Discount Code: ", updatedPaymentRequest);
     });
 
     session.addEventListener("deliverymethodchanged", function(ev) {
@@ -180,9 +177,6 @@ function setSessionListeners(session) {
         });
 
         session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
-        // TODO: remove these debugging lines before final delivery
-        console.log('deliverymethodchanged', ev);
-        console.log("Updated Payment Req w/ entered Delivery Method: ", updatedPaymentRequest);
     });
 
     session.addEventListener("shippingaddresschanged", function(ev) {
@@ -210,9 +204,6 @@ function setSessionListeners(session) {
         });
 
         session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
-        // TODO: remove these debugging lines before final delivery
-        console.log('shippingaddresschanged', ev);
-        console.log("Updated Payment Req w/ entered Shipping Address: ", updatedPaymentRequest);
     });
 
     session.addEventListener("paymentconfirmationrequested", function(ev) {
@@ -233,13 +224,9 @@ function setSessionListeners(session) {
             continueUrl: responseJSON.continueUrl
         };
         session.completePaymentConfirmationRequest();
-        // TODO: remove this debugging line before final delivery
-        console.log('paymentconfirmationrequested', ev);
     });
 
     session.addEventListener("paymentcomplete", function(ev) {
-        // TODO: remove this debugging line before final delivery
-        console.log('paymentcomplete', ev);
         session.close();
         let data = orderConfirmationData;
         let redirect = $('<form>').appendTo(document.body).attr({

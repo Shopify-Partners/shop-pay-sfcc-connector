@@ -93,10 +93,6 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
             if (responseJSON && !responseJSON.error && responseJSON.paymentRequest !== null) {
                 session.close();
                 session = initShopPaySession();
-
-                // TODO: remove these debugging lines before final delivery
-                console.log('RESPONSE JSON >>>> ', responseJSON.paymentRequest)
-                console.log('SESSION Obj >>>> ', session.paymentRequest)
             }
         }
     }
