@@ -84,6 +84,7 @@ function setSessionListeners(session) {
                 error: function (err) {
                     if (err.responseJSON || err.status !== 200) {
                         session.close();
+                        window.location.reload();
                         return;
                     }
                 }
@@ -112,6 +113,7 @@ function setSessionListeners(session) {
             error: function (err) {
                 if (err.responseJSON || err.status !== 200) {
                     session.close();
+                    window.location.reload();
                     return;
                 }
             }

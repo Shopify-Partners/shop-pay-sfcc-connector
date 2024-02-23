@@ -170,14 +170,12 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                                     paymentRequest: paymentRequest
                                 });
                                 helper.setSessionListeners(shopPaySession);
-                                console.log(shopPaySession.paymentRequest);
-                            } else {
-                                console.log(data.errorMsg);
                             }
                         },
                         error: function (err) {
                             if (err.responseJSON || err.status !== 200) {
                                 session.close();
+                                window.location.reload()
                                 return;
                             }
                         }
