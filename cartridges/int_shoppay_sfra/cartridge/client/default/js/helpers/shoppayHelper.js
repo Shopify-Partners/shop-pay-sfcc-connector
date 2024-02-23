@@ -194,6 +194,12 @@ function setSessionListeners(session) {
 
     session.addEventListener("shippingaddresschanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
+        if (!ev.shippingAddress) {
+            /* This event is triggered with no shipping address when a customer clicks "change"
+               to choose an alternate email address in the modal */
+            session.completeShippingAddressChange({ updatedPaymentRequest: currentPaymentRequest });
+            return;
+        }
         let requestData = {
             shippingAddress: ev.shippingAddress,
             paymentRequest: currentPaymentRequest,
