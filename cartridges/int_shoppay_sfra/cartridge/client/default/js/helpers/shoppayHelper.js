@@ -130,6 +130,11 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
+        if (responseJSON.exception && responseJSON.error){
+            session.close();
+            // refresh the page?
+            return;
+        }
         const { deliveryMethods, discountCodes, lineItems, shippingLines, subtotal, discounts, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         let updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
@@ -165,6 +170,11 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
+        if (responseJSON.exception && responseJSON.error){
+            session.close();
+            // refresh the page?
+            return;
+        }
         const { shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         // Update the payment request based on the delivery method change and update the total accordingly
@@ -191,6 +201,11 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
+        if (responseJSON.exception && responseJSON.error){
+            session.close();
+            // refresh the page?
+            return;
+        }
         const { deliveryMethods, shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         // Update the payment request based on the shipping address change
@@ -217,6 +232,11 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
+        if (responseJSON.exception && responseJSON.error){
+            session.close();
+            // refresh the page?
+            return;
+        }
 
         orderConfirmationData = {
             orderID: responseJSON.orderID,
@@ -295,37 +315,22 @@ function isReadyToOrderOnPageLoad() {
  * @returns {Object} responseJSON - an updated response object to be used in the build & on the ShopPay.PaymentRequest object.
  */
 function createResponse (requestObj, controllerURL) {
-    let responseJSON = $.ajax({
+    let responseJSON;
+    $.ajax({
         url: getUrlWithCsrfToken(controllerURL),
         method: 'POST',
         async: false,
         data: JSON.stringify(requestObj),
         contentType: 'application/json',
         success: function(data) {
-            console.log("SUCCESS DATA >>>> ", data);
-            if (!data.error) {
-                // sessionPaymentRequest = data.paymentRequest; // REWORK THIS...DOESN'T APPEAR TO BE NEEDED (consider alter values that should be stored on the response?)
-                data.exception = false; // consider whether this is to be used elsewhere for some checks? (ex: check for responseJSON.exception in the returned value? Or maybe also see if response.json is on the value.)
-            } else {
-                data.exception = true;
-                console.log(data.errorMsg);
-            }
+            responseJSON = data;
+            responseJSON.exception = false
         },
         error: function (err) {
-
-            // return an obj with the error, etc.
-            // ...consider adding error.true property with errmsg, etc.  
-            // ...maybe consider error.exception property instead of error property so it can be distinguised, etc.
-
-
-
-            // NOT GOOD...remove use of session!
-            // if (session && (err.responseJSON || err.status !== 200)) {
-            //     session.close();
-            //     return;
-            // }
+            responseJSON = err.responseJSON ? err.responseJSON : {};
+            responseJSON.exception = true;
         }
-    }).responseJSON;
+    });
 
     return responseJSON;
 }
