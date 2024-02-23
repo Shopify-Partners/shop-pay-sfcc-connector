@@ -3,6 +3,7 @@
 var URLUtils = require('dw/web/URLUtils');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var ProductMgr = require('dw/catalog/ProductMgr');
+var Resource = require('dw/web/Resource');
 var currentSite = require('dw/system/Site').current;
 
 const shoppayPaymentMethodId = 'ShopPay';
@@ -147,7 +148,8 @@ var getClientRefs = function(context, productId) {
         constants: {
             shoppayEnabled: shoppayEnabled(),
             initShopPayEmailRecognition: context === 'checkout',
-            isBuyNow: context === 'pdp'
+            isBuyNow: context === 'pdp',
+            technicalError: Resource.msg('shoppay.error.technical.general', 'shoppay', null)
         },
         preferences: {
             shoppayPDPButtonEnabled: isShoppayPDPButtonEnabled(productId),

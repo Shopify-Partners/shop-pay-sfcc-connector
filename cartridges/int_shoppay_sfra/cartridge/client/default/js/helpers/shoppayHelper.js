@@ -4,6 +4,7 @@ var sourceIdentifier = null;
 var token = null;
 var checkoutUrl = null;
 var productData = {};
+const technicalErrorMsg = window.shoppayClientRefs.constants.technicalError;
 
 /**
  * Add csrf token param to url
@@ -78,24 +79,36 @@ function setSessionListeners(session) {
                         sessionPaymentRequest = data.paymentRequest;
                         sourceIdentifier = data.basketId;
                     } else {
+                        let errorMsg = technicalErrorMsg;
                         if (data.errorMsg) {
-                            session.completeSessionRequest({
-                                errors: [
-                                    {
-                                        type: "sessionBeginError",
-                                        message: data.errorMsg
-                                    }
-                                ]
-                            });
+                            errorMsg = data.errorMsg;
                         }
+                        session.completeSessionRequest({
+                            errors: [
+                                {
+                                    type: "sessionBeginError",
+                                    message: errorMsg
+                                }
+                            ]
+                        });
                         return;
                     }
                 },
                 error: function (err) {
+                    // TODO: do we even need this conditional?
                     if (err.responseJSON || err.status !== 200) {
-                        // return generic "technical issue" error and set timeout/delay on session.close()/reload?
-                        session.close();
-                        window.location.reload();
+                        session.completeSessionRequest({
+                            errors: [
+                                {
+                                    type: "sessionBeginError",
+                                    message: technicalErrorMsg
+                                }
+                            ]
+                        });
+                        setTimeout(function() {
+                            session.close();
+                            window.location.reload();
+                        }, 2000);
                         return;
                     }
                 }
@@ -124,24 +137,36 @@ function setSessionListeners(session) {
                     sourceIdentifier = data.sourceIdentifier;
                     session.completeSessionRequest({token, checkoutUrl, sourceIdentifier});
                 } else {
+                    let errorMsg = technicalErrorMsg;
                     if (data.errorMsg) {
-                        session.completeSessionRequest({
-                            errors: [
-                                {
-                                    type: "sessionBeginError",
-                                    message: data.errorMsg
-                                }
-                            ]
-                        });
+                        errorMsg = data.errorMsg;
                     }
+                    session.completeSessionRequest({
+                        errors: [
+                            {
+                                type: "sessionBeginError",
+                                message: errorMsg
+                            }
+                        ]
+                    });
                     return;
                 }
             },
             error: function (err) {
+                // TODO: do we even need this conditional?
                 if (err.responseJSON || err.status !== 200) {
-                    // return generic "technical issue" error and set timeout/delay on session.close()/reload?
-                    session.close();
-                    window.location.reload();
+                    session.completeSessionRequest({
+                        errors: [
+                            {
+                                type: "sessionBeginError",
+                                message: technicalErrorMsg
+                            }
+                        ]
+                    });
+                    setTimeout(function() {
+                        session.close();
+                        window.location.reload();
+                    }, 2000);
                     return;
                 }
             }
@@ -160,21 +185,32 @@ function setSessionListeners(session) {
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
         if (responseJSON.exception){
-            session.close();
-            window.location.reload();
+            session.completeDiscountCodeChange({
+                errors: [
+                    {
+                        type: "discountCodeError",
+                        message: technicalErrorMsg
+                    }
+                ]
+            });
+            setTimeout(function() {
+                session.close();
+                window.location.reload();
+            }, 2000);
             return;
         } else if (responseJSON.error) {
+            let errorMsg = technicalErrorMsg;
             if (responseJSON.errorMsg) {
-                session.completeDiscountCodeChange({
-                    errors: [
-                        {
-                            type: "discountCodeError",
-                            message: responseJSON.errorMsg
-                        }
-                    ]
-                });
+                errorMsg = responseJSON.errorMsg;
             }
-            // add a generic technical error message as fallback?
+            session.completeDiscountCodeChange({
+                errors: [
+                    {
+                        type: "discountCodeError",
+                        message: errorMsg
+                    }
+                ]
+            });
             return;
         }
         const { deliveryMethods, discountCodes, lineItems, shippingLines, subtotal, discounts, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -213,21 +249,32 @@ function setSessionListeners(session) {
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
         if (responseJSON.exception) {
-            session.close();
-            window.location.reload();
+            session.completeDeliveryMethodChange({
+                errors: [
+                    {
+                        type: "deliveryMethodError",
+                        message: technicalErrorMsg
+                    }
+                ]
+            });
+            setTimeout(function() {
+                session.close();
+                window.location.reload();
+            }, 2000);
             return;
         } else if (responseJSON.error) {
+            let errorMsg = technicalErrorMsg;
             if (responseJSON.errorMsg) {
-                session.completeDeliveryMethodChange({
-                    errors: [
-                        {
-                            type: "deliveryMethodError",
-                            message: responseJSON.errorMsg
-                        }
-                    ]
-                });
+                errorMsg = responseJSON.errorMsg;
             }
-            // add a generic technical error message as fallback?
+            session.completeDeliveryMethodChange({
+                errors: [
+                    {
+                        type: "deliveryMethodError",
+                        message: errorMsg
+                    }
+                ]
+            });
             return;
         }
         const { shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -263,21 +310,32 @@ function setSessionListeners(session) {
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
         if (responseJSON.exception) {
-            session.close();
-            window.location.reload();
+            session.completeShippingAddressChange({
+                errors: [
+                    {
+                        type: "shippingAddressError",
+                        message: technicalErrorMsg
+                    }
+                ]
+            });
+            setTimeout(function() {
+                session.close();
+                window.location.reload();
+            }, 2000);
             return;
         } else if (responseJSON.error) {
+            let errorMsg = technicalErrorMsg;
             if (responseJSON.errorMsg) {
-                session.completeShippingAddressChange({
-                    errors: [
-                        {
-                            type: "shippingAddressError",
-                            message: responseJSON.errorMsg
-                        }
-                    ]
-                });
+                errorMsg = responseJSON.errorMsg;
             }
-            // add a generic technical error message as fallback?
+            session.completeShippingAddressChange({
+                errors: [
+                    {
+                        type: "shippingAddressError",
+                        message: errorMsg
+                    }
+                ]
+            });
             return;
         }
         const { deliveryMethods, shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -307,21 +365,32 @@ function setSessionListeners(session) {
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
         if (responseJSON.exception) {
-            session.close();
-            window.location.reload();
+            session.completePaymentConfirmationRequest({
+                errors: [
+                    {
+                        type: "paymentConfirmationError",
+                        message: technicalErrorMsg
+                    }
+                ]
+            });
+            setTimeout(function() {
+                session.close();
+                window.location.reload();
+            }, 2000);
             return;
         } else if (responseJSON.error) {
+            let errorMsg = technicalErrorMsg;
             if (responseJSON.errorMsg) {
-                session.completePaymentConfirmationRequest({
-                    errors: [
-                        {
-                            type: "paymentConfirmationError",
-                            message: responseJSON.errorMsg
-                        }
-                    ]
-                });
+                errorMsg = responseJSON.errorMsg;
             }
-            // add a generic technical error message as fallback?
+            session.completePaymentConfirmationRequest({
+                errors: [
+                    {
+                        type: "paymentConfirmationError",
+                        message: errorMsg
+                    }
+                ]
+            });
             return;
         }
 
