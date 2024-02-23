@@ -1,11 +1,12 @@
 on:
+  push:
+    branches:
+      - devops/sb-shutdown
   schedule:
     - cron: '0 0 * * *'
 
 jobs:
-
   shutdown:
-    name: Shutdown Dev06
     runs-on: ubuntu-latest
 
     steps:
