@@ -1,7 +1,7 @@
 const helper = require('../helpers/shoppayHelper');
 
 let session;
-let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
+const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
 
 $(document).ready(function () {
     if(window.ShopPay) {
