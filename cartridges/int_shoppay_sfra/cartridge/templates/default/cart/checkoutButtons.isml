@@ -7,7 +7,7 @@
 
 <iscomment>BEGIN SHOPPAY</iscomment>
 <isif condition="${pdict.includeShopPayJS}">
-    <div class="mb-sm-3">
+    <div class="mb-sm-3 shopPayButtonContainer">
         <isinclude template="common/shopPayButton" />
     </div>
 </isif>
