@@ -175,7 +175,8 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         error: function (err) {
                             if (err.responseJSON || err.status !== 200) {
                                 session.close();
-                                window.location.reload()
+                                // modal hasn't opened yet so "windowclosed" listener won't fire
+                                window.location.reload();
                                 return;
                             }
                         }
@@ -201,7 +202,7 @@ function buildPaymentRequest () {
             contentType: 'application/json',
             async: false
         }) || {};
-
+        // TODO: Add error handling here?
         return paymentResponse;
     } else {
         session.close();

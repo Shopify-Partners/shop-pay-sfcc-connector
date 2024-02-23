@@ -5,6 +5,7 @@ var token = null;
 var checkoutUrl = null;
 var productData = {};
 const technicalErrorMsg = window.shoppayClientRefs.constants.technicalError;
+let reloadOnClose = true;
 
 /**
  * Add csrf token param to url
@@ -107,7 +108,7 @@ function setSessionListeners(session) {
                         });
                         setTimeout(function() {
                             session.close();
-                            window.location.reload();
+                            // window.location.reload();
                         }, 2000);
                         return;
                     }
@@ -165,7 +166,7 @@ function setSessionListeners(session) {
                     });
                     setTimeout(function() {
                         session.close();
-                        window.location.reload();
+                        // window.location.reload();
                     }, 2000);
                     return;
                 }
@@ -195,7 +196,7 @@ function setSessionListeners(session) {
             });
             setTimeout(function() {
                 session.close();
-                window.location.reload();
+                // window.location.reload();
             }, 2000);
             return;
         } else if (responseJSON.error) {
@@ -259,7 +260,7 @@ function setSessionListeners(session) {
             });
             setTimeout(function() {
                 session.close();
-                window.location.reload();
+                // window.location.reload();
             }, 2000);
             return;
         } else if (responseJSON.error) {
@@ -320,7 +321,7 @@ function setSessionListeners(session) {
             });
             setTimeout(function() {
                 session.close();
-                window.location.reload();
+                // window.location.reload();
             }, 2000);
             return;
         } else if (responseJSON.error) {
@@ -375,7 +376,7 @@ function setSessionListeners(session) {
             });
             setTimeout(function() {
                 session.close();
-                window.location.reload();
+                // window.location.reload();
             }, 2000);
             return;
         } else if (responseJSON.error) {
@@ -403,6 +404,7 @@ function setSessionListeners(session) {
     });
 
     session.addEventListener("paymentcomplete", function(ev) {
+        reloadOnClose = false;
         session.close();
         let data = orderConfirmationData;
         let redirect = $('<form>').appendTo(document.body).attr({
@@ -418,6 +420,17 @@ function setSessionListeners(session) {
             value: data.orderToken
         });
         redirect.submit();
+    });
+
+    session.addEventListener("windowclosed", function(ev) {
+        // TODO: Remove this line
+        console.log("windowclosed (session)");
+        // Reset global value to default
+        if (!reloadOnClose) {
+            reloadOnClose = true;
+        } else {
+            window.location.reload();
+        }
     });
 }
 
