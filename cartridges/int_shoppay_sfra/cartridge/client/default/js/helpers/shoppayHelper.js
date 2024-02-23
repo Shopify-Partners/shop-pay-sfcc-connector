@@ -94,9 +94,11 @@ function setSessionListeners(session) {
         }
 
         let requestData = {
-            paymentRequest: sessionPaymentRequest,
-            basketId: sourceIdentifier
+            paymentRequest: sessionPaymentRequest
         };
+        if (window.shoppayClientRefs.constants.isBuyNow) {
+            requestData.basketId = sourceIdentifier;
+        }
 
         $.ajax({
             url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
@@ -126,8 +128,7 @@ function setSessionListeners(session) {
         let requestData = {
             discountCodes: ev.discountCodes
         };
-        let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
-        if (isBuyNow && window.shoppayClientRefs.constants.isBuyNow) {
+        if (window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
         }
 
