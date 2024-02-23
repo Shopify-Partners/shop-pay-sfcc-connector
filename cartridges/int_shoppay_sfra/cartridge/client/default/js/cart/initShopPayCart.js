@@ -1,6 +1,7 @@
 const helper = require('../helpers/shoppayHelper');
 
 let session;
+const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
 
 $(document).ready(function () {
     if(window.ShopPay) {
@@ -17,11 +18,11 @@ $(document).ready(function () {
         }
 
         /*
-        /* The below code triggers if a product is a Buy Now item, but is not ready to order on page load (ex: required product attributes like color or size are not yet chosen).
-        /* Here, a watcher is set to capture user interactions when product attributes are selected. Helper scripts will be triggered by these interactions to determine if the item
-        /* is ready to order when all required attributes are selected.
+        The below code triggers if a product is a Buy Now item, but is not ready to order on page load (ex: required product attributes like color or size are not yet chosen).
+        Here, a watcher is set to capture user interactions when product attributes are selected.
+        Helper scripts will be triggered by these interactions to determine if the item is ready to order when all required attributes are selected.
         */
-        if (window.shoppayClientRefs.constants.isBuyNow && !readyOnPageLoad) {
+        if (isBuyNow && !readyOnPageLoad) {
             $('body').on('product:afterAttributeSelect', initBuyNow); // receives the Event & Response
         } else {
             session = initShopPaySession();
@@ -41,7 +42,7 @@ function initShopPayButton() {
     initShopPayConfig();
 
     let paymentSelector = '#shop-pay-button-container';
-    window.ShopPay.PaymentRequest.createButton().render(paymentSelector);
+    window.ShopPay.PaymentRequest.createButton({buyWith: isBuyNow}).render(paymentSelector);
     helper.shopPayMutationObserver(paymentSelector);
 }
 
@@ -69,8 +70,8 @@ function initShopPayEmailRecognition() {
     initShopPayConfig();
 
     /*
-    /* If your checkout is not built with SFRA or you have custimized and removed the 'email-guest'
-    /* id on the email input you will need to update the id value for emailInputId
+    If your checkout is not built with SFRA or you have custimized and removed the 'email-guest'
+    id on the email input you will need to update the id value for emailInputId
     */
     window.ShopPay.PaymentRequest.createLogin({emailInputId: 'email-guest'})
         .render('#shop-pay-login-container');
@@ -79,7 +80,7 @@ function initShopPayEmailRecognition() {
 $('body').on('cart:update product:afterAddToCart promotion:success', function () {
     /* Only interested in cart updates on Cart page (cart updates are not triggered in checkout). Buy Now already
     has a separate event handler for changes to attribute selections */
-    if (window.ShopPay && !window.shoppayClientRefs.constants.isBuyNow) {
+    if (window.ShopPay && !isBuyNow) {
         if (!session) {
             session = initShopPaySession();
         } else {
@@ -93,10 +94,6 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
             if (responseJSON && !responseJSON.error && responseJSON.paymentRequest !== null) {
                 session.close();
                 session = initShopPaySession();
-
-                // TODO: remove these debugging lines before final delivery
-                console.log('RESPONSE JSON >>>> ', responseJSON.paymentRequest)
-                console.log('SESSION Obj >>>> ', session.paymentRequest)
             }
         }
     }
@@ -104,7 +101,6 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
 
 
 function initShopPaySession(paymentRequestInput, readyToOrder) {
-    let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
     let paymentRequest;
     let paymentRequestResponse;
     let responseJSON;
@@ -115,6 +111,11 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
         let productData = helper.getInitProductData();
         if (productData) {
             paymentRequestResponse = helper.createResponse(productData, window.shoppayClientRefs.urls.BuyNowData);
+            if (paymentRequestResponse.exception || paymentRequestResponse.error){
+                // No need to close any session because a session does not exist at this point (has not yet been initiated).
+                // Return to exit function - don't reload the page in case there is a page rendering issue (will result in infinite reload loop).
+                return;
+            }
             paymentRequest = paymentRequestResponse.paymentRequest;
             responseJSON = paymentRequestResponse ? paymentRequestResponse : null;
         }
@@ -137,7 +138,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
 
             $('body').on('product:afterAttributeSelect', function(e, response) {
                 let responseProduct = response.data.product;
-                if (window.shoppayClientRefs.constants.isBuyNow && responseProduct.buyNow) {
+                if (isBuyNow && responseProduct.buyNow) {
                     helper.setInitProductData({
                         pid: responseProduct.id,
                         quantity: responseProduct.selectedQuantity,
@@ -169,13 +170,14 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                                     paymentRequest: paymentRequest
                                 });
                                 helper.setSessionListeners(shopPaySession);
-                                console.log(shopPaySession.paymentRequest);
-                            } else {
-                                console.log(data.errorMsg);
                             }
                         },
                         error: function (err) {
-                            console.error("Ajax Error - Check GetCartSummary call:  ", err);
+                            if (err.responseJSON || err.status !== 200) {
+                                session.close();
+                                window.location.reload()
+                                return;
+                            }
                         }
                     });
                 }

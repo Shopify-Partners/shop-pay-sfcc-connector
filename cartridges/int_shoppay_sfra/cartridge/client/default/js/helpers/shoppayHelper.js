@@ -82,7 +82,11 @@ function setSessionListeners(session) {
                     }
                 },
                 error: function (err) {
-                    console.error("Ajax Error - Check PrepareBasket call:  ", err);
+                    if (err.responseJSON || err.status !== 200) {
+                        session.close();
+                        window.location.reload();
+                        return;
+                    }
                 }
             });
         } else {
@@ -107,7 +111,11 @@ function setSessionListeners(session) {
                 session.completeSessionRequest({token, checkoutUrl, sourceIdentifier});
             },
             error: function (err) {
-                console.log(err);
+                if (err.responseJSON || err.status !== 200) {
+                    session.close();
+                    window.location.reload();
+                    return;
+                }
             }
 
         });
@@ -124,6 +132,11 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
+        if (responseJSON.exception || responseJSON.error){
+            session.close();
+            window.location.reload();
+            return;
+        }
         const { deliveryMethods, discountCodes, lineItems, shippingLines, subtotal, discounts, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         let updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
@@ -145,9 +158,6 @@ function setSessionListeners(session) {
         }
 
         session.completeDiscountCodeChange({ updatedPaymentRequest: updatedPaymentRequest });
-        // TODO: remove these debugging lines before final delivery
-        console.log('discountcodechanged', ev);
-        console.log("Updated Payment Req w/ entered Discount Code: ", updatedPaymentRequest);
     });
 
     session.addEventListener("deliverymethodchanged", function(ev) {
@@ -162,6 +172,11 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
+        if (responseJSON.exception || responseJSON.error){
+            session.close();
+            window.location.reload();
+            return;
+        }
         const { shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         // Update the payment request based on the delivery method change and update the total accordingly
@@ -174,9 +189,6 @@ function setSessionListeners(session) {
         });
 
         session.completeDeliveryMethodChange({ updatedPaymentRequest: updatedPaymentRequest });
-        // TODO: remove these debugging lines before final delivery
-        console.log('deliverymethodchanged', ev);
-        console.log("Updated Payment Req w/ entered Delivery Method: ", updatedPaymentRequest);
     });
 
     session.addEventListener("shippingaddresschanged", function(ev) {
@@ -191,6 +203,11 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
+        if (responseJSON.exception || responseJSON.error){
+            session.close();
+            window.location.reload();
+            return;
+        }
         const { deliveryMethods, shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
 
         // Update the payment request based on the shipping address change
@@ -204,9 +221,6 @@ function setSessionListeners(session) {
         });
 
         session.completeShippingAddressChange({ updatedPaymentRequest: updatedPaymentRequest });
-        // TODO: remove these debugging lines before final delivery
-        console.log('shippingaddresschanged', ev);
-        console.log("Updated Payment Req w/ entered Shipping Address: ", updatedPaymentRequest);
     });
 
     session.addEventListener("paymentconfirmationrequested", function(ev) {
@@ -220,6 +234,11 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
+        if (responseJSON.exception || responseJSON.error){
+            session.close();
+            window.location.reload();
+            return;
+        }
 
         orderConfirmationData = {
             orderID: responseJSON.orderID,
@@ -227,13 +246,9 @@ function setSessionListeners(session) {
             continueUrl: responseJSON.continueUrl
         };
         session.completePaymentConfirmationRequest();
-        // TODO: remove this debugging line before final delivery
-        console.log('paymentconfirmationrequested', ev);
     });
 
     session.addEventListener("paymentcomplete", function(ev) {
-        // TODO: remove this debugging line before final delivery
-        console.log('paymentcomplete', ev);
         session.close();
         let data = orderConfirmationData;
         let redirect = $('<form>').appendTo(document.body).attr({
@@ -302,13 +317,22 @@ function isReadyToOrderOnPageLoad() {
  * @returns {Object} responseJSON - an updated response object to be used in the build & on the ShopPay.PaymentRequest object.
  */
 function createResponse (requestObj, controllerURL) {
-    let responseJSON = $.ajax({
+    let responseJSON;
+    $.ajax({
         url: getUrlWithCsrfToken(controllerURL),
         method: 'POST',
         async: false,
         data: JSON.stringify(requestObj),
-        contentType: 'application/json'
-    }).responseJSON;
+        contentType: 'application/json',
+        success: function(data) {
+            responseJSON = data;
+            responseJSON.exception = false
+        },
+        error: function (err) {
+            responseJSON = err.responseJSON ? err.responseJSON : {};
+            responseJSON.exception = true;
+        }
+    });
 
     return responseJSON;
 }
