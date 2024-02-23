@@ -132,7 +132,7 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
-        if (responseJSON.exception && responseJSON.error){
+        if (responseJSON.exception || responseJSON.error){
             session.close();
             window.location.reload();
             return;
@@ -172,7 +172,7 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
-        if (responseJSON.exception && responseJSON.error){
+        if (responseJSON.exception || responseJSON.error){
             session.close();
             window.location.reload();
             return;
@@ -203,7 +203,7 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
-        if (responseJSON.exception && responseJSON.error){
+        if (responseJSON.exception || responseJSON.error){
             session.close();
             window.location.reload();
             return;
@@ -234,7 +234,7 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
-        if (responseJSON.exception && responseJSON.error){
+        if (responseJSON.exception || responseJSON.error){
             session.close();
             window.location.reload();
             return;
