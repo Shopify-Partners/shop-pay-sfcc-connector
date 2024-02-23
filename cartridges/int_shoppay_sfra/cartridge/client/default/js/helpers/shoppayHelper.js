@@ -78,11 +78,22 @@ function setSessionListeners(session) {
                         sessionPaymentRequest = data.paymentRequest;
                         sourceIdentifier = data.basketId;
                     } else {
-                        console.log(data.errorMsg);
+                        if (data.errorMsg) {
+                            session.completeSessionRequest({
+                                errors: [
+                                    {
+                                        type: "sessionBeginError",
+                                        message: data.errorMsg
+                                    }
+                                ]
+                            });
+                        }
+                        return;
                     }
                 },
                 error: function (err) {
                     if (err.responseJSON || err.status !== 200) {
+                        // return generic "technical issue" error and set timeout/delay on session.close()/reload?
                         session.close();
                         window.location.reload();
                         return;
@@ -107,13 +118,28 @@ function setSessionListeners(session) {
             data: JSON.stringify(requestData),
             contentType: 'application/json',
             success: function (data) {
-                token = data.token;
-                checkoutUrl = data.checkoutUrl;
-                sourceIdentifier = data.sourceIdentifier;
-                session.completeSessionRequest({token, checkoutUrl, sourceIdentifier});
+                if (!data.error) {
+                    token = data.token;
+                    checkoutUrl = data.checkoutUrl;
+                    sourceIdentifier = data.sourceIdentifier;
+                    session.completeSessionRequest({token, checkoutUrl, sourceIdentifier});
+                } else {
+                    if (data.errorMsg) {
+                        session.completeSessionRequest({
+                            errors: [
+                                {
+                                    type: "sessionBeginError",
+                                    message: data.errorMsg
+                                }
+                            ]
+                        });
+                    }
+                    return;
+                }
             },
             error: function (err) {
                 if (err.responseJSON || err.status !== 200) {
+                    // return generic "technical issue" error and set timeout/delay on session.close()/reload?
                     session.close();
                     window.location.reload();
                     return;
@@ -133,9 +159,22 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
-        if (responseJSON.exception || responseJSON.error){
+        if (responseJSON.exception){
             session.close();
             window.location.reload();
+            return;
+        } else if (responseJSON.error) {
+            if (responseJSON.errorMsg) {
+                session.completeDiscountCodeChange({
+                    errors: [
+                        {
+                            type: "discountCodeError",
+                            message: responseJSON.errorMsg
+                        }
+                    ]
+                });
+            }
+            // add a generic technical error message as fallback?
             return;
         }
         const { deliveryMethods, discountCodes, lineItems, shippingLines, subtotal, discounts, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -173,9 +212,22 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
-        if (responseJSON.exception || responseJSON.error){
+        if (responseJSON.exception) {
             session.close();
             window.location.reload();
+            return;
+        } else if (responseJSON.error) {
+            if (responseJSON.errorMsg) {
+                session.completeDeliveryMethodChange({
+                    errors: [
+                        {
+                            type: "deliveryMethodError",
+                            message: responseJSON.errorMsg
+                        }
+                    ]
+                });
+            }
+            // add a generic technical error message as fallback?
             return;
         }
         const { shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -210,9 +262,22 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
-        if (responseJSON.exception || responseJSON.error){
+        if (responseJSON.exception) {
             session.close();
             window.location.reload();
+            return;
+        } else if (responseJSON.error) {
+            if (responseJSON.errorMsg) {
+                session.completeShippingAddressChange({
+                    errors: [
+                        {
+                            type: "shippingAddressError",
+                            message: responseJSON.errorMsg
+                        }
+                    ]
+                });
+            }
+            // add a generic technical error message as fallback?
             return;
         }
         const { deliveryMethods, shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -241,9 +306,22 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
-        if (responseJSON.exception || responseJSON.error){
+        if (responseJSON.exception) {
             session.close();
             window.location.reload();
+            return;
+        } else if (responseJSON.error) {
+            if (responseJSON.errorMsg) {
+                session.completePaymentConfirmationRequest({
+                    errors: [
+                        {
+                            type: "paymentConfirmationError",
+                            message: responseJSON.errorMsg
+                        }
+                    ]
+                });
+            }
+            // add a generic technical error message as fallback?
             return;
         }
 
