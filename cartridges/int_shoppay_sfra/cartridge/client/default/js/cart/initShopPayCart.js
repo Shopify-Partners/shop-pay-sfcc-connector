@@ -112,7 +112,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
         if (productData) {
             paymentRequestResponse = helper.createResponse(productData, window.shoppayClientRefs.urls.BuyNowData);
             if (paymentRequestResponse.exception && paymentRequestResponse.error){
-                // Session does not exist at this point - no need to close any session from this point.
+                // No need to close any session because a session does not exist at this point (has not yet been initiated).
                 // Return to exit function - don't reload the page in case there is a page rendering issue (will result in infinite reload loop).
                 return;
             }
