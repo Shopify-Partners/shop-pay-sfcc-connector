@@ -2,7 +2,7 @@
 
 var ShippingMgr = require('dw/order/ShippingMgr');
 var collections = require('*/cartridge/scripts/util/collections');
-var common = require('*/cartridge/scripts/shoppay/common');
+var common = require('*/cartridge/scripts/shoppay/shoppayCommon');
 var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHelpers');
 var deliveryDateHelpers = require('*/cartridge/scripts/shoppay/helpers/deliveryDateHelpers');
 

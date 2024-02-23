@@ -2,7 +2,7 @@
 
 var Transaction = require('dw/system/Transaction');
 var collections = require('*/cartridge/scripts/util/collections');
-var common = require('*/cartridge/scripts/shoppay/common');
+var common = require('*/cartridge/scripts/shoppay/shoppayCommon');
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var BasketMgr = require('dw/order/BasketMgr');
 var ShippingMgr = require('dw/order/ShippingMgr');

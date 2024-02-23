@@ -1,6 +1,6 @@
 'use strict'
 
-var common = require('*/cartridge/scripts/shoppay/common');
+var common = require('*/cartridge/scripts/shoppay/shoppayCommon');
 var collections = require('*/cartridge/scripts/util/collections');
 
 /**
