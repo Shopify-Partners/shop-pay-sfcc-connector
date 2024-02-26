@@ -1,11 +1,10 @@
 const helper = require('../helpers/shoppayHelper');
-
 let session;
 const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
 
 $(document).ready(function () {
     if(window.ShopPay) {
-        if(window.shoppayClientRefs.constants.initShopPayEmailRecognition) {
+        if(window.shoppayClientRefs.constants.isCheckout) {
             initShopPayEmailRecognition();
         }
 

@@ -16,6 +16,7 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
     var currentBasket = BasketMgr.getCurrentBasket();
     var shoppayABCookie = request.httpCookies['shoppayAB'];
     var shoppayApplicable = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);
+    var viewData = res.getViewData();
 
     //If there is no cookie create it else do nothing
     if(!shoppayABCookie || shoppayABCookie.value === '{}') {
@@ -30,6 +31,9 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
         shoppayABCookie.setMaxAge(7776000);
         response.addHttpCookie(shoppayABCookie);
     }
+
+    viewData.intABTest = true;
+    res.setViewData(viewData);
 
     next();
 });

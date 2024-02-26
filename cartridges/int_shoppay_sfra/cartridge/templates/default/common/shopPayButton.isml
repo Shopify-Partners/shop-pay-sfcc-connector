@@ -1,6 +1,9 @@
 <isscript>
     var assets = require('*/cartridge/scripts/assets.js');
     assets.addJs('/js/cart/initShopPayCart.js');
+    if(pdict.intABTest) {
+        assets.addJs('/js/initABTest.js');
+    }
 </isscript>
 
 <style>
@@ -24,3 +27,4 @@
     >
     <div id="shop-pay-button-container" class="${pdict.action === 'Product-Show' ? 'btn col-sm-8 shopPayButtonContainer' : 'btn col-sm-12 shopPayButtonContainer'}"></div>
 </div>
+z

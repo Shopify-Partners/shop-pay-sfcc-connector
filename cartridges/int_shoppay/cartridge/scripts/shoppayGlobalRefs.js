@@ -146,7 +146,7 @@ var getClientRefs = function(context, productId) {
         urls: urls,
         constants: {
             shoppayEnabled: shoppayEnabled(),
-            initShopPayEmailRecognition: context === 'checkout',
+            isCheckout: context === 'checkout',
             isBuyNow: context === 'pdp'
         },
         preferences: {

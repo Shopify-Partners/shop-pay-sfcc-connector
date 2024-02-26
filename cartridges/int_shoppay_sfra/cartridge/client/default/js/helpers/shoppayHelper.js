@@ -344,7 +344,6 @@ function createResponse (requestObj, controllerURL) {
     return responseJSON;
 }
 
-
 module.exports = {
     getCsrfToken: getCsrfToken,
     getUrlWithCsrfToken: getUrlWithCsrfToken,
