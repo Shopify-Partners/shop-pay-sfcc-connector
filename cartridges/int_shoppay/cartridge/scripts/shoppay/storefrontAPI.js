@@ -1,6 +1,7 @@
 'use strict'
 
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+var Result = require('dw/svc/Result');
 
 /**
  * Function to create a GraphQL ShopPay payment request session
@@ -23,6 +24,13 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
         var response = shoppayStorefrontService.call({
             body: bodyObj || {}
         });
+
+        if (response.status === Result.SERVICE_UNAVAILABLE) {
+            // retry service call once
+            response = shoppayStorefrontService.call({
+                body: bodyObj || {}
+            });
+        }
 
         var responseHeaders = shoppayStorefrontService.client.responseHeaders;
         var shopifyRequestID = responseHeaders.get('X-Request-ID');
