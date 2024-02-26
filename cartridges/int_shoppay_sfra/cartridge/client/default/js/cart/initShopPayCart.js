@@ -207,6 +207,8 @@ function buildPaymentRequest() {
                     response = {
                         responseJSON: data
                     };
+                } else {
+                    helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
                 }
             },
             error: function(err) {
@@ -214,8 +216,8 @@ function buildPaymentRequest() {
                     /*  Return to exit function - don't reload the page in case there is a page rendering
                         issue (will result in infinite reload loop). */
                     session.close();
-                    // TODO: Call helper.shopPayBtnDisabledStyle?
                 }
+                helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
             }
         });
         return response;
@@ -223,7 +225,7 @@ function buildPaymentRequest() {
         /*  Return to exit function - don't reload the page in case there is a page rendering
             issue (will result in infinite reload loop). */
         session.close();
-        // TODO: Call helper.shopPayBtnDisabledStyle?
+        helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
     }
 }
 

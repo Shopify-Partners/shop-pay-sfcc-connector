@@ -6,6 +6,7 @@ var checkoutUrl = null;
 var productData = {};
 const technicalErrorMsg = window.shoppayClientRefs.constants.technicalError;
 let reloadOnClose = true;
+let observer;
 
 /**
  * Add csrf token param to url
@@ -409,11 +410,19 @@ function setSessionListeners(session) {
 /**
  * Enables & Disables Shop Pay's Buy Now button click based on whether the product is ready to order on the PDP
  */
-function shopPayBtnDisabledStyle(elem, isReadyToOrder) {
+function shopPayBtnDisabledStyle(elem, isReadyToOrder, forceDisable) {
     let readyToOrderPageLoad = isReadyToOrderOnPageLoad();
     let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
 
     if (elem) {
+        // An error occured, disable the button
+        if (!isBuyNow && forceDisable) {
+            elem.style.pointerEvents = 'none';
+            if (observer) {
+                observer.disconnect();
+            }
+            return;
+        }
         if (!isBuyNow || (isBuyNow && (isReadyToOrder || readyToOrderPageLoad))) {
             elem.style.pointerEvents = 'auto';
         } else {
@@ -426,7 +435,7 @@ function shopPayBtnDisabledStyle(elem, isReadyToOrder) {
  * Watches for when ShopPay button is first rendered to the page to then apply correct button styling depending on whether the basket is empty or not
  */
 function shopPayMutationObserver(elemSelector) {
-    const observer = new MutationObserver((mutationsList, observer) => {
+    observer = new MutationObserver((mutationsList, observer) => {
         const renderedShopPayElem = document.querySelector(elemSelector);
         if (renderedShopPayElem) {
             shopPayBtnDisabledStyle(renderedShopPayElem);
