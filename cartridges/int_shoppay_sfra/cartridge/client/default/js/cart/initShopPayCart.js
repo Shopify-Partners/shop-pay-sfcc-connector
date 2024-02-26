@@ -43,7 +43,7 @@ function initShopPayButton() {
 
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton({buyWith: isBuyNow}).render(paymentSelector);
-    helper.shopPayMutationObserver(paymentSelector);
+    helper.shoppayMutationObserver(paymentSelector);
 }
 
 

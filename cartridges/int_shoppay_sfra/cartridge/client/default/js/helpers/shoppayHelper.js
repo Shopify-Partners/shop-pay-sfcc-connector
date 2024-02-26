@@ -434,7 +434,7 @@ function shoppayBtnDisabledStyle(elem, isReadyToOrder, forceDisable) {
 /**
  * Watches for when ShopPay button is first rendered to the page to then apply correct button styling depending on whether the basket is empty or not
  */
-function shopPayMutationObserver(elemSelector) {
+function shoppayMutationObserver(elemSelector) {
     observer = new MutationObserver((mutationsList, observer) => {
         const renderedShopPayElem = document.querySelector(elemSelector);
         if (renderedShopPayElem) {
@@ -494,7 +494,7 @@ module.exports = {
     productData: productData,
     setInitProductData: setInitProductData,
     shoppayBtnDisabledStyle: shoppayBtnDisabledStyle,
-    shopPayMutationObserver: shopPayMutationObserver,
+    shoppayMutationObserver: shoppayMutationObserver,
     isReadyToOrderOnPageLoad: isReadyToOrderOnPageLoad,
     createResponse: createResponse
 };
