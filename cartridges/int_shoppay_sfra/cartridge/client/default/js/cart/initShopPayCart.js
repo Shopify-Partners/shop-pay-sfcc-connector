@@ -112,8 +112,9 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
         if (productData) {
             paymentRequestResponse = helper.createResponse(productData, window.shoppayClientRefs.urls.BuyNowData);
             if (paymentRequestResponse.exception || paymentRequestResponse.error){
-                // No need to close any session because a session does not exist at this point (has not yet been initiated).
-                // Return to exit function - don't reload the page in case there is a page rendering issue (will result in infinite reload loop).
+                /*  No need to close any session because a session does not exist at this point (has not yet been
+                    initiated). Return to exit function - don't reload the page in case there is a page rendering
+                    issue (will result in infinite reload loop). */
                 return;
             }
             paymentRequest = paymentRequestResponse.paymentRequest;
@@ -193,19 +194,37 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
  * Handles AJAX call to get the payment response.
  * @returns {Object} paymentResponse - an response object.
  */
-function buildPaymentRequest () {
+function buildPaymentRequest() {
     let token = document.querySelector('[data-csrf-token]');
+    let response;
     if (token) {
         const paymentResponse = $.ajax({
             url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
             type: 'GET',
             contentType: 'application/json',
-            async: false
-        }) || {};
-        // TODO: Add error handling here?
-        return paymentResponse;
+            async: false,
+            success: function(data) {
+                if (!data.error) {
+                    response = {
+                        responseJSON: data
+                    };
+                }
+            },
+            error: function(err) {
+                if (session) {
+                    /*  Return to exit function - don't reload the page in case there is a page rendering
+                        issue (will result in infinite reload loop). */
+                    session.close();
+                    // TODO: Call helper.shopPayBtnDisabledStyle?
+                }
+            }
+        });
+        return response;
     } else {
+        /*  Return to exit function - don't reload the page in case there is a page rendering
+            issue (will result in infinite reload loop). */
         session.close();
+        // TODO: Call helper.shopPayBtnDisabledStyle?
     }
 }
 
