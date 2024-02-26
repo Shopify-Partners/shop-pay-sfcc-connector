@@ -84,28 +84,16 @@ function setSessionListeners(session) {
                         if (data.errorMsg) {
                             errorMsg = data.errorMsg;
                         }
-                        session.completeSessionRequest({
-                            errors: [
-                                {
-                                    type: "sessionBeginError",
-                                    message: errorMsg
-                                }
-                            ]
-                        });
+                        /* session.completeSessionRequest() does not take an errors array as input so just return
+                           and use default modal error handling. */
                         return;
                     }
                 },
                 error: function (err) {
                     // TODO: do we even need this conditional?
                     if (err.responseJSON || err.status !== 200) {
-                        session.completeSessionRequest({
-                            errors: [
-                                {
-                                    type: "sessionBeginError",
-                                    message: technicalErrorMsg
-                                }
-                            ]
-                        });
+                        /* session.completeSessionRequest() does not take an errors array as input so just
+                            destroy the session and return. */
                         setTimeout(function() {
                             session.close();
                             // window.location.reload();
@@ -142,28 +130,16 @@ function setSessionListeners(session) {
                     if (data.errorMsg) {
                         errorMsg = data.errorMsg;
                     }
-                    session.completeSessionRequest({
-                        errors: [
-                            {
-                                type: "sessionBeginError",
-                                message: errorMsg
-                            }
-                        ]
-                    });
+                    /* session.completeSessionRequest() does not take an errors array as input so just return
+                       and use default modal error handling. */
                     return;
                 }
             },
             error: function (err) {
                 // TODO: do we even need this conditional?
                 if (err.responseJSON || err.status !== 200) {
-                    session.completeSessionRequest({
-                        errors: [
-                            {
-                                type: "sessionBeginError",
-                                message: technicalErrorMsg
-                            }
-                        ]
-                    });
+                    /* session.completeSessionRequest() does not take an errors array as input so just
+                    destroy the session and return. */
                     setTimeout(function() {
                         session.close();
                         // window.location.reload();
