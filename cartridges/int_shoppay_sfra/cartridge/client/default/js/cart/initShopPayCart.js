@@ -73,8 +73,9 @@ function initShopPayEmailRecognition() {
     If your checkout is not built with SFRA or you have customized and removed the 'email-guest'
     id on the email input you will need to update the id value for emailInputId
 
-    Note: A 1.5 second delay has been added to accomodate users may have incorporated browser autofills
-    so the pop-up will appear if the field is autofilled with a recognized email address
+    Note: A 1.5 second delay has been added before attaching to the email trigger to the email field to
+    accommodate users who may have incorporated browser autofills. The pop-up will appear if the field
+    is autofilled with a recognized email address
     */
     setTimeout(function() {
         window.ShopPay.PaymentRequest.createLogin({emailInputId: 'email-guest'})
