@@ -86,7 +86,7 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
 
             if (responseJSON) {
-                helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"));
+                helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"));
             }
 
             if (responseJSON && !responseJSON.error && responseJSON.paymentRequest !== null) {
@@ -126,7 +126,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     if (paymentRequest || (responseJSON && !responseJSON.error)) {
         const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
         // Enable BuyNow Button Click on PDP if Product is Ready To Order
-        helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder);
+        helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder);
 
         let shopPaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
@@ -208,7 +208,7 @@ function buildPaymentRequest() {
                         responseJSON: data
                     };
                 } else {
-                    helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
+                    helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
                 }
             },
             error: function(err) {
@@ -217,7 +217,7 @@ function buildPaymentRequest() {
                         issue (will result in infinite reload loop). */
                     session.close();
                 }
-                helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
+                helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
             }
         });
         return response;
@@ -225,7 +225,7 @@ function buildPaymentRequest() {
         /*  Return to exit function - don't reload the page in case there is a page rendering
             issue (will result in infinite reload loop). */
         session.close();
-        helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
+        helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
     }
 }
 

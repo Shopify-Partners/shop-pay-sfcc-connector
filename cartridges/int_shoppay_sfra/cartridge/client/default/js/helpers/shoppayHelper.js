@@ -410,7 +410,7 @@ function setSessionListeners(session) {
 /**
  * Enables & Disables Shop Pay's Buy Now button click based on whether the product is ready to order on the PDP
  */
-function shopPayBtnDisabledStyle(elem, isReadyToOrder, forceDisable) {
+function shoppayBtnDisabledStyle(elem, isReadyToOrder, forceDisable) {
     let readyToOrderPageLoad = isReadyToOrderOnPageLoad();
     let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
 
@@ -438,7 +438,7 @@ function shopPayMutationObserver(elemSelector) {
     observer = new MutationObserver((mutationsList, observer) => {
         const renderedShopPayElem = document.querySelector(elemSelector);
         if (renderedShopPayElem) {
-            shopPayBtnDisabledStyle(renderedShopPayElem);
+            shoppayBtnDisabledStyle(renderedShopPayElem);
             observer.disconnect();
         }
     });
@@ -493,7 +493,7 @@ module.exports = {
     getInitProductData: getInitProductData,
     productData: productData,
     setInitProductData: setInitProductData,
-    shopPayBtnDisabledStyle: shopPayBtnDisabledStyle,
+    shoppayBtnDisabledStyle: shoppayBtnDisabledStyle,
     shopPayMutationObserver: shopPayMutationObserver,
     isReadyToOrderOnPageLoad: isReadyToOrderOnPageLoad,
     createResponse: createResponse
