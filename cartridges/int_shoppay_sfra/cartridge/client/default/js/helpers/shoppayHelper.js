@@ -1,9 +1,9 @@
 // Global Variables
 let orderConfirmationData;
-var sourceIdentifier = null;
-var token = null;
-var checkoutUrl = null;
-var productData = {};
+let sourceIdentifier = null;
+let token = null;
+let checkoutUrl = null;
+let productData = {};
 const technicalErrorMsg = window.shoppayClientRefs.constants.technicalError;
 let reloadOnClose = true;
 let observer;
