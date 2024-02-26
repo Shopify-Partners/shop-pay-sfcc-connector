@@ -41,7 +41,7 @@ function getCsrfToken() {
 
 /**
  * Get Init Product Data (page load and captures data available on page load)
- * @returns {Object} - productData witht he following structure: { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
+ * @returns {Object} - productData with the following structure: { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
  */
 function getInitProductData() {
     let productData = null;
@@ -54,7 +54,7 @@ function getInitProductData() {
 
 /**
  * Set Init Product Data
- * @param {Object} data - accepts product data obj & updates global productData variable.  { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
+ * @param {Object} data - accepts product data obj & updates global productData variable: { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
  */
 function setInitProductData(data) {
     productData = data;
@@ -80,23 +80,19 @@ function setSessionListeners(session) {
                         sessionPaymentRequest = data.paymentRequest;
                         sourceIdentifier = data.basketId;
                     } else {
-                        let errorMsg = technicalErrorMsg;
-                        if (data.errorMsg) {
-                            errorMsg = data.errorMsg;
-                        }
-                        /* session.completeSessionRequest() does not take an errors array as input so just return
-                           and use default modal error handling. */
+                        /*  session.completeSessionRequest() does not take an errors array as input so just return
+                            and use default modal error handling. */
                         return;
                     }
                 },
                 error: function (err) {
                     // TODO: do we even need this conditional?
                     if (err.responseJSON || err.status !== 200) {
-                        /* session.completeSessionRequest() does not take an errors array as input so just
+                        /*  session.completeSessionRequest() does not take an errors array as input so just
                             destroy the session and return. */
                         setTimeout(function() {
                             session.close();
-                            // window.location.reload();
+                            // Event listeners have loaded so window.location.reload() will be called in windowclosed
                         }, 2000);
                         return;
                     }
@@ -130,19 +126,19 @@ function setSessionListeners(session) {
                     if (data.errorMsg) {
                         errorMsg = data.errorMsg;
                     }
-                    /* session.completeSessionRequest() does not take an errors array as input so just return
-                       and use default modal error handling. */
+                    /*  session.completeSessionRequest() does not take an errors array as input so just return
+                        and use default modal error handling. */
                     return;
                 }
             },
             error: function (err) {
                 // TODO: do we even need this conditional?
                 if (err.responseJSON || err.status !== 200) {
-                    /* session.completeSessionRequest() does not take an errors array as input so just
-                    destroy the session and return. */
+                    /*  session.completeSessionRequest() does not take an errors array as input so just
+                        destroy the session and return. */
                     setTimeout(function() {
                         session.close();
-                        // window.location.reload();
+                        // Event listeners have loaded so window.location.reload() will be called in windowclosed
                     }, 2000);
                     return;
                 }
@@ -172,7 +168,7 @@ function setSessionListeners(session) {
             });
             setTimeout(function() {
                 session.close();
-                // window.location.reload();
+                // Event listeners have loaded so window.location.reload() will be called in windowclosed
             }, 2000);
             return;
         } else if (responseJSON.error) {
@@ -236,7 +232,7 @@ function setSessionListeners(session) {
             });
             setTimeout(function() {
                 session.close();
-                // window.location.reload();
+                // Event listeners have loaded so window.location.reload() will be called in windowclosed
             }, 2000);
             return;
         } else if (responseJSON.error) {
@@ -297,7 +293,7 @@ function setSessionListeners(session) {
             });
             setTimeout(function() {
                 session.close();
-                // window.location.reload();
+                // Event listeners have loaded so window.location.reload() will be called in windowclosed
             }, 2000);
             return;
         } else if (responseJSON.error) {
@@ -352,7 +348,7 @@ function setSessionListeners(session) {
             });
             setTimeout(function() {
                 session.close();
-                // window.location.reload();
+                // Event listeners have loaded so window.location.reload() will be called in windowclosed
             }, 2000);
             return;
         } else if (responseJSON.error) {
