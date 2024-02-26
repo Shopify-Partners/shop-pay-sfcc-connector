@@ -72,9 +72,14 @@ function initShopPayEmailRecognition() {
     /*
     If your checkout is not built with SFRA or you have custimized and removed the 'email-guest'
     id on the email input you will need to update the id value for emailInputId
+
+    Note: A 1.5 second delay has been added to accomodate users may have incorporated browser autofills
+    so the pop-up will appear if the field is autofilled with a recognized email address
     */
-    window.ShopPay.PaymentRequest.createLogin({emailInputId: 'email-guest'})
-        .render('#shop-pay-login-container');
+    setTimeout(function() {
+        window.ShopPay.PaymentRequest.createLogin({emailInputId: 'email-guest'})
+            .render('#shop-pay-login-container');
+    }, 1500);
 }
 
 $('body').on('cart:update product:afterAddToCart promotion:success', function () {
