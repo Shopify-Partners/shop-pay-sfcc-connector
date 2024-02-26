@@ -128,12 +128,12 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
         // Enable BuyNow Button Click on PDP if Product is Ready To Order
         helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder);
 
-        let shopPaySession = window.ShopPay.PaymentRequest.createSession({
+        let shoppaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
         });
 
-        if (shopPaySession) {
-            helper.setSessionListeners(shopPaySession);
+        if (shoppaySession) {
+            helper.setSessionListeners(shoppaySession);
             $('body').off('product:afterAttributeSelect', initBuyNow);
 
             $('body').on('product:afterAttributeSelect', function(e, response) {
@@ -144,14 +144,14 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         quantity: responseProduct.selectedQuantity,
                         options: responseProduct.options
                     });
-                    if (shopPaySession) {
-                        shopPaySession.close();
+                    if (shoppaySession) {
+                        shoppaySession.close();
                         let updatedPaymentRequest = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
-                        shopPaySession = window.ShopPay.PaymentRequest.createSession({
+                        shoppaySession = window.ShopPay.PaymentRequest.createSession({
                             paymentRequest: updatedPaymentRequest
                         });
 
-                        helper.setSessionListeners(shopPaySession);
+                        helper.setSessionListeners(shoppaySession);
                     }
 
                 } else {
@@ -162,14 +162,14 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         async: false,
                         success: function (data) {
                             if (!data.error) {
-                                if (shopPaySession) {
-                                    shopPaySession.close();
+                                if (shoppaySession) {
+                                    shoppaySession.close();
                                 }
                                 let paymentRequest = window.ShopPay.PaymentRequest.build(response.product.buyNow);
-                                shopPaySession = window.ShopPay.PaymentRequest.createSession({
+                                shoppaySession = window.ShopPay.PaymentRequest.createSession({
                                     paymentRequest: paymentRequest
                                 });
-                                helper.setSessionListeners(shopPaySession);
+                                helper.setSessionListeners(shoppaySession);
                             }
                         },
                         error: function (err) {
@@ -185,7 +185,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             });
         }
 
-        return shopPaySession;
+        return shoppaySession;
     }
 }
 
