@@ -21,7 +21,8 @@ $(document).ready(function () {
             (ex: required product attributes like color or size are not yet chosen). Here, a watcher is set
             to capture user interactions when product attributes are selected. Helper scripts will be triggered
             by these interactions to determine if the item is ready to order when all required attributes are
-            selected. */
+            selected.
+        */
         if (isBuyNow && !readyOnPageLoad) {
             $('body').on('product:afterAttributeSelect', initBuyNow); // receives the Event & Response
         } else {
@@ -69,15 +70,23 @@ function initBuyNow(e, response) {
 function initShopPayEmailRecognition() {
     initShopPayConfig();
 
-    /*  If your checkout is not built with SFRA or you have custimized and removed the 'email-guest'
-        id on the email input you will need to update the id value for emailInputId */
-    window.ShopPay.PaymentRequest.createLogin({emailInputId: 'email-guest'})
-        .render('#shop-pay-login-container');
+    /*  If your checkout is not built with SFRA or you have customized and removed the 'email-guest'
+        id on the email input you will need to update the id value for emailInputId
+
+        Note: A 1.5 second delay has been added before attaching to the email trigger to the email field to
+        accommodate users who may have incorporated browser autofills. The pop-up will appear if the field
+        is autofilled with a recognized email address
+    */
+    setTimeout(function() {
+        window.ShopPay.PaymentRequest.createLogin({emailInputId: 'email-guest'})
+            .render('#shop-pay-login-container');
+    }, 1500);
 }
 
 $('body').on('cart:update product:afterAddToCart promotion:success', function () {
     /*  Only interested in cart updates on Cart page (cart updates are not triggered in checkout). Buy Now already
-        has a separate event handler for changes to attribute selections */
+        has a separate event handler for changes to attribute selections
+    */
     if (window.ShopPay && !isBuyNow) {
         if (!session) {
             session = initShopPaySession();
@@ -112,7 +121,8 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             if (paymentRequestResponse.exception || paymentRequestResponse.error){
                 /*  No need to close any session because a session does not exist at this point (has not yet been
                     initiated). Return to exit function - don't reload the page in case there is a page rendering
-                    issue (will result in infinite reload loop). */
+                    issue (will result in infinite reload loop).
+                */
                 return;
             }
             paymentRequest = paymentRequestResponse.paymentRequest;
@@ -214,7 +224,8 @@ function buildPaymentRequest() {
             error: function(err) {
                 if (session) {
                     /*  Return to exit function - don't reload the page in case there is a page rendering
-                        issue (will result in infinite reload loop). */
+                        issue (will result in infinite reload loop).
+                    */
                     session.close();
                 }
                 helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
@@ -223,7 +234,8 @@ function buildPaymentRequest() {
         return response;
     } else {
         /*  Return to exit function - don't reload the page in case there is a page rendering
-            issue (will result in infinite reload loop). */
+            issue (will result in infinite reload loop).
+        */
         session.close();
         helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
     }

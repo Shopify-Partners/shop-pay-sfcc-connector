@@ -82,7 +82,8 @@ function setSessionListeners(session) {
                         sourceIdentifier = data.basketId;
                     } else {
                         /*  session.completeSessionRequest() does not take an errors array as input so just return
-                            and use default modal error handling. */
+                            and use default modal error handling.
+                        */
                         return;
                     }
                 },
@@ -90,7 +91,8 @@ function setSessionListeners(session) {
                     // TODO: do we even need this conditional?
                     if (err.responseJSON || err.status !== 200) {
                         /*  session.completeSessionRequest() does not take an errors array as input so just
-                            destroy the session and return. */
+                            destroy the session and return.
+                        */
                         setTimeout(function() {
                             session.close();
                             // Event listeners have loaded so window.location.reload() will be called in windowclosed
@@ -128,7 +130,8 @@ function setSessionListeners(session) {
                         errorMsg = data.errorMsg;
                     }
                     /*  session.completeSessionRequest() does not take an errors array as input so just return
-                        and use default modal error handling. */
+                        and use default modal error handling.
+                    */
                     return;
                 }
             },
@@ -136,7 +139,8 @@ function setSessionListeners(session) {
                 // TODO: do we even need this conditional?
                 if (err.responseJSON || err.status !== 200) {
                     /*  session.completeSessionRequest() does not take an errors array as input so just
-                        destroy the session and return. */
+                        destroy the session and return.
+                    */
                     setTimeout(function() {
                         session.close();
                         // Event listeners have loaded so window.location.reload() will be called in windowclosed
@@ -269,7 +273,8 @@ function setSessionListeners(session) {
         const currentPaymentRequest = session.paymentRequest;
         if (!ev.shippingAddress) {
             /* This event is triggered with no shipping address when a customer clicks "change"
-               to choose an alternate email address in the modal */
+               to choose an alternate email address in the modal
+            */
             session.completeShippingAddressChange({ updatedPaymentRequest: currentPaymentRequest });
             return;
         }
