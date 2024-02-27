@@ -259,7 +259,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         || response.error
         || !response.shoppayPaymentRequestSessionCreate
         || response.shoppayPaymentRequestSessionCreate.userErrors.length > 0
-        || response.shoppayPaymentRequestSessionCreate.shopPayPaymentRequestSession == null
+        || response.shoppayPaymentRequestSessionCreate.shoppayPaymentRequestSession == null
     ) {
         res.json({
             error: true,
@@ -267,7 +267,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         });
         return next();
     }
-    var paymentRequestSession = response.shoppayPaymentRequestSessionCreate.shopPayPaymentRequestSession;
+    var paymentRequestSession = response.shoppayPaymentRequestSessionCreate.shoppayPaymentRequestSession;
 
     res.json({
         error: false,
