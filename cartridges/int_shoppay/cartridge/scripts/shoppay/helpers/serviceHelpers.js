@@ -146,8 +146,8 @@ const buildSubmitPaymentRequest = () => {
 
 const mockShopPayPaymentRequestSessionCreateResponse = {
     data: {
-        shoppayPaymentRequestSessionCreate: {
-            shoppayPaymentRequestSession: {
+        shopPayPaymentRequestSessionCreate: {
+            shopPayPaymentRequestSession: {
                 sourceIdentifier: 'xyz123',
                 token: 'db4eede13822684b13a607823b7ba40d',
                 checkoutUrl: 'https://shop.app/checkout/1/spe/db4eede13822684b13a607823b7ba40d/shoppay',
@@ -160,7 +160,7 @@ const mockShopPayPaymentRequestSessionCreateResponse = {
 
 const mockShopPayPaymentRequestSessionSubmitResponse = {
     data: {
-        shoppayPaymentRequestSessionSubmit: {
+        shopPayPaymentRequestSessionSubmit: {
             paymentRequestReceipt: {
                 token: 'a607823b7ba40ddb4eede13822684b13',
                 processingStatusType: 'ready'
@@ -287,19 +287,19 @@ function getStorefrontResponseLogMessage(response) {
         }
         var data = jsonBody.data;
         // Session Create
-        if (data.shoppayPaymentRequestSessionCreate
-            && data.shoppayPaymentRequestSessionCreate.shoppayPaymentRequestSession
-            && data.shoppayPaymentRequestSessionCreate.shoppayPaymentRequestSession.token
+        if (data.shopPayPaymentRequestSessionCreate
+            && data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession
+            && data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token
         ) {
             // mask session token
-            data.shoppayPaymentRequestSessionCreate.shoppayPaymentRequestSession.token = "****";
+            data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token = "****";
         // Session Submit
-        } else if (data.shoppayPaymentRequestSessionSubmit
-            && data.shoppayPaymentRequestSessionSubmit.paymentRequestReceipt
-            && data.shoppayPaymentRequestSessionSubmit.paymentRequestReceipt.token
+        } else if (data.shopPayPaymentRequestSessionSubmit
+            && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt
+            && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token
         ) {
             // mask payment token
-            data.shoppayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
+            data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
         }
         return JSON.stringify(jsonBody);
     } catch (e) {
