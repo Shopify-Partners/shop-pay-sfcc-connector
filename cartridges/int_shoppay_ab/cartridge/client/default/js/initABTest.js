@@ -2,6 +2,7 @@ const helper = require('./helpers/abTestHelpers');
 
 $(document).ready(function () {
     if(window.ShopPay) {
+        //the return form parseABTestCookie is still a string not a object
         var abCookieJSON = helper.parseABTestCookie();
 
         if(abCookieJSON && !abCookieJSON['isTracked']) {
@@ -26,6 +27,7 @@ $(document).ready(function () {
                 timestamp: new Date().toISOString()
             });
             abCookieJSON['isTracked'] = true;
+            helper.deleteCookieValue('shoppayAB');
             helper.setCookie('shoppayAB', JSON.stringify(abCookieJSON), 90);
         }
     }

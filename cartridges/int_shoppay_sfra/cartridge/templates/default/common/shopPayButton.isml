@@ -27,4 +27,3 @@
     >
     <div id="shop-pay-button-container" class="${pdict.action === 'Product-Show' ? 'btn col-sm-8 shopPayButtonContainer' : 'btn col-sm-12 shopPayButtonContainer'}"></div>
 </div>
-z
