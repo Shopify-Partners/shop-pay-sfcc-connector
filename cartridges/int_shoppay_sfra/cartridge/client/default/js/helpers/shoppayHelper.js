@@ -458,7 +458,7 @@ function isReadyToOrderOnPageLoad() {
 /**
  * Handles AJAX call to create / update the payment response needed for the ShopPay.PaymentRequest.build() method.
  * @param {Object} requestObj - a request object that contains relevant event data & session data.
- * @param {string} controllerURL - String url of the targeted controller (based on the urls Obj set in shopPayGlobalRefs.js)
+ * @param {string} controllerURL - String url of the targeted controller (based on the urls Obj set in shoppayGlobalRefs.js)
  * @returns {Object} responseJSON - an updated response object to be used in the build & on the ShopPay.PaymentRequest object.
  */
 function createResponse (requestObj, controllerURL) {
