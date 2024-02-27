@@ -44,12 +44,12 @@ function Authorize(paymentRequest, token, paymentInstrument) {
     var fieldErrors = {};
     var error = false;
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
-    var response = storefrontAPI.shopPayPaymentRequestSessionSubmit(paymentRequest, token);
+    var response = storefrontAPI.shoppayPaymentRequestSessionSubmit(paymentRequest, token);
     if (!response
         || response.error
-        || !response.shopPayPaymentRequestSessionSubmit
-        || response.shopPayPaymentRequestSessionSubmit.userErrors.length > 0
-        || !response.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt
+        || !response.shoppayPaymentRequestSessionSubmit
+        || response.shoppayPaymentRequestSessionSubmit.userErrors.length > 0
+        || !response.shoppayPaymentRequestSessionSubmit.paymentRequestReceipt
     ) {
         error = true;
         serverErrors.push(Resource.msg('shoppay.service.error', 'shoppay', null));
@@ -57,7 +57,7 @@ function Authorize(paymentRequest, token, paymentInstrument) {
     }
 
     Transaction.wrap(function() {
-        paymentInstrument.custom.shoppayPaymentToken = response.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token;
+        paymentInstrument.custom.shoppayPaymentToken = response.shoppayPaymentRequestSessionSubmit.paymentRequestReceipt.token;
     });
 
     return { fieldErrors: fieldErrors, serverErrors: serverErrors, error: false };

@@ -63,7 +63,7 @@ function shoppayPaymentRequestSessionCreate(basket, paymentRequest) {
  * @param {string} token - the Shop Pay session token returned in the session create GraphQL response
  * @returns {Object} The GraphQL service response body
  */
-function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
+function shoppayPaymentRequestSessionSubmit(paymentRequest, token) {
     /* shippingAddress.id is a Shop Pay specific/provided element and is not a valid input for the GraphQL session
        submit request, but is included in the payment request object from the client-side Shop Pay session */
     if (paymentRequest.shippingAddress.id) {
@@ -71,7 +71,7 @@ function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
     }
     try {
         const bodyObj = {
-            query: 'mutation shopPayPaymentRequestSessionSubmit($token: String!, $paymentRequest: ShopPayPaymentRequestInput!, $idempotencyKey: String!) {shopPayPaymentRequestSessionSubmit(token: $token, paymentRequest: $paymentRequest, idempotencyKey: $idempotencyKey) {paymentRequestReceipt {token processingStatusType} userErrors {field message}}}',
+            query: 'mutation shoppayPaymentRequestSessionSubmit($token: String!, $paymentRequest: ShopPayPaymentRequestInput!, $idempotencyKey: String!) {shoppayPaymentRequestSessionSubmit(token: $token, paymentRequest: $paymentRequest, idempotencyKey: $idempotencyKey) {paymentRequestReceipt {token processingStatusType} userErrors {field message}}}',
             variables: {
                 token: token,
                 idempotencyKey: dw.util.UUIDUtils.createUUID(), // Kristin TODO: Do we need to store and reuse within session?
@@ -110,5 +110,5 @@ function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
 
 module.exports = {
     shoppayPaymentRequestSessionCreate: shoppayPaymentRequestSessionCreate,
-    shopPayPaymentRequestSessionSubmit: shopPayPaymentRequestSessionSubmit
+    shoppayPaymentRequestSessionSubmit: shoppayPaymentRequestSessionSubmit
 };
