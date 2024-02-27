@@ -257,9 +257,9 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
     var response = storefrontAPI.shoppayPaymentRequestSessionCreate(currentBasket, paymentRequest);
     if (!response
         || response.error
-        || !response.shoppayPaymentRequestSessionCreate
-        || response.shoppayPaymentRequestSessionCreate.userErrors.length > 0
-        || response.shoppayPaymentRequestSessionCreate.shoppayPaymentRequestSession == null
+        || !response.shopPayPaymentRequestSessionCreate
+        || response.shopPayPaymentRequestSessionCreate.userErrors.length > 0
+        || response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession == null
     ) {
         res.json({
             error: true,
@@ -267,7 +267,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         });
         return next();
     }
-    var paymentRequestSession = response.shoppayPaymentRequestSessionCreate.shoppayPaymentRequestSession;
+    var paymentRequestSession = response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession;
 
     res.json({
         error: false,
