@@ -8,13 +8,13 @@ var Result = require('dw/svc/Result');
  * @param {Object} paymentRequest - the Shop Pay payment request object representing the customer's basket
  * @returns {Object} The GraphQL service response body
  */
-function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
+function shoppayPaymentRequestSessionCreate(basket, paymentRequest) {
     if (paymentRequest.shippingAddress && paymentRequest.shippingAddress.id) {
         delete paymentRequest.shippingAddress.id;
     }
     try {
         const bodyObj = {
-            query: 'mutation shopPayPaymentRequestSessionCreate($sourceIdentifier: String!, $paymentRequest: ShopPayPaymentRequestInput!) {shopPayPaymentRequestSessionCreate(sourceIdentifier: $sourceIdentifier, paymentRequest: $paymentRequest) {shopPayPaymentRequestSession {token sourceIdentifier checkoutUrl paymentRequest {total {amount currencyCode}}} userErrors{field message}}}',
+            query: 'mutation shoppayPaymentRequestSessionCreate($sourceIdentifier: String!, $paymentRequest: ShopPayPaymentRequestInput!) {shoppayPaymentRequestSessionCreate(sourceIdentifier: $sourceIdentifier, paymentRequest: $paymentRequest) {shopPayPaymentRequestSession {token sourceIdentifier checkoutUrl paymentRequest {total {amount currencyCode}}} userErrors{field message}}}',
             variables: {
                 sourceIdentifier: basket.UUID,
                 paymentRequest: paymentRequest
@@ -109,6 +109,6 @@ function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
 }
 
 module.exports = {
-    shopPayPaymentRequestSessionCreate: shopPayPaymentRequestSessionCreate,
+    shoppayPaymentRequestSessionCreate: shoppayPaymentRequestSessionCreate,
     shopPayPaymentRequestSessionSubmit: shopPayPaymentRequestSessionSubmit
 };

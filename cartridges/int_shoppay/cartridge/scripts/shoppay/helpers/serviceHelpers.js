@@ -146,7 +146,7 @@ const buildSubmitPaymentRequest = () => {
 
 const mockShopPayPaymentRequestSessionCreateResponse = {
     data: {
-        shopPayPaymentRequestSessionCreate: {
+        shoppayPaymentRequestSessionCreate: {
             shopPayPaymentRequestSession: {
                 sourceIdentifier: 'xyz123',
                 token: 'db4eede13822684b13a607823b7ba40d',
@@ -287,12 +287,12 @@ function getStorefrontResponseLogMessage(response) {
         }
         var data = jsonBody.data;
         // Session Create
-        if (data.shopPayPaymentRequestSessionCreate
-            && data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession
-            && data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token
+        if (data.shoppayPaymentRequestSessionCreate
+            && data.shoppayPaymentRequestSessionCreate.shopPayPaymentRequestSession
+            && data.shoppayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token
         ) {
             // mask session token
-            data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token = "****";
+            data.shoppayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token = "****";
         // Session Submit
         } else if (data.shopPayPaymentRequestSessionSubmit
             && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt
