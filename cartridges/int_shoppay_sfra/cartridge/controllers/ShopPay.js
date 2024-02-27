@@ -295,6 +295,7 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
     var URLUtils = require('dw/web/URLUtils');
     var BasketMgr = require('dw/order/BasketMgr');
     var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+    var PromotionMgr = require('dw/campaign/PromotionMgr');
     var currentBasket;
     var data = JSON.parse(req.body);
 
@@ -318,6 +319,10 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
     var discountCodesToRemove = [];
 
     collections.forEach(currentBasket.couponLineItems, function (item) {
+        /*  If coupon code is valid and succesfully added, but NO_APPLICABLE_PROMOTION, don't remove it. The Shop Pay
+            modal won't know about these promotions, but if the customer closes the modal and returns to cart, the
+            cart should still show the coupon has been added but "not applied". Similar text/flagging is not
+            supported in the Shop Pay modal. */
         if (discountCodes.indexOf(item.couponCode) < 0 && item.applied) {
             discountCodesToRemove.push(item.couponCode);
         }
@@ -340,11 +345,11 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
             discountCodesToAdd.forEach(function (code) {
                 Transaction.wrap(function () {
                     couponLineItem = currentBasket.createCouponLineItem(code, true);
+                    PromotionMgr.applyDiscounts(currentBasket);
                 });
                 /*  remove coupon if it was successfully added but not applied (status code "NO_APPLICABLE_PROMOTION")
-                    as the Shop Pay modal does not support the "not applied" text for the promo that SFCC cart uses */
-                    var test = couponLineItem;
-                    if (!couponLineItem.applied) {
+                    as the Shop Pay modal does not support the "not applied" text for the promo that SFCC cart uses. */
+                if (!couponLineItem.applied) {
                     var statusCode = couponLineItem.statusCode;
                     errorMessage = Resource.msg('error.no.applicable.promotion', 'shoppay', null);
                     Transaction.wrap(function() {
