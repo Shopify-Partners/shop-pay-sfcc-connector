@@ -318,26 +318,61 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
     var discountCodesToRemove = [];
 
     collections.forEach(currentBasket.couponLineItems, function (item) {
-        if(!discountCodes[item.couponCode]) {
+        if (discountCodes.indexOf(item.couponCode) < 0 && item.applied) {
             discountCodesToRemove.push(item.couponCode);
         }
     });
 
     discountCodes.forEach(function (code) {
         const couponLineItem = collections.find(currentBasket.couponLineItems, function (item) {
-            return item.couponCode === code
+            return item.couponCode === code;
         });
         if(couponLineItem === null) {
-            discountCodesToAdd.push(code)
+            discountCodesToAdd.push(code);
         }
     });
 
+    var codeApplicationError = false;
+    var errorMessage;
     if (discountCodesToAdd.length) {
-        discountCodesToAdd.forEach(function (code) {
-            Transaction.wrap(function () {
-                currentBasket.createCouponLineItem(code, true);
+        var couponLineItem;
+        try {
+            discountCodesToAdd.forEach(function (code) {
+                Transaction.wrap(function () {
+                    couponLineItem = currentBasket.createCouponLineItem(code, true);
+                });
+                /*  remove coupon if it was successfully added but not applied (status code "NO_APPLICABLE_PROMOTION")
+                    as the Shop Pay modal does not support the "not applied" text for the promo that SFCC cart uses */
+                    var test = couponLineItem;
+                    if (!couponLineItem.applied) {
+                    var statusCode = couponLineItem.statusCode;
+                    errorMessage = Resource.msg('error.no.applicable.promotion', 'shoppay', null);
+                    Transaction.wrap(function() {
+                        currentBasket.removeCouponLineItem(couponLineItem);
+                    });
+                    throw new Error(statusCode);
+                }
             });
-        });
+        } catch (e) {
+            // Invalid coupon code. Generate an appropriate error message for response, but continue processing.
+            codeApplicationError = true;
+            if (!errorMessage) {
+                var errorCodes = {
+                    COUPON_CODE_ALREADY_IN_BASKET: 'error.coupon.already.in.cart',
+                    COUPON_ALREADY_IN_BASKET: 'error.coupon.cannot.be.combined',
+                    COUPON_CODE_ALREADY_REDEEMED: 'error.coupon.already.redeemed',
+                    COUPON_CODE_UNKNOWN: 'error.unable.to.add.coupon',
+                    COUPON_DISABLED: 'error.unable.to.add.coupon',
+                    REDEMPTION_LIMIT_EXCEEDED: 'error.unable.to.add.coupon',
+                    TIMEFRAME_REDEMPTION_LIMIT_EXCEEDED: 'error.unable.to.add.coupon',
+                    NO_ACTIVE_PROMOTION: 'error.unable.to.add.coupon',
+                    NO_APPLICABLE_PROMOTION: 'error.no.applicable.promotion',
+                    default: 'error.unable.to.add.coupon'
+                };
+                var errorMessageKey = errorCodes[e.errorCode] || errorCodes.default;
+                errorMessage = Resource.msg(errorMessageKey, 'cart', null);
+            }
+        }
     }
 
     if (discountCodesToRemove.length) {
@@ -353,6 +388,15 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
 
     COHelpers.recalculateBasket(currentBasket);
     var paymentRequestModel = new PaymentRequestModel(currentBasket);
+
+    if (codeApplicationError) {
+        res.json({
+            error: true,
+            errorMsg: errorMessage,
+            paymentRequest: paymentRequestModel
+        });
+        return next();
+    }
 
     res.json({
         error: false,
