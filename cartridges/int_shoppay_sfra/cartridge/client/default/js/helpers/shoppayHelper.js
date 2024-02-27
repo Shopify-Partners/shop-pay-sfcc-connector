@@ -88,17 +88,14 @@ function setSessionListeners(session) {
                     }
                 },
                 error: function (err) {
-                    // TODO: do we even need this conditional?
-                    if (err.responseJSON || err.status !== 200) {
-                        /*  session.completeSessionRequest() does not take an errors array as input so just
-                            destroy the session and return.
-                        */
-                        setTimeout(function() {
-                            session.close();
-                            // Event listeners have loaded so window.location.reload() will be called in windowclosed
-                        }, 2000);
-                        return;
-                    }
+                    /*  session.completeSessionRequest() does not take an errors array as input so just
+                        destroy the session and return.
+                    */
+                    setTimeout(function() {
+                        session.close();
+                        // Event listeners have loaded so window.location.reload() will be called in windowclosed
+                    }, 2000);
+                    return;
                 }
             });
         } else {
@@ -136,17 +133,14 @@ function setSessionListeners(session) {
                 }
             },
             error: function (err) {
-                // TODO: do we even need this conditional?
-                if (err.responseJSON || err.status !== 200) {
-                    /*  session.completeSessionRequest() does not take an errors array as input so just
-                        destroy the session and return.
-                    */
-                    setTimeout(function() {
-                        session.close();
-                        // Event listeners have loaded so window.location.reload() will be called in windowclosed
-                    }, 2000);
-                    return;
-                }
+                /*  session.completeSessionRequest() does not take an errors array as input so just
+                    destroy the session and return.
+                */
+                setTimeout(function() {
+                    session.close();
+                    // Event listeners have loaded so window.location.reload() will be called in windowclosed
+                }, 2000);
+                return;
             }
 
         });
@@ -401,8 +395,6 @@ function setSessionListeners(session) {
     });
 
     session.addEventListener("windowclosed", function(ev) {
-        // TODO: Remove this line
-        console.log("windowclosed (session)");
         // Reset global value to default
         if (!reloadOnClose) {
             reloadOnClose = true;
