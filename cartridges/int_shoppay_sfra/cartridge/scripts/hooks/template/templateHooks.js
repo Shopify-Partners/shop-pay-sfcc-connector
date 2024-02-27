@@ -9,7 +9,7 @@ var ISML = require('dw/template/ISML');
 function htmlHead(pdict) {
     var includeShopPayJS = true;//pdict.includeShopPayJS; // update logic for A/B testing to render script tag on all pages
     if (includeShopPayJS) {
-        ISML.renderTemplate('/components/header/shopPayScriptsIncludes');
+        ISML.renderTemplate('/components/header/shoppayScriptsIncludes');
     }
 }
 
