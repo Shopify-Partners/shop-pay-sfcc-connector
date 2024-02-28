@@ -28,7 +28,9 @@ $(document).ready(function () {
             });
             abCookieJSON['isTracked'] = true;
             helper.deleteCookieValue('shoppayAB');
-            helper.setCookie('shoppayAB', JSON.stringify(abCookieJSON), 90);
+            //btoa encodes the string to base64 to ensure the cookie JSON string keeps
+            // the correct struture
+            helper.setCookie('shoppayAB', btoa(JSON.stringify(abCookieJSON)), 90);
         }
     }
 });

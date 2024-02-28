@@ -47,7 +47,8 @@ function deleteCookieValue(cookieName) {
 function parseABTestCookie() {
     var abCookie = getCookie('shoppayAB');
     if(abCookie) {
-        return JSON.parse(abCookie);
+        //atob decodes base64 to ensure the string is parsed correctly
+        return JSON.parse(atob(abCookie));
     }
 
     return;
