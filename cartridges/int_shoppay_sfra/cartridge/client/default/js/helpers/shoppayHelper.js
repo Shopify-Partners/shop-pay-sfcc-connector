@@ -1,12 +1,12 @@
 /* Global Variables */
-let orderConfirmationData;
-let sourceIdentifier = null;
-let token = null;
 let checkoutUrl = null;
-let productData = {};
-const technicalErrorMsg = window.shoppayClientRefs.constants.technicalError;
-let reloadOnClose = true;
 let observer;
+let orderConfirmationData;
+let productData = {};
+let reloadOnClose = true;
+let sourceIdentifier = null;
+const technicalErrorMsg = window.shoppayClientRefs.constants.technicalError;
+let token = null;
 
 /**
  * Add csrf token param to url
@@ -484,14 +484,14 @@ function createResponse (requestObj, controllerURL) {
 
 
 module.exports = {
+    createResponse: createResponse,
     getCsrfToken: getCsrfToken,
-    getUrlWithCsrfToken: getUrlWithCsrfToken,
-    setSessionListeners: setSessionListeners,
     getInitProductData: getInitProductData,
+    getUrlWithCsrfToken: getUrlWithCsrfToken,
+    isReadyToOrderOnPageLoad: isReadyToOrderOnPageLoad,
     productData: productData,
     setInitProductData: setInitProductData,
+    setSessionListeners: setSessionListeners,
     shoppayBtnDisabledStyle: shoppayBtnDisabledStyle,
     shoppayMutationObserver: shoppayMutationObserver,
-    isReadyToOrderOnPageLoad: isReadyToOrderOnPageLoad,
-    createResponse: createResponse
 };
