@@ -1,6 +1,7 @@
 'use strict'
 
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+/* API Includes */
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var Result = require('dw/svc/Result');
 
 /**
@@ -35,7 +36,7 @@ function shoppayPaymentRequestSessionCreate(basket, paymentRequest) {
         var responseHeaders = shoppayStorefrontService.client.responseHeaders;
         var shopifyRequestID = responseHeaders.get('X-Request-ID');
         if (shopifyRequestID && shopifyRequestID.length > 0) {
-            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+            Logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
         }
 
         if (!response.ok
@@ -49,7 +50,7 @@ function shoppayPaymentRequestSessionCreate(basket, paymentRequest) {
         }
         return response.object.data;
     } catch (e) {
-        logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return {
             error: true,
             errorMsg: e.message
@@ -86,7 +87,7 @@ function shoppayPaymentRequestSessionSubmit(paymentRequest, token) {
         var responseHeaders = shoppayStorefrontService.client.responseHeaders;
         var shopifyRequestID = responseHeaders.get('X-Request-ID');
         if (shopifyRequestID && shopifyRequestID.length > 0) {
-            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+            Logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
         }
 
         if (!response.ok
@@ -100,7 +101,7 @@ function shoppayPaymentRequestSessionSubmit(paymentRequest, token) {
         }
         return response.object.data;
     } catch (e) {
-        logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return {
             error: true,
             errorMsg: e.message

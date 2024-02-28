@@ -1,8 +1,12 @@
 'use strict'
 
+/* Script Modules */
 var array = require('*/cartridge/scripts/util/array');
 var collections = require('*/cartridge/scripts/util/collections');
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+
+/* API Includes */
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+
 
 /**
  * Converts an SFCC Money object into the ShopPayMoney object
@@ -106,14 +110,14 @@ function matchObjects(object1, object2) {
     } catch (e) {
         // some difference between the objects caused an error
         var test = e;
-        logger.error('[common.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[common.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return false;
     }
 }
 
 module.exports = {
-    getPriceObject: getPriceObject,
     getDiscountsObject: getDiscountsObject,
+    getPriceObject: getPriceObject,
     isNull: isNull,
     matchObjects: matchObjects
 }

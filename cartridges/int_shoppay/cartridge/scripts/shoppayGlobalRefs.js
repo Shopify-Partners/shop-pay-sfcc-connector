@@ -1,13 +1,14 @@
 'use strict';
 
+/* API Includes */
 var URLUtils = require('dw/web/URLUtils');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var ProductMgr = require('dw/catalog/ProductMgr');
 var Resource = require('dw/web/Resource');
 var currentSite = require('dw/system/Site').current;
 
+/* Global Variables */
 const shoppayPaymentMethodId = 'ShopPay';
-
 var urls = {
     GetCartSummary: URLUtils.https('ShopPay-GetCartSummary').toString(),
     BeginSession: URLUtils.https('ShopPay-BeginSession').toString(),
@@ -19,8 +20,8 @@ var urls = {
     BuyNowData: URLUtils.https('ShopPay-BuyNowData').toString(),
 };
 
-// core reference for if Shop Pay is enabled, controlled by
-// enabling or disabling the Shop Pay payment method
+/*  Core reference for whether Shop Pay is enabled. This is controlled by
+    enabling or disabling the Shop Pay payment method. */
 var shoppayEnabled = function() {
     var paymentMethod = PaymentMgr.getPaymentMethod(shoppayPaymentMethodId);
     return (paymentMethod) ? paymentMethod.isActive() : false;
@@ -48,7 +49,7 @@ var isShoppayPDPButtonEnabled = function(productId) {
     return isEnabled;
 }
 
-// shortcut references to individual Shop Pay site preference values
+// Shortcut references to individual Shop Pay site preference values
 var isShoppayCartButtonEnabled  = function() { return currentSite.getCustomPreferenceValue('shoppayCartButtonEnabled'); }
 var shoppayStoreId              = function() { return currentSite.getCustomPreferenceValue('shoppayStoreId'); }
 var shoppayClientId             = function() { return currentSite.getCustomPreferenceValue('shoppayClientId'); }
@@ -130,11 +131,10 @@ function shoppayElementsApplicable(context, productId) {
     return showShoppayButton;
 }
 
-/*
- add any values you want made available to client-side JS to the object below.
- then, in controller, add:
+/*  Add any values you want made available to client-side JS to the object below.
+    then, in controller, add:
     res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs);
- then, in ISML add:
+    then, in ISML add:
     <script>
         window.shoppayClientRefs = JSON.parse('<isprint encoding="jsonvalue" value="${pdict.shoppayClientRefs}" />');
     </script>
@@ -168,16 +168,16 @@ var getClientRefs = function(context, productId) {
 
 
 module.exports = {
-    shoppayEnabled: shoppayEnabled,
+    getClientRefs: getClientRefs,
+    isShoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
+    isShoppayPDPButtonEnabled: isShoppayPDPButtonEnabled,
+    shoppayAdminAPIVersion: shoppayAdminAPIVersion(),
     shoppayApplicable: shoppayApplicable,
     shoppayElementsApplicable: shoppayElementsApplicable,
-    isShoppayPDPButtonEnabled: isShoppayPDPButtonEnabled,
-    isShoppayCartButtonEnabled: isShoppayCartButtonEnabled(),
-    shoppayStoreId: shoppayStoreId(),
-    shoppayAdminAPIVersion: shoppayAdminAPIVersion(),
-    shoppayStorefrontAPIVersion: shoppayStorefrontAPIVersion(),
-    shoppayModalImageViewType: shoppayModalImageViewType(),
+    shoppayEnabled: shoppayEnabled,
     shoppayModalDebugEnabled: shoppayModalDebugEnabled(),
-    getClientRefs: getClientRefs,
-    shoppayPaymentMethodId: shoppayPaymentMethodId
+    shoppayModalImageViewType: shoppayModalImageViewType(),
+    shoppayPaymentMethodId: shoppayPaymentMethodId,
+    shoppayStorefrontAPIVersion: shoppayStorefrontAPIVersion(),
+    shoppayStoreId: shoppayStoreId()
 };

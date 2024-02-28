@@ -1,9 +1,12 @@
 'use strict'
 
+/* Global Variables */
+const dateFormat = "yyyy-MM-dd";
+
+/* API Includes */
 var Calendar = require('dw/util/Calendar');
 var StringUtils = require('dw/util/StringUtils');
 
-const dateFormat = "yyyy-MM-dd";
 
 /**
  * Helper function to retrieve the minimum expected delivery date for a shipping method for the current
@@ -32,6 +35,6 @@ function getMaxDeliveryDate(shippingMethod) {
 }
 
 module.exports = {
-    getMinDeliveryDate: getMinDeliveryDate,
-    getMaxDeliveryDate: getMaxDeliveryDate
+    getMaxDeliveryDate: getMaxDeliveryDate,
+    getMinDeliveryDate: getMinDeliveryDate
 }
