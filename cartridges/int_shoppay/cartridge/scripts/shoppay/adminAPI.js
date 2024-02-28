@@ -1,7 +1,9 @@
 'use strict'
 
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+/* API Includes */
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
+/* Global Variables */
 const webhookIncludeFields = {
     "ORDERS_CREATE": ["admin_graphql_api_id","name","source_identifier","email","billing_address","total_price","confirmed","customer"]
 };
@@ -26,7 +28,7 @@ function getOrderBySourceIdentifier(sourceIdentifier) {
         var responseHeaders = shoppayAdminService.client.responseHeaders;
         var shopifyRequestID = responseHeaders.get('X-Request-ID');
         if (shopifyRequestID && shopifyRequestID.length > 0) {
-            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+            Logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
         }
 
         if (!response.ok
@@ -41,7 +43,7 @@ function getOrderBySourceIdentifier(sourceIdentifier) {
         }
         return response.object.data;
     } catch (e) {
-        logger.error('[adminAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[adminAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return {
             error: true,
             errorMsg: e.message
@@ -79,7 +81,7 @@ function subscribeWebhook(topic, callbackUrl) {
     var responseHeaders = shoppayAdminService.client.responseHeaders;
     var shopifyRequestID = responseHeaders.get('X-Request-ID');
     if (shopifyRequestID && shopifyRequestID.length > 0) {
-        logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+        Logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
     }
 
     if (!response.ok
@@ -116,7 +118,7 @@ function getExistingWebhook(topic, callbackUrl) {
     var responseHeaders = shoppayAdminService.client.responseHeaders;
     var shopifyRequestID = responseHeaders.get('X-Request-ID');
     if (shopifyRequestID && shopifyRequestID.length > 0) {
-        logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+        Logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
     }
 
     if (!response.ok
@@ -154,7 +156,7 @@ function unsubscribeWebhook(id) {
     var responseHeaders = shoppayAdminService.client.responseHeaders;
     var shopifyRequestID = responseHeaders.get('X-Request-ID');
     if (shopifyRequestID && shopifyRequestID.length > 0) {
-        logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+        Logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
     }
 
     if (!response.ok

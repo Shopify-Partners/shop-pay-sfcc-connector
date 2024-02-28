@@ -9,7 +9,6 @@ var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHel
 /* API Includes */
 var ShippingMgr = require('dw/order/ShippingMgr');
 
-
 /**
  * Checks the current cart or order for any BOPIS shipments. Note that BOPIS is not currently
  * supported in the Shop Pay checkout modal. More than 1 home delivery shipment is also not supported.

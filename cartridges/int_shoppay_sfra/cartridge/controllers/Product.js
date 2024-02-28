@@ -2,7 +2,6 @@
 
 const page = module.superModule;
 const server = require('server');
-
 server.extend(page);
 
 /* Middleware */
@@ -13,7 +12,6 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 
 /* API Includes */
 var BasketMgr = require('dw/order/BasketMgr');
-
 
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
     var currentBasket = BasketMgr.getCurrentBasket();

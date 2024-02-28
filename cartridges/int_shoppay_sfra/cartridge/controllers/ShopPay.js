@@ -24,7 +24,6 @@ var Resource = require('dw/web/Resource');
 var Transaction = require('dw/system/Transaction');
 var URLUtils = require('dw/web/URLUtils');
 
-
 function validateInputs(req, currentBasket, inputParams) {
     if (!currentBasket
         || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)

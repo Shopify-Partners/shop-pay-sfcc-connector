@@ -7,7 +7,6 @@ const dateFormat = "yyyy-MM-dd";
 var Calendar = require('dw/util/Calendar');
 var StringUtils = require('dw/util/StringUtils');
 
-
 /**
  * Helper function to retrieve the minimum expected delivery date for a shipping method for the current
  * basket. This function should be overridden to account for related customizations as SFCC does not

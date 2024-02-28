@@ -6,7 +6,6 @@ var Order = require('dw/order/Order');
 var OrderMgr = require('dw/order/OrderMgr');
 var Status = require('dw/system/Status');
 
-
 /* ORDERS_CREATE payload uses underscores (snake case) while GraphQL response uses camel case. This
    object maps the attributes for both payload types to the appropriate SFCC billing address attribute. */
 const addressElements = {
@@ -108,6 +107,6 @@ var placeOrder = function(order) {
 
 module.exports = {
     handleBillingInfo: handleBillingInfo,
-    setOrderCustomAttributes: setOrderCustomAttributes,
-    placeOrder: placeOrder
+    placeOrder: placeOrder,
+    setOrderCustomAttributes: setOrderCustomAttributes
 }

@@ -14,7 +14,6 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 /* API Includes */
 var BasketMgr = require('dw/order/BasketMgr');
 
-
 /**
  * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS
  */

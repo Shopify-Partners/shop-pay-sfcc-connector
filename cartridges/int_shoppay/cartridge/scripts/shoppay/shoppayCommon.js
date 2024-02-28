@@ -7,7 +7,6 @@ var collections = require('*/cartridge/scripts/util/collections');
 /* API Includes */
 var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
-
 /**
  * Converts an SFCC Money object into the ShopPayMoney object
  * @param {dw.value.Money} price - a price as an SFCC Money object

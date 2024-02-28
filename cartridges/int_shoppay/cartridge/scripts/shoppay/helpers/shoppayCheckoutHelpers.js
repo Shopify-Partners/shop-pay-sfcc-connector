@@ -13,7 +13,6 @@ var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var ShippingMgr = require('dw/order/ShippingMgr');
 var Transaction = require('dw/system/Transaction');
 
-
 /**
  * Ensures that no shipment exists with 0 product line items in the customer's basket.
  * This method differs from the OOTB SFRA ensureNoEmptyShipments only in that it takes in

@@ -8,7 +8,6 @@ var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 var Resource = require('dw/web/Resource');
 var Transaction = require('dw/system/Transaction');
 
-
 /**
  * Creates the Shop Pay payment instrument.
  * @param {dw.order.LineItemCtnr} basket - the target basket
