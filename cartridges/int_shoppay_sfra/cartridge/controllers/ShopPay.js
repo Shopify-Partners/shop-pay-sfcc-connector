@@ -133,8 +133,8 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
  * @memberOf ShopPay
  */
 server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(product);
     var product = JSON.parse(req.body);
+    var buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(product);
 
     res.json({
         error: false,
