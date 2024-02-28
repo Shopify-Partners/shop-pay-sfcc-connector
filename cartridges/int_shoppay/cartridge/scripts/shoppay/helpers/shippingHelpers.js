@@ -1,10 +1,14 @@
 'use strict';
 
-var ShippingMgr = require('dw/order/ShippingMgr');
+/* Script Modules */
 var collections = require('*/cartridge/scripts/util/collections');
 var common = require('*/cartridge/scripts/shoppay/shoppayCommon');
-var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHelpers');
 var deliveryDateHelpers = require('*/cartridge/scripts/shoppay/helpers/deliveryDateHelpers');
+var eDeliveryHelpers = require('*/cartridge/scripts/shoppay/helpers/eDeliveryHelpers');
+
+/* API Includes */
+var ShippingMgr = require('dw/order/ShippingMgr');
+
 
 /**
  * Checks the current cart or order for any BOPIS shipments. Note that BOPIS is not currently
@@ -51,7 +55,7 @@ function getPrimaryShipment(basket) {
         return null;
     }
     var shipments = basket.getShipments();
-    // use default shipment if only 1 shipment or if all shipments contain e-delivery items
+    // Use default shipment if only 1 shipment or if all shipments contain e-delivery items
     var primaryShipment = basket.getDefaultShipment();
     if (shipments.length > 1) {
         var homeDeliveryShipment = collections.find(shipments, function (shipment) {
@@ -164,8 +168,8 @@ function getApplicableDeliveryMethods(shipment) {
     }
 
     var deliveryMethods = [];
-    // Note: cannot use the base getApplicableShippingMethods function here because the JSON structure
-    // that it returns does not include the currencyCode and amount as separate elements
+    /*  Note: cannot use the base getApplicableShippingMethods function here because the JSON structure
+        it returns does not include the currencyCode and the amount as separate elements. */
     var applicableShippingMethods = getApplicableShippingMethods(shipment);
     if (applicableShippingMethods.length > 0) {
         collections.forEach(applicableShippingMethods, function (shippingMethod) {
@@ -196,9 +200,9 @@ function getApplicableDeliveryMethods(shipment) {
 }
 
 module.exports = {
-    hasIneligibleShipments: hasIneligibleShipments,
+    getApplicableDeliveryMethods: getApplicableDeliveryMethods,
     getPrimaryShipment: getPrimaryShipment,
     getShippingAddress: getShippingAddress,
     getShippingLines: getShippingLines,
-    getApplicableDeliveryMethods: getApplicableDeliveryMethods
+    hasIneligibleShipments: hasIneligibleShipments
 };

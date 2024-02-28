@@ -1,14 +1,18 @@
 'use strict'
 
-var Transaction = require('dw/system/Transaction');
+/* Script Modules */
+var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
 var collections = require('*/cartridge/scripts/util/collections');
 var common = require('*/cartridge/scripts/shoppay/shoppayCommon');
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
-var BasketMgr = require('dw/order/BasketMgr');
-var ShippingMgr = require('dw/order/ShippingMgr');
-var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
 var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
 var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
+
+/* API Includes */
+var BasketMgr = require('dw/order/BasketMgr');
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+var ShippingMgr = require('dw/order/ShippingMgr');
+var Transaction = require('dw/system/Transaction');
+
 
 /**
  * Ensures that no shipment exists with 0 product line items in the customer's basket.
@@ -104,7 +108,7 @@ function validatePaymentRequest(clientRequest, serverRequest) {
         }
         return common.matchObjects(clientRequest, serverRequest);
     } catch (e) {
-        logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
     }
     return false;
 }
@@ -222,7 +226,7 @@ function addProductToTempBasket(product, basket) {
             pli.setQuantityValue(quantity);
         });
     } catch (e) {
-        dw.system.Logger.error(e.message);
+        Logger.error(e.message);
         return {
             error: true,
             errorMsg: e.message
@@ -237,9 +241,9 @@ function addProductToTempBasket(product, basket) {
 function getBuyNowData(product) {
     // Create a temporary basket for payment request options calculation
     var basket = Transaction.wrap(createBuyNowBasket);
-    var shippingMethod = ShippingMgr.defaultShippingMethod;
     var paymentRequest;
     var result = addProductToTempBasket(product, basket);
+    var shippingMethod = ShippingMgr.defaultShippingMethod;
 
     Transaction.wrap(function () {
         try {
@@ -250,8 +254,7 @@ function getBuyNowData(product) {
             basketCalculationHelpers.calculateTotals(basket);
             paymentRequest = new PaymentRequestModel(basket);
         } catch (e) {
-            var test = e;
-            dw.system.Logger.error(e.message);
+            Logger.error(e.message);
         } finally {
             // Delete temporary basket after calculation
             BasketMgr.deleteTemporaryBasket(basket);
@@ -262,12 +265,12 @@ function getBuyNowData(product) {
 
 
 module.exports = {
-    validatePaymentRequest: validatePaymentRequest,
-    ensureNoEmptyShipments: ensureNoEmptyShipments,
-    validateShippingMethods: validateShippingMethods,
-    handleBillingAddress: handleBillingAddress,
-    failOrder: failOrder,
     addProductToTempBasket: addProductToTempBasket,
     createBuyNowBasket: createBuyNowBasket,
-    getBuyNowData: getBuyNowData
+    ensureNoEmptyShipments: ensureNoEmptyShipments,
+    failOrder: failOrder,
+    getBuyNowData: getBuyNowData,
+    handleBillingAddress: handleBillingAddress,
+    validatePaymentRequest: validatePaymentRequest,
+    validateShippingMethods: validateShippingMethods
 }
