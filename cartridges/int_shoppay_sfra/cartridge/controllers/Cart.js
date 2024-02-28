@@ -5,10 +5,15 @@ const server = require('server');
 
 server.extend(page);
 
+/* Middleware */
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
+
+/* Script Modules */
+const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
+/* API Includes */
 var BasketMgr = require('dw/order/BasketMgr');
 
-const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 
 /**
  * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS

@@ -5,10 +5,14 @@ const server = require('server');
 
 server.extend(page);
 
+/* Middleware */
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
-var BasketMgr = require('dw/order/BasketMgr');
 
+/* Script Modules */
 const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
+/* API Includes */
+var BasketMgr = require('dw/order/BasketMgr');
 
 
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
