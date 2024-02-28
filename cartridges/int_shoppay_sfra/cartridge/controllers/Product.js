@@ -16,22 +16,24 @@ var BasketMgr = require('dw/order/BasketMgr');
 
 
 server.append('Show', csrfProtection.generateToken, function (req, res, next) {
+    var currentBasket = BasketMgr.getCurrentBasket();
+    var isEmptyCart = false;
     var product = res.viewData.product;
+
     if (product.productType === 'set') {
         return next();
     }
 
     res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('pdp', res.viewData.product.id);
-    var currentBasket = BasketMgr.getCurrentBasket();
-    var isEmptyCart = false;
     if (!currentBasket
         || (currentBasket.productLineItems.length == 0 && currentBasket.giftCertificateLineItems.length == 0)
     ) {
         isEmptyCart = true;
     }
-    res.viewData.isEmptyCart = isEmptyCart;
 
+    res.viewData.isEmptyCart = isEmptyCart;
     res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs('pdp', res.viewData.product.id));
+
     if (product.readyToOrder) {
         var buyNowInitData = {
             pid: product.id,
@@ -68,11 +70,11 @@ server.append('Variation', function (req, res, next) {
     var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
     var viewData = res.getViewData();
     var product = viewData.product;
-
     var buyNowProduct = {
         pid: product.id,
         quantity: product.selectedQuantity
     };
+
     if (product.options) {
         var options = [];
         product.options.forEach(function(option) {
