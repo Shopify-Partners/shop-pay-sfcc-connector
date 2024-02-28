@@ -66,11 +66,16 @@ var shoppayModalDebugEnabled    = function() { return currentSite.getCustomPrefe
  */
 function shoppayApplicable(req, currentBasket) {
     var shoppayPaymentMethod = PaymentMgr.getPaymentMethod(shoppayPaymentMethodId);
-        /* TODO: Consider changing this to check merchanidise + gift certificate total in case shipping is not
-    yet assigned. OOTB assigns shipping method at add to cart, but customer may have customized? */
     var paymentAmount = 0;
-    if (currentBasket) {
+    if (currentBasket && currentBasket.totalGrossPrice.available) {
         paymentAmount = currentBasket.totalGrossPrice.value;
+    } else if (currentBasket) {
+        var collections = require('*/cartridge/scripts/util/collections');
+        var subtotal = currentBasket.getAdjustedMerchandizeTotalPrice(false);
+        collections.forEach(currentBasket.giftCertificateLineItems, function (gcli) {
+            subtotal = subTotal.add(gcli.getNetPrice());
+        });
+        paymentAmount = subtotal.value;
     }
     var countryCode = req.geolocation.countryCode;
     var currentCustomer = req.currentCustomer.raw;

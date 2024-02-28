@@ -15,7 +15,6 @@ var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
  * This method differs from the OOTB SFRA ensureNoEmptyShipments only in that it takes in
  * the currentBasket to ensure that in Buy Now situations the temporary basket is checked
  * rather than the standard basket.
- * Kristin TODO: remove this method and call OOTB method instead if Buy Now is not in scope
  * @param {dw.order.LineItemCtnr} currentBasket - the target basket
  * @param {Object} req - the request object needed to access session.privacyCache
  */
