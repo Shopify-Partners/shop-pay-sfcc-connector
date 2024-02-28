@@ -91,7 +91,7 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
         if (!session) {
             session = initShopPaySession();
         } else {
-            const paymentRequestResponse = buildPaymentRequest();
+            const paymentRequestResponse = helper.buildPaymentRequest();
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
 
             if (responseJSON) {
@@ -129,7 +129,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             responseJSON = paymentRequestResponse ? paymentRequestResponse : null;
         }
     } else {
-        paymentRequest = buildPaymentRequest();
+        paymentRequestResponse = helper.buildPaymentRequest();
         responseJSON = paymentRequest ? paymentRequest.responseJSON : null;
     }
 
@@ -199,47 +199,6 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
     }
 }
 
-/**
- * Handles AJAX call to get the payment response.
- * @returns {Object} paymentResponse - an response object.
- */
-function buildPaymentRequest() {
-    let token = document.querySelector('[data-csrf-token]');
-    let response;
-    if (token) {
-        const paymentResponse = $.ajax({
-            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
-            type: 'GET',
-            contentType: 'application/json',
-            async: false,
-            success: function(data) {
-                if (!data.error) {
-                    response = {
-                        responseJSON: data
-                    };
-                } else {
-                    helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
-                }
-            },
-            error: function(err) {
-                if (session) {
-                    /*  Return to exit function - don't reload the page in case there is a page rendering
-                        issue (will result in infinite reload loop).
-                    */
-                    session.close();
-                }
-                helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
-            }
-        });
-        return response;
-    } else {
-        /*  Return to exit function - don't reload the page in case there is a page rendering
-            issue (will result in infinite reload loop).
-        */
-        session.close();
-        helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
-    }
-}
 
 module.exports = {
     initShopPaySession: initShopPaySession

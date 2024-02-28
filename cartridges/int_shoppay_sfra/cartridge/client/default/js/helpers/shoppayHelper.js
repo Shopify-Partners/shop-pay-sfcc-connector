@@ -482,8 +482,51 @@ function createResponse (requestObj, controllerURL) {
     return responseJSON;
 }
 
+/**
+ * Handles AJAX call to get the payment response.
+ * @returns {Object} paymentResponse - an response object.
+ */
+function buildPaymentRequest() {
+    let token = document.querySelector('[data-csrf-token]');
+    let response;
+    if (token) {
+        const paymentResponse = $.ajax({
+            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+            type: 'GET',
+            contentType: 'application/json',
+            async: false,
+            success: function(data) {
+                if (!data.error) {
+                    response = {
+                        responseJSON: data
+                    };
+                } else {
+                    shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
+                }
+            },
+            error: function(err) {
+                if (session) {
+                    /*  Return to exit function - don't reload the page in case there is a page rendering
+                        issue (will result in infinite reload loop).
+                    */
+                    session.close();
+                }
+                shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
+            }
+        });
+        return response;
+    } else {
+        /*  Return to exit function - don't reload the page in case there is a page rendering
+            issue (will result in infinite reload loop).
+        */
+        session.close();
+        shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
+    }
+}
+
 
 module.exports = {
+    buildPaymentRequest: buildPaymentRequest,
     createResponse: createResponse,
     getCsrfToken: getCsrfToken,
     getInitProductData: getInitProductData,
