@@ -108,7 +108,6 @@ function matchObjects(object1, object2) {
         return true;
     } catch (e) {
         // some difference between the objects caused an error
-        var test = e;
         Logger.error('[common.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return false;
     }
