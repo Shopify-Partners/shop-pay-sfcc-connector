@@ -6,7 +6,7 @@ var Status = require('dw/system/Status');
 
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
-/* Attribute IDs differ between the ORDERS_CREATE webhook payload and the GraphQL Orders response payload. This
+/* ORDERS_CREATE payload uses underscores (snake case) while GraphQL response uses camel case. This
    object maps the attributes for both payload types to the appropriate SFCC billing address attribute. */
 const addressElements = {
     "companyName": "companyName",
@@ -34,6 +34,8 @@ const addressElements = {
  */
 var handleBillingInfo = function(order, node) {
     var billingAddress = order.billingAddress;
+    // ORDERS_CREATE payload uses underscores (snake case) while GraphQL response uses camel case
+    var nodeBillingAddress = node.billingAddress ? node.billingAddress : node.billing_address;
     if (node.email) {
         order.customerEmail = node.email;
     }
@@ -41,15 +43,16 @@ var handleBillingInfo = function(order, node) {
     for (var i = 0; i < addressKeys.length; i++) {
         var shoppayAttribute = addressKeys[i];
         var sfccAttribute = addressElements[shoppayAttribute];
-        if (!empty(node.billingAddress[shoppayAttribute])) {
-            billingAddress[sfccAttribute] = node.billingAddress[shoppayAttribute];
+        if (!empty(nodeBillingAddress[shoppayAttribute])) {
+            billingAddress[sfccAttribute] = nodeBillingAddress[shoppayAttribute];
         }
     }
     // billing phone is optional in the Shopify Shop App
-    if (empty(node.phone) && node.customer && !empty(node.customer.phone)) {
+    if (empty(nodeBillingAddress.phone) && node.customer && !empty(node.customer.phone)) {
         billingAddress.phone = node.customer.phone;
     }
     if (node.customer) {
+        // ORDERS_CREATE payload uses underscores (snake case) while GraphQL response uses camel case
         var firstName = node.customer.firstName ? node.customer.firstName : node.customer.first_name;
         var lastName = node.customer.lastName ? node.customer.lastName : node.customer.last_name;
         if ((!empty(firstName) || !empty(lastName))) {
@@ -87,7 +90,7 @@ var placeOrder = function(order) {
 
     try {
         var placeOrderStatus = OrderMgr.placeOrder(order);
-        if (placeOrderStatus === Status.ERROR) {
+        if (placeOrderStatus.status === Status.ERROR) {
             throw new Error(placeOrderStatus.message);
         }
 
