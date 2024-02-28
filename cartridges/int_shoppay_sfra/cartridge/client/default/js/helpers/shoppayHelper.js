@@ -1,4 +1,4 @@
-// Global Variables
+/* Global Variables */
 let orderConfirmationData;
 let sourceIdentifier = null;
 let token = null;
@@ -412,7 +412,7 @@ function shoppayBtnDisabledStyle(elem, isReadyToOrder, forceDisable) {
     let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
 
     if (elem) {
-        // An error occured, disable the button
+        // An error occurred, disable the button
         if (!isBuyNow && forceDisable) {
             elem.style.pointerEvents = 'none';
             if (observer) {
