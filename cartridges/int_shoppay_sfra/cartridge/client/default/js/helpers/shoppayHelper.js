@@ -94,9 +94,11 @@ function setSessionListeners(session) {
         }
 
         let requestData = {
-            paymentRequest: sessionPaymentRequest,
-            basketId: sourceIdentifier
+            paymentRequest: sessionPaymentRequest
         };
+        if (window.shoppayClientRefs.constants.isBuyNow) {
+            requestData.basketId = sourceIdentifier;
+        }
 
         $.ajax({
             url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.BeginSession),
@@ -126,8 +128,7 @@ function setSessionListeners(session) {
         let requestData = {
             discountCodes: ev.discountCodes
         };
-        let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
-        if (isBuyNow && window.shoppayClientRefs.constants.isBuyNow) {
+        if (window.shoppayClientRefs.constants.isBuyNow) {
             requestData.basketId = sourceIdentifier;
         }
 
@@ -193,6 +194,12 @@ function setSessionListeners(session) {
 
     session.addEventListener("shippingaddresschanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
+        if (!ev.shippingAddress) {
+            /* This event is triggered with no shipping address when a customer clicks "change"
+               to choose an alternate email address in the modal */
+            session.completeShippingAddressChange({ updatedPaymentRequest: currentPaymentRequest });
+            return;
+        }
         let requestData = {
             shippingAddress: ev.shippingAddress,
             paymentRequest: currentPaymentRequest,
