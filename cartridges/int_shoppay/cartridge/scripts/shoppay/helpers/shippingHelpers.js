@@ -16,15 +16,20 @@ var ShippingMgr = require('dw/order/ShippingMgr');
  * @returns {boolean} - true if the basket contains a shipment type that is not compatible with Shop Pay
  */
 function hasIneligibleShipments(basket) {
-    /* Kristin TODO: Update this to skip the multishipping check if Buy Now (temporary basket).
-       Compare basket.UUID to BasketMgr.getCurrentBasket().UUID to make this determination. Consider
-       putting this check in a helper function in shoppayGlobalRefs for multiple use cases. */
-    var usingMultiShipping = session.privacy.usingMultiShipping === true;
-    if (usingMultiShipping && basket.shipments.length < 2) {
-        usingMultiShipping = false;
-    }
-    if (usingMultiShipping) {
-        return true;
+    /*  Skip the multi-shipping check if Buy Now (temporary basket). Buy Now always creates a new, temporary
+        basket with single shipment, single line item only. Buy Now should not be excluded because of what is
+        sitting in a shopper's regular (non-Buy Now) cart.
+    */
+    var BasketMgr = require('dw/order/BasketMgr');
+    var currentBasket = BasketMgr.getCurrentBasket();
+    if (currentBasket && currentBasket.UUID === basket.UUID) {
+        var usingMultiShipping = session.privacy.usingMultiShipping === true;
+        if (usingMultiShipping && basket.shipments.length < 2) {
+            usingMultiShipping = false;
+        }
+        if (usingMultiShipping) {
+            return true;
+        }
     }
 
     var ineligibleShipments = collections.find(basket.shipments, function (shipment) {
@@ -180,9 +185,9 @@ function getApplicableDeliveryMethods(shipment) {
                 "minDeliveryDate": deliveryDateHelpers.getMinDeliveryDate(shippingMethod),
                 "maxDeliveryDate": deliveryDateHelpers.getMaxDeliveryDate(shippingMethod)
             };
-            /* Kristin TODO: Update the min/max delivery date after discussion with Shop Pay team.
-               Note minDeliveryDate and maxDeliveryDate are required for each delivery method by GraphQL,
-               but are not OOTB calculations/attributes in SFCC. */
+            /* Note minDeliveryDate and maxDeliveryDate are required for each delivery method by GraphQL,
+               but are not OOTB calculations/attributes in SFCC. Therefore, placeholders are passed to the
+               modal, but never used by the modal/seen by the customer. */
             if (shippingMethod.custom.estimatedArrivalTime) {
                 method.deliveryExpectationLabel = shippingMethod.custom.estimatedArrivalTime;
             } else if (shippingMethod.description) {

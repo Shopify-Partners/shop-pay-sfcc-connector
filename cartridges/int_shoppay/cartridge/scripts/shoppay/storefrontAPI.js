@@ -75,7 +75,7 @@ function shoppayPaymentRequestSessionSubmit(paymentRequest, token) {
             query: 'mutation shopPayPaymentRequestSessionSubmit($token: String!, $paymentRequest: ShopPayPaymentRequestInput!, $idempotencyKey: String!) {shopPayPaymentRequestSessionSubmit(token: $token, paymentRequest: $paymentRequest, idempotencyKey: $idempotencyKey) {paymentRequestReceipt {token processingStatusType} userErrors {field message}}}',
             variables: {
                 token: token,
-                idempotencyKey: dw.util.UUIDUtils.createUUID(), // Kristin TODO: Do we need to store and reuse within session?
+                idempotencyKey: dw.util.UUIDUtils.createUUID(),
                 paymentRequest: paymentRequest
             }
         };
