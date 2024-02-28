@@ -1,5 +1,4 @@
 <style>
- /* TODO: solidify & rework before final delivery. These are Placeholder styles. Any styles developed during this ticket likely to be moved into scss file within cartridge.  */
     .pdp-actions--shoppay-atc {
         text-align: -webkit-center;
 
