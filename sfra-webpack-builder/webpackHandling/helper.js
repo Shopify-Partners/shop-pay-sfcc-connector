@@ -79,7 +79,6 @@ function buildRuleSet(executingDir, cartridge, env, fileType) {
                 ),
             );
         }
-        // TODO add include paths to config
         ruleSet.push({
             test: /\.(sa|sc|c)ss$/,
             use: [
