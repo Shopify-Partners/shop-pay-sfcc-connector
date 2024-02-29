@@ -91,7 +91,7 @@ $('body').on('cart:update product:afterAddToCart promotion:success', function ()
         if (!session) {
             session = initShopPaySession();
         } else {
-            const paymentRequestResponse = helper.buildPaymentRequest();
+            const paymentRequestResponse = helper.buildPaymentRequest(session);
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
 
             if (responseJSON) {
@@ -129,7 +129,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             responseJSON = paymentRequestResponse ? paymentRequestResponse : null;
         }
     } else {
-        paymentRequestResponse = helper.buildPaymentRequest();
+        paymentRequestResponse = helper.buildPaymentRequest(session);
         responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
     }
 

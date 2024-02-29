@@ -486,7 +486,7 @@ function createResponse (requestObj, controllerURL) {
  * Handles AJAX call to get the payment response.
  * @returns {Object} paymentResponse - an response object.
  */
-function buildPaymentRequest() {
+function buildPaymentRequest(session) {
     let token = document.querySelector('[data-csrf-token]');
     let response;
     if (token) {
@@ -519,7 +519,9 @@ function buildPaymentRequest() {
         /*  Return to exit function - don't reload the page in case there is a page rendering
             issue (will result in infinite reload loop).
         */
-        session.close();
+        if (session) {
+            session.close();
+        }
         shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
     }
 }
