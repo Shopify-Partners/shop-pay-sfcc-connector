@@ -17,8 +17,8 @@ test.beforeEach(async ({ page, isMobile }) => {
     baseUrl = checkoutPage.baseUrl
 })
 
-// The following test Jira Issue:
-// https://themazegroup.atlassian.net/browse/SSPSC-26
+// The following tests verify the functionality of these Jira Issue:
+// https://themazegroup.atlassian.net/browse/SSPSC-25, https://themazegroup.atlassian.net/browse/SSPSC-26
 test.describe('Test backend handlers for processing data from frontend listeners', () => {
 
     test('Test backend listener for changes in the discounts object => ShopPay-DiscountCodeChanged', async ({ page }) => {
@@ -141,8 +141,6 @@ test.describe('Test backend handlers for processing data from frontend listeners
         await checkoutPage.productPage.addToCart()
         await checkoutPage.goToCart()
         await page.waitForLoadState('domcontentloaded')
-
-        // const deliveryMethodSelected = await page.locator('#shippingMethods > option:nth-child(1)').innerText()
 
         const selectedDeliveryOption = await page.evaluate(() => {
             const deliveryOptions = document.getElementById('shippingMethods')

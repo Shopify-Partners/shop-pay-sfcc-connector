@@ -9,7 +9,6 @@ const submitPaymentCtrl = 'ShopPay-SubmitPayment'
 let checkoutPage
 let siteUrl
 
-// The following test Jira Issue: https://themazegroup.atlassian.net/browse/SSPSC-23
 test.beforeEach(async ({ page, isMobile }) => {
     checkoutPage = new CheckoutPage(page, isMobile)
     await checkoutPage.goHome()
@@ -18,7 +17,7 @@ test.beforeEach(async ({ page, isMobile }) => {
 })
 
 test.describe('Test sessions and submit order controllers', () => {
-
+    // Jira Issue: https://themazegroup.atlassian.net/browse/SSPSC-23
     test('Verify ShopPay payment object is returned => ShopPay-GetCartSummary', async ({ page }) => {
         const csrfSelector = page.locator('[data-tokenname="csrf_token"]')
         const csrfToken = await csrfSelector.getAttribute('data-token')
@@ -41,7 +40,7 @@ test.describe('Test sessions and submit order controllers', () => {
         expect(cartResponse.error).toBe(false)
     })
 
-    // The following test Jira Issue: https://themazegroup.atlassian.net/jira/software/c/projects/SSPSC/issues/SSPSC-22
+    // Jira Issue: https://themazegroup.atlassian.net/jira/software/c/projects/SSPSC/issues/SSPSC-22
     test('Verify ShopPay GraphQL request response => ShopPay-BeginSession', async ({ page }) => {
         const csrfSelector = page.locator('[data-tokenname="csrf_token"]')
         const csrfToken = await csrfSelector.getAttribute('data-token')
@@ -84,7 +83,7 @@ test.describe('Test sessions and submit order controllers', () => {
           expect(sessionResponse.error).toBe(false)
     })
 
-    // The following test Jira Issue: https://themazegroup.atlassian.net/browse/SSPSC-30
+    // Jira Issue: https://themazegroup.atlassian.net/browse/SSPSC-30
     test('Verify ShopPay GraphQL place order functionality => ShopPay-SubmitPayment', async ({ page }) => {
         let email
         let paymentRequest
@@ -164,10 +163,13 @@ test.describe('Test sessions and submit order controllers', () => {
             return response.json()
         }, { submitPaymentUrl: submitPaymentUrl, paymentData })
 
+        await page.waitForLoadState('domcontentloaded')
+
         expect(paymentResponse.error).toBe(false)
         expect(paymentResponse.continueUrl).not.toBe(undefined)
     })
 
+    // Jira Issue: https://themazegroup.atlassian.net/browse/SSPSC-23
     test('Verify request cannot be processed outside of the client session (CSRF)', async ({ page }) => {
         const csrfSelector = page.locator('[data-tokenname="csrf_token"]')
         const csrfToken = await csrfSelector.getAttribute('data-token')
