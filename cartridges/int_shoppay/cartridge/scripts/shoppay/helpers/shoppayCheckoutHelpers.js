@@ -32,8 +32,7 @@ function ensureNoEmptyShipments(currentBasket, req) {
             shipment = iter.next();
             if (shipment.productLineItems.length < 1 && shipmentsToDelete.indexOf(shipment) < 0) {
                 if (shipment.default) {
-                    // Cant delete the defaultShipment
-                    // Copy all line items from 2nd to first
+                    // Cant delete the defaultShipment. Copy all line items from 2nd to first
                     var altShipment = COHelpers.getFirstNonDefaultShipmentWithProductLineItems(currentBasket);
                     if (!altShipment) return;
 
