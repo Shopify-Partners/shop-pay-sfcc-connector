@@ -22,11 +22,12 @@ var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
  */
 server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
     try {
+        var Order = require('dw/order/Order');
         var OrderMgr = require('dw/order/OrderMgr');
         var Transaction = require('dw/system/Transaction');
         var postProcessingHelpers = require('*/cartridge/scripts/shoppay/helpers/postProcessingHelpers');
         var order;
-        var placeOrderResult
+        var placeOrderResult;
         var payload = JSON.parse(req.body);
         if (payload.source_identifier) {
             order = OrderMgr.queryOrder('custom.shoppaySourceIdentifier={0}', payload.source_identifier);
@@ -42,17 +43,20 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
             res.json({});
             return next();
         }
-        Transaction.wrap(function() {
-            postProcessingHelpers.setOrderCustomAttributes(order, payload);
-            postProcessingHelpers.handleBillingInfo(order, payload);
-            order.custom.shoppayOrderCreateWebhookReceived = true;
-            placeOrderResult = postProcessingHelpers.placeOrder(order);
-        });
-        if (placeOrderResult.error) {
-            Logger.error('[ShopPayWebhooks-OrdersCreate] Unable to place order ' + order.orderNo);
-            // This order will be reattempted by the Order Reconciliation job
-            res.json({});
-            return next();
+        // Webhooks can sometimes be received more than once. Ensure payload has not already been handled.
+        if (order.status === Order.ORDER_STATUS_CREATED) {
+            Transaction.wrap(function() {
+                postProcessingHelpers.setOrderCustomAttributes(order, payload);
+                postProcessingHelpers.handleBillingInfo(order, payload);
+                order.custom.shoppayOrderCreateWebhookReceived = true;
+                placeOrderResult = postProcessingHelpers.placeOrder(order);
+            });
+            if (placeOrderResult.error) {
+                logger.error('[ShopPayWebhooks-OrdersCreate] Unable to place order ' + order.orderNo);
+                // This order will be reattempted by the Order Reconciliation job
+                res.json({});
+                return next();
+            }
         }
     } catch (e) {
         Logger.error('[ShopPayWebhooks-OrdersCreate] error: \n\r' + e.message + '\n\r' + e.stack);
