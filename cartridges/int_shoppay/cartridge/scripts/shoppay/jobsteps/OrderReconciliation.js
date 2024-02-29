@@ -1,9 +1,5 @@
 'use strict'
 
-/* Global Variables */
-var orderCount;
-var successCount;
-
 /* Script Modules */
 var adminAPI = require('*/cartridge/scripts/shoppay/adminAPI');
 var postProcessingHelpers = require('*/cartridge/scripts/shoppay/helpers/postProcessingHelpers');
@@ -13,6 +9,10 @@ var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var Order = require('dw/order/Order');
 var OrderMgr = require('dw/order/OrderMgr');
 var Status = require('dw/system/Status');
+
+/* Global Variables */
+var orderCount;
+var successCount;
 
 /**
  * Finalizes processing of an SFCC order paid using Shop Pay. Finds the corresponding Shopify order,

@@ -1,7 +1,10 @@
 'use strict';
 
-const LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
+/* Script Modules */
 const shoppayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
+
+/* API Includes */
+const LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
 
 /* Global Variables */
 const serviceName = 'shoppay.api.storefront';
