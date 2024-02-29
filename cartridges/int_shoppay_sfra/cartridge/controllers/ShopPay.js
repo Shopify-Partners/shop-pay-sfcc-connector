@@ -246,13 +246,13 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
 
     var paymentRequest = inputs.paymentRequest;
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
-    var response = storefrontAPI.shoppayPaymentRequestSessionCreate(currentBasket, paymentRequest);
+    var result = storefrontAPI.shoppayPaymentRequestSessionCreate(currentBasket, paymentRequest);
 
-    if (!response
-        || response.error
-        || !response.shopPayPaymentRequestSessionCreate
-        || response.shopPayPaymentRequestSessionCreate.userErrors.length > 0
-        || response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession == null
+    if (!result
+        || result.error
+        || !result.shopPayPaymentRequestSessionCreate
+        || result.shopPayPaymentRequestSessionCreate.userErrors.length > 0
+        || result.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession == null
     ) {
         res.json({
             error: true,
@@ -260,7 +260,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         });
         return next();
     }
-    var paymentRequestSession = response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession;
+    var paymentRequestSession = result.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession;
 
     res.json({
         error: false,
