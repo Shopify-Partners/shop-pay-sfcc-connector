@@ -130,7 +130,7 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
         }
     } else {
         paymentRequestResponse = helper.buildPaymentRequest();
-        responseJSON = paymentRequest ? paymentRequest.responseJSON : null;
+        responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
     }
 
     if (paymentRequest || (responseJSON && !responseJSON.error)) {
