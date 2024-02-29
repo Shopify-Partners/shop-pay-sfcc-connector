@@ -1,10 +1,10 @@
 /**
  * Gets the value of a specified cookie
- * @param {string} cname - cookie name
+ * @param {string} cName - cookie name
  * @returns {string} - value of a specified cookie
  */
-function getCookie(cname) {
-    let name = cname + '=';
+function getCookie(cName) {
+    let name = cName + '=';
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
     for(let i = 0; i <ca.length; i++) {
@@ -21,22 +21,15 @@ function getCookie(cname) {
 
 /**
  * Set a Cookie
- * @param {string} cname - cookie name
- * @param {string} cvalue - cookie value
+ * @param {string} cName - cookie name
+ * @param {string} cValue - cookie value
  * @param {string} expDays - days until cookie expires
  */
-function setCookie(cname, cvalue, expDays) {
+function setCookie(cName, cValue, expDays) {
     let date = new Date();
     date.setTime(date.getTime() + (expDays * 24 * 60 * 60 * 1000));
-    const expires = 'expires=' + date.toUTCString();
-    document.cookie = cname + '=' + cvalue + '; ' + expires + '; path=/';
-}
-
-function deleteCookieValue(cookieName) {
-    var d = new Date();
-    d.setTime(d.getTime());
-    var cookieExpireDate = 'expires=' + d.toString();
-    document.cookie = cookieName + '=expired;' + cookieExpireDate;
+    const expires = "expires=" + date.toUTCString();
+    document.cookie = cName + "=" + cValue + "; " + expires + ";";
 }
 
 /**
@@ -57,6 +50,5 @@ function parseABTestCookie() {
 module.exports = {
     getCookie: getCookie,
     setCookie: setCookie,
-    deleteCookieValue: deleteCookieValue,
     parseABTestCookie: parseABTestCookie
 };

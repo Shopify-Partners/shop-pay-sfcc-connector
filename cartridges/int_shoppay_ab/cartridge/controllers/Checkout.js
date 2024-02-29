@@ -7,9 +7,8 @@ server.extend(page);
 
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 var BasketMgr = require('dw/order/BasketMgr');
-var Cookie = require('dw/web/Cookie');
 var StringUtils = require('dw/util/StringUtils');
-
+var currentSite = require('dw/system/Site').current;
 const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 var abTestHelpers = require('*/cartridge/scripts/shoppay/helpers/abTestHelpers');
 
@@ -25,32 +24,33 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
     if(!shoppayABCookie || shoppayABCookie.value === '{}') {
         var assignmentObject = abTestHelpers.getAssignmentGroup(shoppayApplicable);
         var { abTest, assignmentGroup } = assignmentObject;
-        var shoppayABCookie = new Cookie(
-            'shoppayAB',
-            //the string is encoded to base64 to ensure the cookie JSON string keeps
-            // the correct struture
-            StringUtils.encodeBase64(
-                JSON.stringify({
-                    subjectId: session.customer.getID(),
-                    abTest: abTest,
-                    assignmentGroup: assignmentGroup
-                })
-            )
-        );
-        //set cookie to expire in 90 days
-        shoppayABCookie.setMaxAge(7776000);
-        response.addHttpCookie(shoppayABCookie);
+        abTestHelpers.createShopPayABCookie({
+            subjectId: session.customer.getID(),
+            abTest: abTest,
+            assignmentGroup: assignmentGroup
+        });
         activeABTest = abTest;
         activeAssignmentGroup = assignmentGroup;
     } else {
-        var shoppayABCookieValue = JSON.parse(
-            StringUtils.decodeBase64(shoppayABCookie.value)
-        );
+        var shoppayABCookieValue = abTestHelpers.decodeString(shoppayABCookie.value);
         activeABTest = shoppayABCookieValue.abTest;
         activeAssignmentGroup = shoppayABCookieValue.assignmentGroup;
     }
 
     viewData.includeShopPayJS = activeABTest !== 'shoppayAA' && activeAssignmentGroup === 'treatment';
+    var shoppayClientRefs = JSON.parse(viewData.shoppayClientRefs);
+    var experimentId = currentSite.getCustomPreferenceValue('experimentId');
+    if(experimentId) {
+        shoppayClientRefs['constants']['experimentId'] = experimentId;
+        viewData.shoppayClientRefs = viewData.includeShopPayJS
+            ? JSON.stringify(shoppayClientRefs)
+            : JSON.stringify({});
+    }
+
+    var mytest = JSON.stringify({'name': 'kristin'});
+    var myCookie = new dw.web.Cookie('__sp1', dw.util.StringUtils.encodeBase64(mytest));
+    response.addHttpCookie(myCookie);
+
     viewData.intABTest = true;
     res.setViewData(viewData);
 

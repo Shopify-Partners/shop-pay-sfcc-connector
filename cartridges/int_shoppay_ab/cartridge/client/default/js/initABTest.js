@@ -3,31 +3,37 @@ const helper = require('./helpers/abTestHelpers');
 $(document).ready(function () {
     if(window.ShopPay) {
         //the return form parseABTestCookie is still a string not a object
-        var abCookieJSON = helper.parseABTestCookie();
+        const abCookieJSON = helper.parseABTestCookie();
 
-        if(abCookieJSON && !abCookieJSON['isTracked']) {
-            var {subjectId, assignmentGroup} = abCookieJSON;
-            // ## JavaScript SDK for A/A and A/B testing
-            // Use the `track` method to provide checkout metrics.
-            // Send the assignment event
-            window.ShopPay.PaymentRequest.track({
-                subjectId: subjectId,
-                assignmentGroup: assignmentGroup,
-                shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
-                experimentId: '<experiment-id-from-shopify>', //site pref or custom attribute
-                timestamp: new Date().toISOString()
-            });
+        if(abCookieJSON && (!abCookieJSON.isAssigned || !abCookieJSON.isStarted)) {
+            const {subjectId, assignmentGroup} = abCookieJSON;
 
-            // Send the checkout events
-            window.ShopPay.PaymentRequest.track({
-                subjectId: subjectId,
-                shopPayToken: null,
-                action: 'checkout-begin', // or 'checkout-complete'
-                totalPrice: "10000", // The total price of the order in cents
-                timestamp: new Date().toISOString()
-            });
-            abCookieJSON['isTracked'] = true;
-            helper.deleteCookieValue('shoppayAB');
+            if(!abCookieJSON.isAssigned) {
+                // Send the assignment event
+                window.ShopPay.PaymentRequest.track({
+                    subjectId: subjectId,
+                    assignmentGroup: assignmentGroup,
+                    shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
+                    experimentId: window.shoppayClientRefs.preferences.experimentId,
+                    timestamp: new Date().toISOString()
+                });
+                abCookieJSON['isAssigned'] = true;
+            }
+
+            if(!abCookieJSON.isStarted) {
+                //If you have modified SFRA checkout classes please verify the correct price is pulled
+                const totalPrice = $('.order-total-summary .grand-total-sum').text().replace(/\$|\./gm, '');
+                // Send the checkout events
+                window.ShopPay.PaymentRequest.track({
+                    subjectId: subjectId,
+                    shopPayToken: null,
+                    action: 'checkout-begin',
+                    totalPrice: totalPrice, // The total price of the order in cents
+                    timestamp: new Date().toISOString()
+                });
+                abCookieJSON['isStarted'] = true;
+            }
+
             //btoa encodes the string to base64 to ensure the cookie JSON string keeps
             // the correct struture
             helper.setCookie('shoppayAB', btoa(JSON.stringify(abCookieJSON)), 90);
