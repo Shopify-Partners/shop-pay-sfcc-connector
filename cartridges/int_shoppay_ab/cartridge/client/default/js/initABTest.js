@@ -36,7 +36,7 @@ $(document).ready(function () {
 
             //btoa encodes the string to base64 to ensure the cookie JSON string keeps
             // the correct struture
-            helper.setCookie('shoppayAB', btoa(JSON.stringify(abCookieJSON)), 90);
+            helper.setCookie('shoppayAB', btoa(JSON.stringify(abCookieJSON), 90));
         }
     }
 });
