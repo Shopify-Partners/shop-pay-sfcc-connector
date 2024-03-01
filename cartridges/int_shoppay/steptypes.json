@@ -105,6 +105,26 @@
                     }
                 ]
             }
+        },
+        {
+            "@type-id": "custom.shoppay.MaintainWebhookSubscriptions",
+            "module": "int_shoppay/cartridge/scripts/shoppay/jobsteps/WebhookSubscriptions.js",
+            "description": "Ensure all registered SFCC webhook subscriptions for the site are still active.",
+            "@supports-site-context": "true",
+            "@supports-organization-context": "false",
+            "function": "MaintainWebhookSubscriptions",
+            "transactional": true,
+            "status-codes": {
+                "status": [{
+                        "@code": "ERROR",
+                        "description": "Used when an error occurred."
+                    },
+                    {
+                        "@code": "OK",
+                        "description": "Used when execution was successful."
+                    }
+                ]
+            }
         }]
     }
 }

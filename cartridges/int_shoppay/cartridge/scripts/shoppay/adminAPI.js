@@ -3,7 +3,7 @@
 var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 const webhookIncludeFields = {
-    "ORDERS_CREATE": ["admin_graphql_api_id","name","source_identifier","email","billing_address","total_price","confirmed","customer"]
+    "ORDERS_CREATE": ["admin_graphql_api_id","name","source_identifier","email","billing_address","total_price","confirmed","customer","updated_at"]
 };
 
 /**
@@ -170,9 +170,41 @@ function unsubscribeWebhook(id) {
     return response.object.data;
 }
 
+function getWebhooksList() {
+    var queryString = "{webhookSubscriptions(first: 50) {edges {node {id legacyResourceId format topic endpoint {__typename ... on WebhookHttpEndpoint {callbackUrl}}}}}}";
+    const bodyObj = {
+        query: queryString,
+        variables: {}
+    };
+
+    var shoppayAdminService = require('*/cartridge/scripts/shoppay/service/shoppayAdminService')();
+    var response = shoppayAdminService.call({
+        body: bodyObj || {}
+    });
+
+    var responseHeaders = shoppayAdminService.client.responseHeaders;
+    var shopifyRequestID = responseHeaders.get('X-Request-ID');
+    if (shopifyRequestID && shopifyRequestID.length > 0) {
+        logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+    }
+
+    if (!response.ok
+        || !response.object
+        || !response.object.data
+        || (response.object.errors && response.object.errors.length > 0)
+    ) {
+        return {
+            error: true,
+            errorMsg: response.errorMessage
+        };
+    }
+    return response.object.data;
+}
+
 module.exports = {
     getOrderBySourceIdentifier: getOrderBySourceIdentifier,
     subscribeWebhook: subscribeWebhook,
     getExistingWebhook: getExistingWebhook,
-    unsubscribeWebhook: unsubscribeWebhook
+    unsubscribeWebhook: unsubscribeWebhook,
+    getWebhooksList: getWebhooksList
 };

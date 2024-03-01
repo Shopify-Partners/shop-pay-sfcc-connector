@@ -11,6 +11,32 @@ const callbackEndpoints = {
     "ORDERS_CREATE": URLUtils.https('ShopPayWebhooks-OrdersCreate').toString()
 };
 
+function subscribe(topic, callbackUrl) {
+    var webhookData = null;
+    var response = adminAPI.subscribeWebhook(topic, callbackUrl);
+    if (response.error || !response.webhookSubscriptionCreate) {
+        return null;
+    } else if (response.webhookSubscriptionCreate.userErrors.length > 0) {
+        var subscribed = isAlreadySubscribedError(response.webhookSubscriptionCreate.userErrors);
+        if (!subscribed) {
+            return null;
+        }
+        // Get the details of the already subscribed webhook to create/update custom object in SFCC
+        var webhookSearchResponse = adminAPI.getExistingWebhook(topic, callbackUrl);
+        if (webhookSearchResponse.error
+            || !webhookSearchResponse.webhookSubscriptions
+            || webhookSearchResponse.webhookSubscriptions.edges.length == 0
+        ) {
+            return null;
+        }
+        webhookData = webhookSearchResponse.webhookSubscriptions.edges[0].node;
+    } else {
+        webhookData = response.webhookSubscriptionCreate.webhookSubscription;
+    }
+
+    return webhookData;
+}
+
 /**
  * Parses a set of userErrors from a Shopify webhook subscribe request to determine if the
  * subscribe action failed because the subscription for that callbackUrl and topic already
@@ -85,34 +111,16 @@ exports.Subscribe = function(params, stepExecution) {
         var topic = params.WebhookTopic;
         var webhookData;
         if (!topic) {
-            return new Status(Status.ERROR, 'No webhook topic provided for subscribe action');
+            return new Status(Status.ERROR, 'ERROR', 'No webhook topic provided for subscribe action');
         }
         var callbackUrl = params.CallbackURL;
         if (!callbackUrl) {
             callbackUrl = callbackEndpoints[topic];
         }
-
-        var response = adminAPI.subscribeWebhook(topic, callbackUrl);
-        if (response.error || !response.webhookSubscriptionCreate) {
-            return new Status(Status.ERROR, 'Webhook subscribe failed: ' + topic);
-        } else if (response.webhookSubscriptionCreate.userErrors.length > 0) {
-            var subscribed = isAlreadySubscribedError(response.webhookSubscriptionCreate.userErrors);
-            if (!subscribed) {
-                return new Status(Status.ERROR, 'Webhook subscribe failed: ' + topic);
-            }
-            // Get the details of the already subscribed webhook to create/update custom object in SFCC
-            var webhookSearchResponse = adminAPI.getExistingWebhook(topic, callbackUrl);
-            if (webhookSearchResponse.error
-                || !webhookSearchResponse.webhookSubscriptions
-                || webhookSearchResponse.webhookSubscriptions.edges.length == 0
-            ) {
-                return new Status(Status.ERROR, 'Webhook subscribe failed: ' + topic);
-            }
-            webhookData = webhookSearchResponse.webhookSubscriptions.edges[0].node;
-        } else {
-            webhookData = response.webhookSubscriptionCreate.webhookSubscription;
+        var webhookData = subscribe(topic, callbackUrl);
+        if (!webhookData) {
+            return new Status(Status.ERROR, 'ERROR', 'Webhook subscribe failed: ' + topic);
         }
-
         // If webhook custom object already exists, update it with the response data to ensure accuracy
         var webhookObj = CustomObjectMgr.getCustomObject('ShopPayWebhookSubscriptions', webhookData.legacyResourceId);
         if (!webhookObj) {
@@ -121,7 +129,7 @@ exports.Subscribe = function(params, stepExecution) {
         setSubscriptionObjectData(webhookObj, webhookData);
     } catch (e) {
         logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
-        return new Status(Status.ERROR, 'Exception thrown: ' + e.message);
+        return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
 
     return new Status(Status.OK);
@@ -138,16 +146,16 @@ exports.Unsubscribe = function(params, stepExecution) {
     try {
         var id = params.WebhookId;
         if (!id) {
-            return new Status(Status.ERROR, 'No webhook ID provided for unsubscribe action');
+            return new Status(Status.ERROR, 'ERROR', 'No webhook ID provided for unsubscribe action');
         }
 
         var response = adminAPI.unsubscribeWebhook('gid://shopify/WebhookSubscription/' + id);
         if (response.error || !response.webhookSubscriptionDelete) {
-            return new Status(Status.ERROR, 'Webhook unsubscribe failed: ' + id);
+            return new Status(Status.ERROR, 'ERROR', 'Webhook unsubscribe failed: ' + id);
         } else if (response.webhookSubscriptionDelete.userErrors.length > 0) {
             var subscriptionNotFoundError = isSubscriptionNotFoundError(response.webhookSubscriptionDelete.userErrors);
             if (!subscriptionNotFoundError) {
-                return new Status(Status.ERROR, 'Webhook unsubscribe failed: ' + id);
+                return new Status(Status.ERROR, 'ERROR', 'Webhook unsubscribe failed: ' + id);
             }
             // If webhook subscription did not exist, continue as though unsubscribe was successful
         }
@@ -158,8 +166,47 @@ exports.Unsubscribe = function(params, stepExecution) {
         }
     } catch (e) {
         logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
-        return new Status(Status.ERROR, 'Exception thrown: ' + e.message);
+        return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
 
+    return new Status(Status.OK);
+};
+
+exports.MaintainWebhookSubscriptions = function(params, stepExecution) {
+    try {
+        var webhookCustomObjects = CustomObjectMgr.getAllCustomObjects('ShopPayWebhookSubscriptions');
+        var response = adminAPI.getWebhooksList();
+        if (response.error || !response.webhookSubscriptions) {
+            return new Status(Status.ERROR, 'ERROR', 'Webhook unsubscribe failed: ' + id);
+        }
+        var activeSubscriptions = response.webhookSubscriptions.edges;
+        // ensure all SFCC-tracked webhooks are still subscribed
+        while (webhookCustomObjects.hasNext()) {
+            var sfccObject = webhookCustomObjects.next();
+            var matchingSubscription = null;
+            for (var i = 0; i < activeSubscriptions.length; i++) {
+                var activeSubscription = activeSubscriptions[i].node;
+                if (activeSubscription.legacyResourceId == sfccObject.custom.id) {
+                    matchingSubscription = activeSubscription;
+                    break;
+                }
+            }
+            if (!matchingSubscription) {
+                // resubscribe to the webhook that has been unsubscribed (due to failed deliveries or other causes)
+                var webhookData = subscribe(sfccObject.custom.topic, sfccObject.custom.callbackUrl);
+                if (!webhookData) {
+                    return new Status(Status.ERROR, 'ERROR', 'Webhook subscribe failed: ' + topic);
+                }
+                // New subscription will have a new legacyResourceId and therefore needs a new custom object
+                var webhookObj = CustomObjectMgr.createCustomObject('ShopPayWebhookSubscriptions', webhookData.legacyResourceId);
+                setSubscriptionObjectData(webhookObj, webhookData);
+                // remove the obsolete custom object for the unsubscribed webhook
+                CustomObjectMgr.remove(sfccObject);
+            }
+        }
+    } catch (e) {
+        logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
+    }
     return new Status(Status.OK);
 };
