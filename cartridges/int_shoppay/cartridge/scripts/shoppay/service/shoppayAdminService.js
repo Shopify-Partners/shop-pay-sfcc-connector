@@ -24,7 +24,6 @@ function createRequest(service, data) {
     var serviceURL = credential.getURL();
     serviceURL = serviceURL.replace('{store_name}', storeName);
     serviceURL = serviceURL.replace('{admin_api_version}', version);
-    dw.system.Logger.debug('serviceURL = ' + serviceURL);
 
     service.addHeader('Content-Type', 'application/json');
     service.setRequestMethod('POST');
