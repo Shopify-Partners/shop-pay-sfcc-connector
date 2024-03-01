@@ -3,7 +3,7 @@
         var assets = require('*/cartridge/scripts/assets.js');
         assets.addCss('/css/checkout/checkout.css');
         assets.addJs('/js/checkoutRegistration.js');
-        assets.addJs('/js/trackComplete.js');
+        assets.addJs('/js/shoppayTrackComplete.js');
     </isscript>
 
     <isif condition="${pdict.reportingURLs && pdict.reportingURLs.length}">

@@ -53,7 +53,7 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
             : JSON.stringify({});
     }
 
-    viewData.intABTest = true;
+    viewData.initShopPayABTest = true;
     res.setViewData(viewData);
 
     next();
