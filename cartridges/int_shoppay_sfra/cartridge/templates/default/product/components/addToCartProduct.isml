@@ -27,7 +27,7 @@
     <iscomment>BEGIN SHOPPAY (VARIANT PRODUCTS & MASTER PRODUCTS)</iscomment>
     <isif condition="${pdict.includeShopPayJS && pdict.product.productType !== 'set' && !pdict.product.productType !== 'bundle'}">
         <div class="col-sm-12">
-            <isinclude template="common/shopPayButton" />
+            <isinclude template="common/shoppayButton" />
         </div>
     </isif>
     <iscomment>END SHOPPAY</iscomment>
