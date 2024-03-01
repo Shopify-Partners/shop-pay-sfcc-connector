@@ -20,13 +20,6 @@ server.append('BeginSession', server.middleware.https, csrfProtection.validateAj
         response.addHttpCookie(shoppayABCookie);
     }
     
-    var mytest2 = JSON.stringify({'name': 'kristin', 'reg': 'true'});
-    var myCookie = request.httpCookies['__sp1'];
-    if(myCookie) {
-        myCookie.setValue(dw.util.StringUtils.encodeBase64(mytest2));
-        response.addHttpCookie(myCookie);
-    }
-
     next();
 });
 

@@ -47,10 +47,6 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
             : JSON.stringify({});
     }
 
-    var mytest = JSON.stringify({'name': 'kristin'});
-    var myCookie = new dw.web.Cookie('__sp1', dw.util.StringUtils.encodeBase64(mytest));
-    response.addHttpCookie(myCookie);
-
     viewData.intABTest = true;
     res.setViewData(viewData);
 
