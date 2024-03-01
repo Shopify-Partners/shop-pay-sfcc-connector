@@ -6,7 +6,7 @@ $(document).ready(function () {
         const abCookieJSON = helper.parseABTestCookie();
 
         if(abCookieJSON && abCookieJSON.isStarted) {
-            const {subjectId} = abCookieJSON;
+            const { subjectId } = abCookieJSON;
 
             //If you have modified SFRA checkout classes please verify the correct price is pulled
             const totalPrice = $('.order-total-summary .grand-total-sum').text().replace(/\$|\./gm, '');
@@ -22,8 +22,9 @@ $(document).ready(function () {
             delete abCookieJSON.isStarted;
             delete abCookieJSON.st;
 
-            //btoa encodes the string to base64 to ensure the cookie JSON string keeps
-            // the correct struture
+            /*  btoa encodes the string to base64 to ensure the cookie JSON string keeps
+                the correct structure
+            */
             helper.setCookie('shoppayAB', btoa(JSON.stringify(abCookieJSON), 90));
         }
     }

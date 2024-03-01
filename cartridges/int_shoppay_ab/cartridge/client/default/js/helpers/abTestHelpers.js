@@ -7,7 +7,7 @@ function getCookie(cName) {
     let name = cName + '=';
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
-    for(let i = 0; i <ca.length; i++) {
+    for(let i = 0; i < ca.length; i++) {
         let c = ca[i];
         while (c.charAt(0) == ' ') {
             c = c.substring(1);
@@ -33,7 +33,7 @@ function setCookie(cName, cValue, expDays) {
 }
 
 /**
- * Gets the shoppayAB test cookie and converts it to a 
+ * Gets the shoppayAB test cookie and converts it to a
  * JSON object
  * @returns {object | undefined} - abCookie json object or undefined
  */
@@ -49,6 +49,6 @@ function parseABTestCookie() {
 
 module.exports = {
     getCookie: getCookie,
-    setCookie: setCookie,
-    parseABTestCookie: parseABTestCookie
+    parseABTestCookie: parseABTestCookie,
+    setCookie: setCookie
 };
