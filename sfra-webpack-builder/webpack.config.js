@@ -170,7 +170,7 @@ class WebpackBundle {
                     ignore: ["**/client/", "*.map"], // We listen only on compiled files
                     liveCSS: false,
                     liveImg: false,
-                    useSourceHash: true, // useSourceSize is faster than useSourceHash but but it has a downside. If file size hasn't changed no reload is triggered. For example if color has changed from #000000 to #ffffff no reload will be triggered!)
+                    useSourceHash: true, // useSourceSize is faster than useSourceHash but but it has a downside. If file size hasn't changed no reload is triggered. For example if color has changed from #000000 to #ffffff no reload will be triggered!
                 }),
             );
         }
@@ -232,9 +232,10 @@ class WebpackBundle {
         let plugins = this.getPlugins(cartridge, fileType, env);
         let modulePaths = ["node_modules"];
         const aliases = this.buildDynamicAliases(sfraBuilderConfig.aliasConfig.alias, fileType);
-        // loop through all cartridges for node_modules lookup
-        // this allows to require node_modules from every plugin, regardless if those
-        // modules are installed in the given plugin
+        /*  Loop through all cartridges for node_modules lookup. This allows to
+            require node_modules from every plugin, regardless if those modules
+            are installed in the given plugin
+        */
         sfraBuilderConfig.cartridges.forEach((includeCartridges) => {
             modulePaths.push(path.resolve(includeCartridges.split("cartridges")[0], "node_modules"));
         });

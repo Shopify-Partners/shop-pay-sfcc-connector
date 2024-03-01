@@ -52,7 +52,7 @@ function getPresentmentCurrency(basket) {
 }
 
 module.exports = {
-    getPaymentMethod: getPaymentMethod,
     getLocale: getLocale,
+    getPaymentMethod: getPaymentMethod,
     getPresentmentCurrency: getPresentmentCurrency
 };

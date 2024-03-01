@@ -1,5 +1,6 @@
 'use strict';
 
+/* Script Modules */
 var discountHelpers = require('*/cartridge/scripts/shoppay/helpers/discountHelpers');
 var paymentHelpers = require('*/cartridge/scripts/shoppay/helpers/paymentHelpers');
 var productLineItemHelpers = require('*/cartridge/scripts/shoppay/helpers/productLineItemHelpers');

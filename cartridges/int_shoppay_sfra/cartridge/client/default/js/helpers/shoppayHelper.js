@@ -1,9 +1,12 @@
-// Global Variables
+/* Global Variables */
+let checkoutUrl = null;
+let observer;
 let orderConfirmationData;
-var sourceIdentifier = null;
-var token = null;
-var checkoutUrl = null;
-var productData = {};
+let productData = {};
+let reloadOnClose = true;
+let sourceIdentifier = null;
+const technicalErrorMsg = window.shoppayClientRefs.constants.technicalError;
+let token = null;
 
 /**
  * Add csrf token param to url
@@ -39,7 +42,7 @@ function getCsrfToken() {
 
 /**
  * Get Init Product Data (page load and captures data available on page load)
- * @returns {Object} - productData witht he following structure: { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
+ * @returns {Object} - productData with the following structure: { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
  */
 function getInitProductData() {
     let productData = null;
@@ -52,7 +55,7 @@ function getInitProductData() {
 
 /**
  * Set Init Product Data
- * @param {Object} data - accepts product data obj & updates global productData variable.  { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
+ * @param {Object} data - accepts product data obj & updates global productData variable: { pid: prodId, quantity: selectedQuantity, options: selectedOptions }
  */
 function setInitProductData(data) {
     productData = data;
@@ -78,15 +81,21 @@ function setSessionListeners(session) {
                         sessionPaymentRequest = data.paymentRequest;
                         sourceIdentifier = data.basketId;
                     } else {
-                        console.log(data.errorMsg);
+                        /*  session.completeSessionRequest() does not take an errors array as input so just return
+                            and use default modal error handling.
+                        */
+                        return;
                     }
                 },
                 error: function (err) {
-                    if (err.responseJSON || err.status !== 200) {
+                    /*  session.completeSessionRequest() does not take an errors array as input so just
+                        destroy the session and return.
+                    */
+                    setTimeout(function() {
                         session.close();
-                        window.location.reload();
-                        return;
-                    }
+                        // Event listeners have loaded so window.location.reload() will be called in windowclosed
+                    }, 2000);
+                    return;
                 }
             });
         } else {
@@ -107,17 +116,31 @@ function setSessionListeners(session) {
             data: JSON.stringify(requestData),
             contentType: 'application/json',
             success: function (data) {
-                token = data.token;
-                checkoutUrl = data.checkoutUrl;
-                sourceIdentifier = data.sourceIdentifier;
-                session.completeSessionRequest({token, checkoutUrl, sourceIdentifier});
-            },
-            error: function (err) {
-                if (err.responseJSON || err.status !== 200) {
-                    session.close();
-                    window.location.reload();
+                if (!data.error) {
+                    token = data.token;
+                    checkoutUrl = data.checkoutUrl;
+                    sourceIdentifier = data.sourceIdentifier;
+                    session.completeSessionRequest({token, checkoutUrl, sourceIdentifier});
+                } else {
+                    let errorMsg = technicalErrorMsg;
+                    if (data.errorMsg) {
+                        errorMsg = data.errorMsg;
+                    }
+                    /*  session.completeSessionRequest() does not take an errors array as input so just return
+                        and use default modal error handling.
+                    */
                     return;
                 }
+            },
+            error: function (err) {
+                /*  session.completeSessionRequest() does not take an errors array as input so just
+                    destroy the session and return.
+                */
+                setTimeout(function() {
+                    session.close();
+                    // Event listeners have loaded so window.location.reload() will be called in windowclosed
+                }, 2000);
+                return;
             }
 
         });
@@ -133,9 +156,33 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DiscountCodeChanged);
-        if (responseJSON.exception || responseJSON.error){
-            session.close();
-            window.location.reload();
+        if (responseJSON.exception){
+            session.completeDiscountCodeChange({
+                errors: [
+                    {
+                        type: "discountCodeError",
+                        message: technicalErrorMsg
+                    }
+                ]
+            });
+            setTimeout(function() {
+                session.close();
+                // Event listeners have loaded so window.location.reload() will be called in windowclosed
+            }, 2000);
+            return;
+        } else if (responseJSON.error) {
+            let errorMsg = technicalErrorMsg;
+            if (responseJSON.errorMsg) {
+                errorMsg = responseJSON.errorMsg;
+            }
+            session.completeDiscountCodeChange({
+                errors: [
+                    {
+                        type: "discountCodeError",
+                        message: errorMsg
+                    }
+                ]
+            });
             return;
         }
         const { deliveryMethods, discountCodes, lineItems, shippingLines, subtotal, discounts, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -173,9 +220,33 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.DeliveryMethodChanged);
-        if (responseJSON.exception || responseJSON.error){
-            session.close();
-            window.location.reload();
+        if (responseJSON.exception) {
+            session.completeDeliveryMethodChange({
+                errors: [
+                    {
+                        type: "deliveryMethodError",
+                        message: technicalErrorMsg
+                    }
+                ]
+            });
+            setTimeout(function() {
+                session.close();
+                // Event listeners have loaded so window.location.reload() will be called in windowclosed
+            }, 2000);
+            return;
+        } else if (responseJSON.error) {
+            let errorMsg = technicalErrorMsg;
+            if (responseJSON.errorMsg) {
+                errorMsg = responseJSON.errorMsg;
+            }
+            session.completeDeliveryMethodChange({
+                errors: [
+                    {
+                        type: "deliveryMethodError",
+                        message: errorMsg
+                    }
+                ]
+            });
             return;
         }
         const { shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -196,7 +267,8 @@ function setSessionListeners(session) {
         const currentPaymentRequest = session.paymentRequest;
         if (!ev.shippingAddress) {
             /* This event is triggered with no shipping address when a customer clicks "change"
-               to choose an alternate email address in the modal */
+               to choose an alternate email address in the modal
+            */
             session.completeShippingAddressChange({ updatedPaymentRequest: currentPaymentRequest });
             return;
         }
@@ -210,9 +282,33 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.ShippingAddressChanged);
-        if (responseJSON.exception || responseJSON.error){
-            session.close();
-            window.location.reload();
+        if (responseJSON.exception) {
+            session.completeShippingAddressChange({
+                errors: [
+                    {
+                        type: "shippingAddressError",
+                        message: technicalErrorMsg
+                    }
+                ]
+            });
+            setTimeout(function() {
+                session.close();
+                // Event listeners have loaded so window.location.reload() will be called in windowclosed
+            }, 2000);
+            return;
+        } else if (responseJSON.error) {
+            let errorMsg = technicalErrorMsg;
+            if (responseJSON.errorMsg) {
+                errorMsg = responseJSON.errorMsg;
+            }
+            session.completeShippingAddressChange({
+                errors: [
+                    {
+                        type: "shippingAddressError",
+                        message: errorMsg
+                    }
+                ]
+            });
             return;
         }
         const { deliveryMethods, shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
@@ -241,9 +337,33 @@ function setSessionListeners(session) {
         }
 
         let responseJSON = createResponse(requestData, window.shoppayClientRefs.urls.SubmitPayment);
-        if (responseJSON.exception || responseJSON.error){
-            session.close();
-            window.location.reload();
+        if (responseJSON.exception) {
+            session.completePaymentConfirmationRequest({
+                errors: [
+                    {
+                        type: "paymentConfirmationError",
+                        message: technicalErrorMsg
+                    }
+                ]
+            });
+            setTimeout(function() {
+                session.close();
+                // Event listeners have loaded so window.location.reload() will be called in windowclosed
+            }, 2000);
+            return;
+        } else if (responseJSON.error) {
+            let errorMsg = technicalErrorMsg;
+            if (responseJSON.errorMsg) {
+                errorMsg = responseJSON.errorMsg;
+            }
+            session.completePaymentConfirmationRequest({
+                errors: [
+                    {
+                        type: "paymentConfirmationError",
+                        message: errorMsg
+                    }
+                ]
+            });
             return;
         }
 
@@ -256,6 +376,7 @@ function setSessionListeners(session) {
     });
 
     session.addEventListener("paymentcomplete", function(ev) {
+        reloadOnClose = false;
         session.close();
         let data = orderConfirmationData;
         let redirect = $('<form>').appendTo(document.body).attr({
@@ -272,16 +393,33 @@ function setSessionListeners(session) {
         });
         redirect.submit();
     });
+
+    session.addEventListener("windowclosed", function(ev) {
+        // Reset global value to default
+        if (!reloadOnClose) {
+            reloadOnClose = true;
+        } else {
+            window.location.reload();
+        }
+    });
 }
 
 /**
  * Enables & Disables Shop Pay's Buy Now button click based on whether the product is ready to order on the PDP
  */
-function shopPayBtnDisabledStyle(elem, isReadyToOrder) {
+function shoppayBtnDisabledStyle(elem, isReadyToOrder, forceDisable) {
     let readyToOrderPageLoad = isReadyToOrderOnPageLoad();
     let isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
 
     if (elem) {
+        // An error occurred, disable the button
+        if (!isBuyNow && forceDisable) {
+            elem.style.pointerEvents = 'none';
+            if (observer) {
+                observer.disconnect();
+            }
+            return;
+        }
         if (!isBuyNow || (isBuyNow && (isReadyToOrder || readyToOrderPageLoad))) {
             elem.style.pointerEvents = 'auto';
         } else {
@@ -293,11 +431,11 @@ function shopPayBtnDisabledStyle(elem, isReadyToOrder) {
 /**
  * Watches for when ShopPay button is first rendered to the page to then apply correct button styling depending on whether the basket is empty or not
  */
-function shopPayMutationObserver(elemSelector) {
-    const observer = new MutationObserver((mutationsList, observer) => {
+function shoppayMutationObserver(elemSelector) {
+    observer = new MutationObserver((mutationsList, observer) => {
         const renderedShopPayElem = document.querySelector(elemSelector);
         if (renderedShopPayElem) {
-            shopPayBtnDisabledStyle(renderedShopPayElem);
+            shoppayBtnDisabledStyle(renderedShopPayElem);
             observer.disconnect();
         }
     });
@@ -320,7 +458,7 @@ function isReadyToOrderOnPageLoad() {
 /**
  * Handles AJAX call to create / update the payment response needed for the ShopPay.PaymentRequest.build() method.
  * @param {Object} requestObj - a request object that contains relevant event data & session data.
- * @param {string} controllerURL - String url of the targeted controller (based on the urls Obj set in shopPayGlobalRefs.js)
+ * @param {string} controllerURL - String url of the targeted controller (based on the urls Obj set in shoppayGlobalRefs.js)
  * @returns {Object} responseJSON - an updated response object to be used in the build & on the ShopPay.PaymentRequest object.
  */
 function createResponse (requestObj, controllerURL) {
@@ -344,15 +482,60 @@ function createResponse (requestObj, controllerURL) {
     return responseJSON;
 }
 
+/**
+ * Handles AJAX call to get the payment response.
+ * @returns {Object} paymentResponse - an response object.
+ */
+function buildPaymentRequest(session) {
+    let token = document.querySelector('[data-csrf-token]');
+    let response;
+    if (token) {
+        const paymentResponse = $.ajax({
+            url: getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
+            type: 'GET',
+            contentType: 'application/json',
+            async: false,
+            success: function(data) {
+                if (!data.error) {
+                    response = {
+                        responseJSON: data
+                    };
+                } else {
+                    shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
+                }
+            },
+            error: function(err) {
+                if (session) {
+                    /*  Return to exit function - don't reload the page in case there is a page rendering
+                        issue (will result in infinite reload loop).
+                    */
+                    session.close();
+                }
+                shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
+            }
+        });
+        return response;
+    } else {
+        /*  Return to exit function - don't reload the page in case there is a page rendering
+            issue (will result in infinite reload loop).
+        */
+        if (session) {
+            session.close();
+        }
+        shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), null, true);
+    }
+}
+
 module.exports = {
+    buildPaymentRequest: buildPaymentRequest,
+    createResponse: createResponse,
     getCsrfToken: getCsrfToken,
-    getUrlWithCsrfToken: getUrlWithCsrfToken,
-    setSessionListeners: setSessionListeners,
     getInitProductData: getInitProductData,
+    getUrlWithCsrfToken: getUrlWithCsrfToken,
+    isReadyToOrderOnPageLoad: isReadyToOrderOnPageLoad,
     productData: productData,
     setInitProductData: setInitProductData,
-    shopPayBtnDisabledStyle: shopPayBtnDisabledStyle,
-    shopPayMutationObserver: shopPayMutationObserver,
-    isReadyToOrderOnPageLoad: isReadyToOrderOnPageLoad,
-    createResponse: createResponse
+    setSessionListeners: setSessionListeners,
+    shoppayBtnDisabledStyle: shoppayBtnDisabledStyle,
+    shoppayMutationObserver: shoppayMutationObserver,
 };

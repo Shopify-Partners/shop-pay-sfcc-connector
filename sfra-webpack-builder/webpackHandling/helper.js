@@ -55,9 +55,10 @@ function buildRuleSet(executingDir, cartridge, env, fileType) {
             use: [MiniCssExtractPlugin.loader, { loader: "css-loader" }, { loader: "sass-loader" }],
         });
     } else if (fileType === "scss") {
-        // include all node_modules folder from each cartridge
-        // this allows to reuse node_modules folder from other cartridges without the need
-        // to directly install them in each cartridge
+        /*  Include all node_modules folder from each cartridge. This allows to
+            reuse node_modules folder from other cartridges without the need
+            to directly install them in each cartridge.
+        */
         let scssIncludePath = [];
         sfraBuilderConfig.cartridges.forEach((includeCartridges) => {
             scssIncludePath.push(path.resolve(includeCartridges.split("cartridges")[0], "node_modules"));
@@ -79,7 +80,6 @@ function buildRuleSet(executingDir, cartridge, env, fileType) {
                 ),
             );
         }
-        // TODO add include paths to config
         ruleSet.push({
             test: /\.(sa|sc|c)ss$/,
             use: [

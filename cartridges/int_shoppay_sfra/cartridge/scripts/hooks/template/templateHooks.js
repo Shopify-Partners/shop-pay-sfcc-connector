@@ -1,5 +1,6 @@
 'use strict';
 
+/* API Includes */
 var ISML = require('dw/template/ISML');
 
 /**
@@ -8,7 +9,7 @@ var ISML = require('dw/template/ISML');
  */
 function htmlHead(pdict) {
     if (pdict.includeShopPayJS) {
-        ISML.renderTemplate('/components/header/shopPayScriptsIncludes');
+        ISML.renderTemplate('/components/header/shoppayScriptsIncludes');
     }
 }
 

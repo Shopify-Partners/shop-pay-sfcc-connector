@@ -1,13 +1,15 @@
 'use strict'
 
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+/* API Includes */
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+var Result = require('dw/svc/Result');
 
 /**
  * Function to create a GraphQL ShopPay payment request session
  * @param {Object} paymentRequest - the Shop Pay payment request object representing the customer's basket
  * @returns {Object} The GraphQL service response body
  */
-function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
+function shoppayPaymentRequestSessionCreate(basket, paymentRequest) {
     if (paymentRequest.shippingAddress && paymentRequest.shippingAddress.id) {
         delete paymentRequest.shippingAddress.id;
     }
@@ -24,10 +26,17 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
             body: bodyObj || {}
         });
 
+        if (response.status === Result.SERVICE_UNAVAILABLE) {
+            // retry service call once
+            response = shoppayStorefrontService.call({
+                body: bodyObj || {}
+            });
+        }
+
         var responseHeaders = shoppayStorefrontService.client.responseHeaders;
         var shopifyRequestID = responseHeaders.get('X-Request-ID');
         if (shopifyRequestID && shopifyRequestID.length > 0) {
-            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+            Logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
         }
 
         if (!response.ok
@@ -41,7 +50,7 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
         }
         return response.object.data;
     } catch (e) {
-        logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return {
             error: true,
             errorMsg: e.message
@@ -55,7 +64,7 @@ function shopPayPaymentRequestSessionCreate(basket, paymentRequest) {
  * @param {string} token - the Shop Pay session token returned in the session create GraphQL response
  * @returns {Object} The GraphQL service response body
  */
-function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
+function shoppayPaymentRequestSessionSubmit(paymentRequest, token) {
     /* shippingAddress.id is a Shop Pay specific/provided element and is not a valid input for the GraphQL session
        submit request, but is included in the payment request object from the client-side Shop Pay session */
     if (paymentRequest.shippingAddress.id) {
@@ -66,7 +75,7 @@ function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
             query: 'mutation shopPayPaymentRequestSessionSubmit($token: String!, $paymentRequest: ShopPayPaymentRequestInput!, $idempotencyKey: String!) {shopPayPaymentRequestSessionSubmit(token: $token, paymentRequest: $paymentRequest, idempotencyKey: $idempotencyKey) {paymentRequestReceipt {token processingStatusType} userErrors {field message}}}',
             variables: {
                 token: token,
-                idempotencyKey: dw.util.UUIDUtils.createUUID(), // Kristin TODO: Do we need to store and reuse within session?
+                idempotencyKey: dw.util.UUIDUtils.createUUID(),
                 paymentRequest: paymentRequest
             }
         };
@@ -78,7 +87,7 @@ function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
         var responseHeaders = shoppayStorefrontService.client.responseHeaders;
         var shopifyRequestID = responseHeaders.get('X-Request-ID');
         if (shopifyRequestID && shopifyRequestID.length > 0) {
-            logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+            Logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
         }
 
         if (!response.ok
@@ -92,7 +101,7 @@ function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
         }
         return response.object.data;
     } catch (e) {
-        logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[storefrontAPI.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return {
             error: true,
             errorMsg: e.message
@@ -101,6 +110,6 @@ function shopPayPaymentRequestSessionSubmit(paymentRequest, token) {
 }
 
 module.exports = {
-    shopPayPaymentRequestSessionCreate: shopPayPaymentRequestSessionCreate,
-    shopPayPaymentRequestSessionSubmit: shopPayPaymentRequestSessionSubmit
+    shoppayPaymentRequestSessionCreate: shoppayPaymentRequestSessionCreate,
+    shoppayPaymentRequestSessionSubmit: shoppayPaymentRequestSessionSubmit
 };

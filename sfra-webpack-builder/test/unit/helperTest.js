@@ -33,7 +33,7 @@ describe("buildRuleSet()", () => {
     try {
       sfraBuilderConfig = require("../../webpackHandling/sfraBuilderConfig");
     } catch (err) {
-      console.log("sfraBuilderConfig not existant - exiting this test");
+      console.log("sfraBuilderConfig not existent - exiting this test");
       assert.isTrue(true); // accept code coverage
       return;
     }

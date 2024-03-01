@@ -6,7 +6,8 @@
 
 var server = require('server');
 
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+/* API Includes */
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 /**
  * The ShopPayWebhooks-OrdersCreate controller receives the payload of the Shopify ORDERS_CREATE
@@ -38,7 +39,7 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
                On dev/test environments this is likely not indicative of a true error as it likely would be on a
                production environment.
             */
-            logger.error('[ShopPayWebhooks-OrdersCreate] Order not found for source_identifier ' + payload.source_identifier);
+            Logger.error('[ShopPayWebhooks-OrdersCreate] Order not found for source_identifier ' + payload.source_identifier);
             res.json({});
             return next();
         }
@@ -51,14 +52,14 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
                 placeOrderResult = postProcessingHelpers.placeOrder(order);
             });
             if (placeOrderResult.error) {
-                logger.error('[ShopPayWebhooks-OrdersCreate] Unable to place order ' + order.orderNo);
+                Logger.error('[ShopPayWebhooks-OrdersCreate] Unable to place order ' + order.orderNo);
                 // This order will be reattempted by the Order Reconciliation job
                 res.json({});
                 return next();
             }
         }
     } catch (e) {
-        logger.error('[ShopPayWebhooks-OrdersCreate] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[ShopPayWebhooks-OrdersCreate] error: \n\r' + e.message + '\n\r' + e.stack);
     }
     res.json({
         success: true

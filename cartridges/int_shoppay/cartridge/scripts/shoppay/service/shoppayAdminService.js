@@ -1,8 +1,13 @@
 'use strict';
 
-const serviceName = 'shoppay.api.admin';
-const LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
+/* Script Modules */
 const shoppayServiceHelper = require('*/cartridge/scripts/shoppay/helpers/serviceHelpers');
+
+/* API Includes */
+const LocalServiceRegistry = require('dw/svc/LocalServiceRegistry');
+
+/* Global Variables */
+const serviceName = 'shoppay.api.admin';
 
 /** Creates 'createRequest' callback for a service
  * @param  {dw.svc.Service} service service instance
@@ -19,7 +24,6 @@ function createRequest(service, data) {
     var serviceURL = credential.getURL();
     serviceURL = serviceURL.replace('{store_name}', storeName);
     serviceURL = serviceURL.replace('{admin_api_version}', version);
-    dw.system.Logger.debug('serviceURL = ' + serviceURL);
 
     service.addHeader('Content-Type', 'application/json');
     service.setRequestMethod('POST');

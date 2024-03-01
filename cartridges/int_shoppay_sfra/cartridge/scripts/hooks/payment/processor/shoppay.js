@@ -1,9 +1,12 @@
 'use strict';
 
-var Resource = require('dw/web/Resource');
-var Transaction = require('dw/system/Transaction');
+/* Script Modules */
 var collections = require('*/cartridge/scripts/util/collections');
 var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
+/* API Includes */
+var Resource = require('dw/web/Resource');
+var Transaction = require('dw/system/Transaction');
 
 /**
  * Creates the Shop Pay payment instrument.
@@ -11,10 +14,10 @@ var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
  * @return {Object} an object that contains error information
  */
 function Handle(basket) {
-    var serverErrors = [];
-    var fieldErrors = {};
     var error = false;
+    var fieldErrors = {};
     var paymentInstruments = basket.getPaymentInstruments();
+    var serverErrors = [];
 
     Transaction.wrap(function () {
         collections.forEach(paymentInstruments, function (item) {
@@ -40,11 +43,12 @@ function Handle(basket) {
  * @return {Object} an object that contains error information
  */
 function Authorize(paymentRequest, token, paymentInstrument) {
-    var serverErrors = [];
-    var fieldErrors = {};
     var error = false;
+    var fieldErrors = {};
+    var serverErrors = [];
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
-    var response = storefrontAPI.shopPayPaymentRequestSessionSubmit(paymentRequest, token);
+    var response = storefrontAPI.shoppayPaymentRequestSessionSubmit(paymentRequest, token);
+
     if (!response
         || response.error
         || !response.shopPayPaymentRequestSessionSubmit

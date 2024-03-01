@@ -1,21 +1,23 @@
 'use strict'
 
-var Transaction = require('dw/system/Transaction');
-var collections = require('*/cartridge/scripts/util/collections');
-var common = require('*/cartridge/scripts/shoppay/common');
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
-var BasketMgr = require('dw/order/BasketMgr');
-var ShippingMgr = require('dw/order/ShippingMgr');
+/* Script Modules */
 var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
+var collections = require('*/cartridge/scripts/util/collections');
+var common = require('*/cartridge/scripts/shoppay/shoppayCommon');
 var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
 var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
+
+/* API Includes */
+var BasketMgr = require('dw/order/BasketMgr');
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+var ShippingMgr = require('dw/order/ShippingMgr');
+var Transaction = require('dw/system/Transaction');
 
 /**
  * Ensures that no shipment exists with 0 product line items in the customer's basket.
  * This method differs from the OOTB SFRA ensureNoEmptyShipments only in that it takes in
  * the currentBasket to ensure that in Buy Now situations the temporary basket is checked
  * rather than the standard basket.
- * Kristin TODO: remove this method and call OOTB method instead if Buy Now is not in scope
  * @param {dw.order.LineItemCtnr} currentBasket - the target basket
  * @param {Object} req - the request object needed to access session.privacyCache
  */
@@ -30,8 +32,7 @@ function ensureNoEmptyShipments(currentBasket, req) {
             shipment = iter.next();
             if (shipment.productLineItems.length < 1 && shipmentsToDelete.indexOf(shipment) < 0) {
                 if (shipment.default) {
-                    // Cant delete the defaultShipment
-                    // Copy all line items from 2nd to first
+                    // Cant delete the defaultShipment. Copy all line items from 2nd to first
                     var altShipment = COHelpers.getFirstNonDefaultShipmentWithProductLineItems(currentBasket);
                     if (!altShipment) return;
 
@@ -104,7 +105,7 @@ function validatePaymentRequest(clientRequest, serverRequest) {
         }
         return common.matchObjects(clientRequest, serverRequest);
     } catch (e) {
-        logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
     }
     return false;
 }
@@ -222,7 +223,7 @@ function addProductToTempBasket(product, basket) {
             pli.setQuantityValue(quantity);
         });
     } catch (e) {
-        dw.system.Logger.error(e.message);
+        Logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return {
             error: true,
             errorMsg: e.message
@@ -237,9 +238,9 @@ function addProductToTempBasket(product, basket) {
 function getBuyNowData(product) {
     // Create a temporary basket for payment request options calculation
     var basket = Transaction.wrap(createBuyNowBasket);
-    var shippingMethod = ShippingMgr.defaultShippingMethod;
     var paymentRequest;
     var result = addProductToTempBasket(product, basket);
+    var shippingMethod = ShippingMgr.defaultShippingMethod;
 
     Transaction.wrap(function () {
         try {
@@ -250,8 +251,7 @@ function getBuyNowData(product) {
             basketCalculationHelpers.calculateTotals(basket);
             paymentRequest = new PaymentRequestModel(basket);
         } catch (e) {
-            var test = e;
-            dw.system.Logger.error(e.message);
+            Logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
         } finally {
             // Delete temporary basket after calculation
             BasketMgr.deleteTemporaryBasket(basket);
@@ -262,12 +262,12 @@ function getBuyNowData(product) {
 
 
 module.exports = {
-    validatePaymentRequest: validatePaymentRequest,
-    ensureNoEmptyShipments: ensureNoEmptyShipments,
-    validateShippingMethods: validateShippingMethods,
-    handleBillingAddress: handleBillingAddress,
-    failOrder: failOrder,
     addProductToTempBasket: addProductToTempBasket,
     createBuyNowBasket: createBuyNowBasket,
-    getBuyNowData: getBuyNowData
+    ensureNoEmptyShipments: ensureNoEmptyShipments,
+    failOrder: failOrder,
+    getBuyNowData: getBuyNowData,
+    handleBillingAddress: handleBillingAddress,
+    validatePaymentRequest: validatePaymentRequest,
+    validateShippingMethods: validateShippingMethods
 }
