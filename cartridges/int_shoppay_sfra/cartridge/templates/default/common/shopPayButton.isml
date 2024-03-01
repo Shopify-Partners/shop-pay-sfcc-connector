@@ -1,7 +1,7 @@
 <isscript>
     var assets = require('*/cartridge/scripts/assets.js');
     assets.addJs('/js/cart/initShopPayCart.js');
-    if(pdict.intABTest) {
+    if(pdict.initShopPayABTest) {
         assets.addJs('/js/initABTest.js');
     }
 </isscript>
