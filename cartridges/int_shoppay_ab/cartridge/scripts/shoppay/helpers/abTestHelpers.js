@@ -80,8 +80,8 @@ function decodeString(str) {
 
 
 module.exports = {
-    getAssignmentGroup: getAssignmentGroup,
     createShopPayABCookie: createShopPayABCookie,
+    decodeString: decodeString,
     encodeObject: encodeObject,
-    decodeString: decodeString
+    getAssignmentGroup: getAssignmentGroup
 }

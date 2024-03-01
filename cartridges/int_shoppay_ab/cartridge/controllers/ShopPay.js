@@ -5,9 +5,14 @@ const server = require('server');
 
 server.extend(page);
 
+/* Middleware */
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
-var StringUtils = require('dw/util/StringUtils');
+
+/* Script Modules */
 var abTestHelpers = require('*/cartridge/scripts/shoppay/helpers/abTestHelpers');
+
+/* API Includes */
+var StringUtils = require('dw/util/StringUtils');
 
 server.append('BeginSession', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
     var shoppayABCookie = request.httpCookies['shoppayAB'];

@@ -6,7 +6,7 @@ $(document).ready(function () {
         const abCookieJSON = helper.parseABTestCookie();
 
         if(abCookieJSON && (!abCookieJSON.isAssigned || !abCookieJSON.isStarted)) {
-            const {subjectId, assignmentGroup} = abCookieJSON;
+            const { subjectId, assignmentGroup } = abCookieJSON;
 
             if(!abCookieJSON.isAssigned) {
                 // Send the assignment event
@@ -34,8 +34,9 @@ $(document).ready(function () {
                 abCookieJSON['isStarted'] = true;
             }
 
-            //btoa encodes the string to base64 to ensure the cookie JSON string keeps
-            // the correct struture
+            /*  btoa encodes the string to base64 to ensure the cookie JSON string keeps
+                the correct structure
+            */
             helper.setCookie('shoppayAB', btoa(JSON.stringify(abCookieJSON), 90));
         }
     }

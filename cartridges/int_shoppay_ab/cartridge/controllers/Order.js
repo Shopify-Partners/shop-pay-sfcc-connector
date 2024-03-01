@@ -5,11 +5,15 @@ const server = require('server');
 
 server.extend(page);
 
-var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
+/* Middleware */
 var consentTracking = require('*/cartridge/scripts/middleware/consentTracking');
-var BasketMgr = require('dw/order/BasketMgr');
+var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 
+/* Script Modules */
 const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
+/* API Includes */
+var BasketMgr = require('dw/order/BasketMgr');
 
 server.append('Confirm',
     consentTracking.consent,

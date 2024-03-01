@@ -13,12 +13,12 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 var abTestHelpers = require('*/cartridge/scripts/shoppay/helpers/abTestHelpers');
 
 server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
+    var activeABTest;
+    var activeAssignmentGroup;
     var currentBasket = BasketMgr.getCurrentBasket();
     var shoppayABCookie = request.httpCookies['shoppayAB'];
     var shoppayApplicable = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);
     var viewData = res.getViewData();
-    var activeABTest;
-    var activeAssignmentGroup;
 
     //If there is no cookie create it else do nothing
     if(!shoppayABCookie || shoppayABCookie.value === '{}') {
