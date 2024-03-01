@@ -208,7 +208,7 @@ exports.MaintainWebhookSubscriptions = function(params, stepExecution) {
             }
         }
     } catch (e) {
-        logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
     return new Status(Status.OK);

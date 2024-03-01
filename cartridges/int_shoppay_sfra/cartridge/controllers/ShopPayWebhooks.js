@@ -52,7 +52,7 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
                 placeOrderResult = postProcessingHelpers.placeOrder(order);
             });
             if (placeOrderResult.error) {
-                logger.error('[ShopPayWebhooks-OrdersCreate] Unable to place order ' + order.orderNo);
+                Logger.error('[ShopPayWebhooks-OrdersCreate] Unable to place order ' + order.orderNo);
                 // This order will be reattempted by the Order Reconciliation job
                 res.json({});
                 return next();

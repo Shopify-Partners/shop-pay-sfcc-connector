@@ -187,7 +187,7 @@ function getWebhooksList() {
     var responseHeaders = shoppayAdminService.client.responseHeaders;
     var shopifyRequestID = responseHeaders.get('X-Request-ID');
     if (shopifyRequestID && shopifyRequestID.length > 0) {
-        logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
+        Logger.info('X-Request-ID: {0}', shopifyRequestID[0]);
     }
 
     if (!response.ok
