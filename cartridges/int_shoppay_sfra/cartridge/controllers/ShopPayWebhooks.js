@@ -44,7 +44,7 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
             return next();
         }
         // Webhooks can sometimes be received more than once. Ensure payload has not already been handled.
-        if (order.status === Order.ORDER_STATUS_CREATED) {
+        if (order.status.value === Order.ORDER_STATUS_CREATED) {
             Transaction.wrap(function() {
                 postProcessingHelpers.setOrderCustomAttributes(order, payload);
                 postProcessingHelpers.handleBillingInfo(order, payload);
