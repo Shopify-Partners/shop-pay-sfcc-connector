@@ -1,3 +1,4 @@
+<iscomment>BEGIN SHOPPAY</iscomment>
 <style>
     .pdp-actions--shoppay-atc {
         text-align: -webkit-center;
@@ -8,6 +9,7 @@
         }
     }
 </style>
+<iscomment>END SHOPPAY</iscomment>
 
 <div class="row cart-and-ipay  ${pdict.includeShopPayJS ? 'pdp-actions--shoppay-atc' : ''}">
     <div class="col-sm-12">
