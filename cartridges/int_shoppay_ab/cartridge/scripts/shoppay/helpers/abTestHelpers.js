@@ -1,6 +1,9 @@
+/* API Includes */
 var ABTestMgr = require('dw/campaign/ABTestMgr');
 var Cookie = require('dw/web/Cookie');
 var StringUtils = require('dw/util/StringUtils');
+
+/* Global Variables */
 var abTests = ['shoppayAA', 'shoppayAB'];
 var segmentTypes = ['Control', 'Treatment'];
 

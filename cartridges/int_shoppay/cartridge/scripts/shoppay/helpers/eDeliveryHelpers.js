@@ -34,7 +34,7 @@ function isEDeliveryShippingMethod(shippingMethod) {
 }
 
 module.exports = {
-    isEDeliveryItem: isEDeliveryItem,
     getEDeliveryItems: getEDeliveryItems,
+    isEDeliveryItem: isEDeliveryItem,
     isEDeliveryShippingMethod: isEDeliveryShippingMethod
 };

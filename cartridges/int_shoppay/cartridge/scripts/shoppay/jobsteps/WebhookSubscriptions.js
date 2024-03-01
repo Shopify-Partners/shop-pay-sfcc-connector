@@ -1,12 +1,15 @@
 'use strict'
 
+/* Script Modules */
+var adminAPI = require('*/cartridge/scripts/shoppay/adminAPI');
+
+/* API Includes */
 var CustomObjectMgr = require('dw/object/CustomObjectMgr');
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var Status = require('dw/system/Status');
 var URLUtils = require('dw/web/URLUtils');
 
-var adminAPI = require('*/cartridge/scripts/shoppay/adminAPI');
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
-
+/* Global Variables */
 const callbackEndpoints = {
     "ORDERS_CREATE": URLUtils.https('ShopPayWebhooks-OrdersCreate').toString()
 };
@@ -128,7 +131,7 @@ exports.Subscribe = function(params, stepExecution) {
         }
         setSubscriptionObjectData(webhookObj, webhookData);
     } catch (e) {
-        logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
 
@@ -165,7 +168,7 @@ exports.Unsubscribe = function(params, stepExecution) {
             CustomObjectMgr.remove(webhookObj);
         }
     } catch (e) {
-        logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
 
@@ -205,7 +208,7 @@ exports.MaintainWebhookSubscriptions = function(params, stepExecution) {
             }
         }
     } catch (e) {
-        logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[WebhookSubscriptions.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
     return new Status(Status.OK);

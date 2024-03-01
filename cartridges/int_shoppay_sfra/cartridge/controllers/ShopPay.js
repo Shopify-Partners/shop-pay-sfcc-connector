@@ -6,13 +6,23 @@
 
 var server = require('server');
 
+/* Middleware */
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
-var Resource = require('dw/web/Resource');
-var Transaction = require('dw/system/Transaction');
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
-var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
+/* Script Modules */
 var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
 var collections = require('*/cartridge/scripts/util/collections');
+var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
+var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
+var shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
+/* API Includes */
+var BasketMgr = require('dw/order/BasketMgr');
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
+var Resource = require('dw/web/Resource');
+var Transaction = require('dw/system/Transaction');
+var URLUtils = require('dw/web/URLUtils');
 
 function validateInputs(req, currentBasket, inputParams) {
     if (!currentBasket
@@ -76,8 +86,6 @@ function validateInputs(req, currentBasket, inputParams) {
  * @param {serverfunction} - get
  */
 server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var BasketMgr = require('dw/order/BasketMgr');
-    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
     var currentBasket;
     var httpParameterMap = req.httpParameterMap;
     if (req.httpParameterMap.basketId && req.httpParameterMap.basketId.value) {
@@ -100,7 +108,7 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
     try {
         var paymentRequestModel = new PaymentRequestModel(currentBasket);
     } catch (e) {
-        logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[ShopPay-GetCartSummary] error: \n\r' + e.message + '\n\r' + e.stack);
         res.json({
             error: true,
             errorMsg: e.message,
@@ -125,7 +133,6 @@ server.get('GetCartSummary', server.middleware.https, csrfProtection.validateAja
  * @memberOf ShopPay
  */
 server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
     var product = JSON.parse(req.body);
     var buyNowPaymentRequest = shoppayCheckoutHelpers.getBuyNowData(product);
 
@@ -145,27 +152,14 @@ server.post('BuyNowData', server.middleware.https, csrfProtection.validateAjaxRe
  * @memberOf ShopPay
  */
 server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var BasketMgr = require('dw/order/BasketMgr');
-    var ProductMgr = require('dw/catalog/ProductMgr');
-    var ShippingMgr = require('dw/order/ShippingMgr');
-    var Transaction = require('dw/system/Transaction');
-
-    var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
-    var cartHelper = require('*/cartridge/scripts/cart/cartHelpers');
-    var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
-    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
-    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
-    var paymentRequestModel;
-    var currentBasket;
-
-    var product = JSON.parse(req.body);
-
     var basket = Transaction.wrap(shoppayCheckoutHelpers.createBuyNowBasket);
-    var shippingMethod = ShippingMgr.defaultShippingMethod;
-
+    var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
+    var currentBasket;
     var paymentRequestModel;
+    var product = JSON.parse(req.body);
     var result = shoppayCheckoutHelpers.addProductToTempBasket(product, basket);
+    var ShippingMgr = require('dw/order/ShippingMgr');
+    var shippingMethod = ShippingMgr.defaultShippingMethod;
 
     if (result.error) {
         Transaction.wrap(function() {
@@ -200,7 +194,7 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
     try {
         paymentRequestModel = new PaymentRequestModel(basket);
     } catch (e) {
-        logger.error('[ShopPay-PrepareBasket] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[ShopPay-PrepareBasket] error: \n\r' + e.message + '\n\r' + e.stack);
         res.json({
             error: true,
             errorMsg: e.message,
@@ -232,7 +226,6 @@ server.post('PrepareBasket', server.middleware.https, csrfProtection.validateAja
  * @param {serverfunction} - post
  */
 server.post('BeginSession', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var BasketMgr = require('dw/order/BasketMgr');
     var currentBasket;
     var inputs = JSON.parse(req.body);
 
@@ -252,14 +245,14 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
     }
 
     var paymentRequest = inputs.paymentRequest;
-
     var storefrontAPI = require('*/cartridge/scripts/shoppay/storefrontAPI');
-    var response = storefrontAPI.shopPayPaymentRequestSessionCreate(currentBasket, paymentRequest);
-    if (!response
-        || response.error
-        || !response.shopPayPaymentRequestSessionCreate
-        || response.shopPayPaymentRequestSessionCreate.userErrors.length > 0
-        || response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession == null
+    var result = storefrontAPI.shoppayPaymentRequestSessionCreate(currentBasket, paymentRequest);
+
+    if (!result
+        || result.error
+        || !result.shopPayPaymentRequestSessionCreate
+        || result.shopPayPaymentRequestSessionCreate.userErrors.length > 0
+        || result.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession == null
     ) {
         res.json({
             error: true,
@@ -267,7 +260,7 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
         });
         return next();
     }
-    var paymentRequestSession = response.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession;
+    var paymentRequestSession = result.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession;
 
     res.json({
         error: false,
@@ -292,12 +285,9 @@ server.post('BeginSession', server.middleware.https, csrfProtection.validateAjax
  * @param {serverfunction} - post
  */
 server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var URLUtils = require('dw/web/URLUtils');
-    var BasketMgr = require('dw/order/BasketMgr');
-    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    var PromotionMgr = require('dw/campaign/PromotionMgr');
     var currentBasket;
     var data = JSON.parse(req.body);
+    var PromotionMgr = require('dw/campaign/PromotionMgr');
 
     if (data.basketId) {
         currentBasket = BasketMgr.getTemporaryBasket(data.basketId);
@@ -319,7 +309,7 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
     var discountCodesToRemove = [];
 
     collections.forEach(currentBasket.couponLineItems, function (item) {
-        /*  If coupon code is valid and succesfully added, but NO_APPLICABLE_PROMOTION, don't remove it. The Shop Pay
+        /*  If coupon code is valid and successfully added, but NO_APPLICABLE_PROMOTION, don't remove it. The Shop Pay
             modal won't know about these promotions, but if the customer closes the modal and returns to cart, the
             cart should still show the coupon has been added but "not applied". Similar text/flagging is not
             supported in the Shop Pay modal. */
@@ -424,9 +414,6 @@ server.post('DiscountCodeChanged', server.middleware.https, csrfProtection.valid
  * @param {serverfunction} - post
  */
 server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var BasketMgr = require('dw/order/BasketMgr');
-    var Transaction = require('dw/system/Transaction');
-    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
     var currentBasket;
     var data = JSON.parse(req.body);
 
@@ -500,7 +487,7 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
 });
 
 /**
- * The ShopPay-DeliveryMethodChanged controller updates current basket with the selected dilevery method form ShopPay event
+ * The ShopPay-DeliveryMethodChanged controller updates current basket with the selected delivery method form ShopPay event
  * listener event.
  * @name Base/ShopPay-DeliveryMethodChanged
  * @function
@@ -512,16 +499,10 @@ server.post('ShippingAddressChanged', server.middleware.https, csrfProtection.va
  * @param {serverfunction} - post
  */
 server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var BasketMgr = require('dw/order/BasketMgr');
-    var SalesforcePaymentRequest = require('dw/extensions/payments/SalesforcePaymentRequest');
-    var Transaction = require('dw/system/Transaction');
-    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    var currentBasket;
     var array = require('*/cartridge/scripts/util/array');
-    var shippingHelpers = require('*/cartridge/scripts/checkout/shippingHelpers');
-
+    var currentBasket;
     var data = JSON.parse(req.body);
-
+    var SalesforcePaymentRequest = require('dw/extensions/payments/SalesforcePaymentRequest');
 
     if (data.basketId) {
         currentBasket = BasketMgr.getTemporaryBasket(data.basketId);
@@ -593,17 +574,13 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
  * @param {serverfunction} - post
  */
 server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAjaxRequest, function (req, res, next) {
-    var URLUtils = require('dw/web/URLUtils');
-    var BasketMgr = require('dw/order/BasketMgr');
+    var currentBasket;
     var HookMgr = require('dw/system/HookMgr');
+    var hooksHelper = require('*/cartridge/scripts/helpers/hooks');
+    var inputs = JSON.parse(req.body);
     var OrderMgr = require('dw/order/OrderMgr');
     var PaymentMgr = require('dw/order/PaymentMgr');
-    var hooksHelper = require('*/cartridge/scripts/helpers/hooks');
-    var PaymentRequestModel = require('*/cartridge/models/paymentRequest');
-    var shoppayCheckoutHelpers = require('*/cartridge/scripts/shoppay/helpers/shoppayCheckoutHelpers');
     var validationHelpers = require('*/cartridge/scripts/helpers/basketValidationHelpers');
-    var currentBasket;
-    var inputs = JSON.parse(req.body);
 
     if (inputs.basketId) {
         currentBasket = BasketMgr.getTemporaryBasket(inputs.basketId);
@@ -681,7 +658,7 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
         return next();
     }
 
-    // Creates a new order.
+    // Creates a new order
     var order = COHelpers.createOrder(currentBasket);
     if (!order) {
         res.json({
@@ -738,7 +715,7 @@ server.post('SubmitPayment', server.middleware.https, csrfProtection.validateAja
     if (fraudDetectionStatus.status === 'fail') {
         shoppayCheckoutHelpers.failOrder(order);
 
-        // fraud detection failed
+        // Fraud detection failed
         req.session.privacyCache.set('fraudDetectionStatus', true);
         res.json({
             error: true,

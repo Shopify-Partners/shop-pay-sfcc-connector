@@ -13,14 +13,14 @@
                 "parameter": [{
                     "@name": "MaxOrderAgeHrs",
                     "description": "Maximum age (in hours) of orders to process",
-                    "@type": "double",
+                    "@type": "long",
                     "@required": "false",
                     "min-value": 1
                 },
                 {
                     "@name": "MinOrderAgeSecs",
                     "description": "Minimum age (in seconds) of orders to process",
-                    "@type": "double",
+                    "@type": "long",
                     "@required": "true",
                     "min-value": 0
                 }]

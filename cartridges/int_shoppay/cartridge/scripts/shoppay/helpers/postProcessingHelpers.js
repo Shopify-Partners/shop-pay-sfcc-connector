@@ -1,10 +1,10 @@
 'use strict'
 
+/* API Includes */
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var Order = require('dw/order/Order');
 var OrderMgr = require('dw/order/OrderMgr');
 var Status = require('dw/system/Status');
-
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 
 /* ORDERS_CREATE payload uses underscores (snake case) while GraphQL response uses camel case. This
    object maps the attributes for both payload types to the appropriate SFCC billing address attribute. */
@@ -99,7 +99,7 @@ var placeOrder = function(order) {
         order.setExportStatus(Order.EXPORT_STATUS_READY);
     } catch (e) {
         result.error = true;
-        logger.error('[postProcessingHelpers.js] error: \n\r' + e.message + '\n\r' + (e.stack ? e.stack : ''));
+        Logger.error('[postProcessingHelpers.js] error: \n\r' + e.message + '\n\r' + (e.stack ? e.stack : ''));
     }
 
     return result;
@@ -107,6 +107,6 @@ var placeOrder = function(order) {
 
 module.exports = {
     handleBillingInfo: handleBillingInfo,
-    setOrderCustomAttributes: setOrderCustomAttributes,
-    placeOrder: placeOrder
+    placeOrder: placeOrder,
+    setOrderCustomAttributes: setOrderCustomAttributes
 }

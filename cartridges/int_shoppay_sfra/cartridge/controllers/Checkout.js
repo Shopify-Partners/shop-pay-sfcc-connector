@@ -5,14 +5,15 @@ const server = require('server');
 
 server.extend(page);
 
+/* Middleware */
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
-var BasketMgr = require('dw/order/BasketMgr');
 
+/* Script Modules */
 const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 
-/**
- * Kristin TODO: Build out and reference conditional logic helper script to set the value of includeShopPayJS
- */
+/* API Includes */
+var BasketMgr = require('dw/order/BasketMgr');
+
 server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
     var currentBasket = BasketMgr.getCurrentBasket();
     var shoppayApplicable = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);
