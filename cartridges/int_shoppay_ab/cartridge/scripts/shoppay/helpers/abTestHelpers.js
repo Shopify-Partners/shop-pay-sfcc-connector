@@ -28,7 +28,7 @@ function getAssignmentGroup(shoppayApplicable) {
         });
     }
 
-    return {abTest: activeABTest, assignmentGroup: activeSegment};
+    return { abTest: activeABTest, assignmentGroup: activeSegment };
 }
 
 /**
@@ -39,8 +39,9 @@ function getAssignmentGroup(shoppayApplicable) {
 function createCookie(cname, cvalue) {
     var cookie = new Cookie(
         cname,
-        //the string is encoded to base64 to ensure the cookie JSON string keeps
-        // the correct struture
+        /*  the string is encoded to base64 to ensure the cookie JSON string keeps
+            the correct structure
+        */
         encodeObject(cvalue)
     );
     //set cookie to expire in 90 days

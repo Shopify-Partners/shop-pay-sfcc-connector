@@ -8,13 +8,12 @@
 
 <style>
     shop-pay-payment-request-button {
-        --shop-pay-button-width: 100%; 
+        --shop-pay-button-width: 100%;
         --shop-pay-button-height: 40px;
         --shop-pay-button-border-radius: 0.1875rem;
     }
 
     .shoppayButtonContainer {
-        feature/SSPSC-50-Track-Checkout-Events
         padding: 0 !important;
     }
 </style>
