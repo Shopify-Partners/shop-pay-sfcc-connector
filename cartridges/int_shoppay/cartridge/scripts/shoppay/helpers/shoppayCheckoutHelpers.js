@@ -223,7 +223,7 @@ function addProductToTempBasket(product, basket) {
             pli.setQuantityValue(quantity);
         });
     } catch (e) {
-        Logger.error(e.message);
+        Logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return {
             error: true,
             errorMsg: e.message
@@ -251,7 +251,7 @@ function getBuyNowData(product) {
             basketCalculationHelpers.calculateTotals(basket);
             paymentRequest = new PaymentRequestModel(basket);
         } catch (e) {
-            Logger.error(e.message);
+            Logger.error('[shoppayCheckoutHelpers.js] error: \n\r' + e.message + '\n\r' + e.stack);
         } finally {
             // Delete temporary basket after calculation
             BasketMgr.deleteTemporaryBasket(basket);
