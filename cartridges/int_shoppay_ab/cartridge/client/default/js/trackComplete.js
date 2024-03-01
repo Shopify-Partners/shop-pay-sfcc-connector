@@ -13,7 +13,7 @@ $(document).ready(function () {
             const trackObject = {
                 subjectId: subjectId,
                 shopPayToken: abCookieJSON.st || null,
-                action: 'checkout-begin',
+                action: 'checkout-complete',
                 totalPrice: totalPrice, // The total price of the order in cents
                 timestamp: new Date().toISOString()
             };
