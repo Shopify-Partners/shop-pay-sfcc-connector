@@ -1,13 +1,16 @@
 'use strict'
 
+/* Script Modules */
+var adminAPI = require('*/cartridge/scripts/shoppay/adminAPI');
+var postProcessingHelpers = require('*/cartridge/scripts/shoppay/helpers/postProcessingHelpers');
+
+/* API Includes */
+var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
 var Order = require('dw/order/Order');
 var OrderMgr = require('dw/order/OrderMgr');
 var Status = require('dw/system/Status');
 
-var adminAPI = require('*/cartridge/scripts/shoppay/adminAPI');
-var logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
-var postProcessingHelpers = require('*/cartridge/scripts/shoppay/helpers/postProcessingHelpers');
-
+/* Global Variables */
 var orderCount;
 var successCount;
 
@@ -22,7 +25,7 @@ function processOrder(order) {
     var sourceIdentifier = order.custom.shoppaySourceIdentifier;
     var response = adminAPI.getOrderBySourceIdentifier(sourceIdentifier);
     if (response.error || response.orders.edges.length == 0) {
-        logger.error('[OrderReconciliation.js] Shopify order not found for SFCC order ' + order.orderNo);
+        Logger.error('[OrderReconciliation.js] Shopify order not found for SFCC order ' + order.orderNo);
         // This order will be reattempted on next run
         return;
     }
@@ -31,8 +34,9 @@ function processOrder(order) {
     postProcessingHelpers.setOrderCustomAttributes(order, node);
     postProcessingHelpers.handleBillingInfo(order, node);
     var placeOrderResult = postProcessingHelpers.placeOrder(order);
+
     if (placeOrderResult.error) {
-        logger.error('[OrderReconciliation.js] Unable to place order ' + order.orderNo);
+        Logger.error('[OrderReconciliation.js] Unable to place order ' + order.orderNo);
         // This order will be reattempted on next run
         return;
     }
@@ -63,7 +67,7 @@ exports.Run = function(params, stepExecution) {
         if (orders) {
             orders.close();
         }
-        logger.error('[OrderReconciliation.js] error: \n\r' + e.message + '\n\r' + e.stack);
+        Logger.error('[OrderReconciliation.js] error: \n\r' + e.message + '\n\r' + e.stack);
         return new Status(Status.ERROR, 'ERROR', 'Exception thrown: ' + e.message);
     }
 

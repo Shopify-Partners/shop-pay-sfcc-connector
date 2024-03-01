@@ -1,5 +1,5 @@
+<iscomment>BEGIN SHOPPAY</iscomment>
 <style>
- /* TODO: solidify & rework before final delivery. These are Placeholder styles. Any styles developed during this ticket likely to be moved into scss file within cartridge.  */
     .pdp-actions--shoppay-atc {
         text-align: -webkit-center;
 
@@ -9,6 +9,7 @@
         }
     }
 </style>
+<iscomment>END SHOPPAY</iscomment>
 
 <div class="row cart-and-ipay  ${pdict.includeShopPayJS ? 'pdp-actions--shoppay-atc' : ''}">
     <div class="col-sm-12">
@@ -29,7 +30,7 @@
     <iscomment>BEGIN SHOPPAY (PRODUCT BUNDLES)</iscomment>
     <isif condition="${pdict.includeShopPayJS && (pdict.product.productType === 'bundle')}">
         <div class="col-sm-12">
-            <isinclude template="common/shopPayButton" />
+            <isinclude template="common/shoppayButton" />
         </div>
     </isif>
     <iscomment>END SHOPPAY</iscomment>

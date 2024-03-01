@@ -4,7 +4,7 @@
     </div>
     <div class="card-body">
         <isif condition="${pdict.includeShopPayJS}">
-            <isinclude template="common/shopPayButton" />
+            <isinclude template="common/shoppayButton" />
         </isif>
     </div>
 </div>

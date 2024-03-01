@@ -10,7 +10,7 @@
         --shop-pay-button-border-radius: 0.1875rem;
     }
 
-    .shopPayButtonContainer {
+    .shoppayButtonContainer {
         padding: 0 !important;
     }
 </style>
@@ -22,5 +22,5 @@
     data-ready-to-order="${pdict.product ? pdict.product.readyToOrder : true}"
     data-buy-now-init="${pdict.buyNowInitData}"
     >
-    <div id="shop-pay-button-container" class="${pdict.action === 'Product-Show' ? 'btn col-sm-8 shopPayButtonContainer' : 'btn col-sm-12 shopPayButtonContainer'}"></div>
+    <div id="shop-pay-button-container" class="${pdict.action === 'Product-Show' ? 'btn col-sm-8 shoppayButtonContainer' : 'btn col-sm-12 shoppayButtonContainer'}"></div>
 </div>

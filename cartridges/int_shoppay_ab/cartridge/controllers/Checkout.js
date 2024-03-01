@@ -5,12 +5,17 @@ const server = require('server');
 
 server.extend(page);
 
+/* Middleware */
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
+
+/* Script Modules */
+var abTestHelpers = require('*/cartridge/scripts/shoppay/helpers/abTestHelpers');
+const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
+/* API Includes */
 var BasketMgr = require('dw/order/BasketMgr');
 var Cookie = require('dw/web/Cookie');
 
-const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
-var abTestHelpers = require('*/cartridge/scripts/shoppay/helpers/abTestHelpers');
 
 server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
     var currentBasket = BasketMgr.getCurrentBasket();

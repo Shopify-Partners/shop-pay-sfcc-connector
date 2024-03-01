@@ -1,7 +1,7 @@
+/* Global Variables */
 const helper = require('../helpers/shoppayHelper');
-
-let session;
 const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
+let session;
 
 $(document).ready(function () {
     if(window.ShopPay) {
@@ -17,10 +17,11 @@ $(document).ready(function () {
             helper.setInitProductData(pageLoadData); // updates global prod data.
         }
 
-        /*
-        The below code triggers if a product is a Buy Now item, but is not ready to order on page load (ex: required product attributes like color or size are not yet chosen).
-        Here, a watcher is set to capture user interactions when product attributes are selected.
-        Helper scripts will be triggered by these interactions to determine if the item is ready to order when all required attributes are selected.
+        /*  The below code triggers if a product is a Buy Now item, but is not ready to order on page load
+            (ex: required product attributes like color or size are not yet chosen). Here, a watcher is set
+            to capture user interactions when product attributes are selected. Helper scripts will be triggered
+            by these interactions to determine if the item is ready to order when all required attributes are
+            selected.
         */
         if (isBuyNow && !readyOnPageLoad) {
             $('body').on('product:afterAttributeSelect', initBuyNow); // receives the Event & Response
@@ -43,7 +44,7 @@ function initShopPayButton() {
 
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton({buyWith: isBuyNow}).render(paymentSelector);
-    helper.shopPayMutationObserver(paymentSelector);
+    helper.shoppayMutationObserver(paymentSelector);
 }
 
 
@@ -69,13 +70,12 @@ function initBuyNow(e, response) {
 function initShopPayEmailRecognition() {
     initShopPayConfig();
 
-    /*
-    If your checkout is not built with SFRA or you have customized and removed the 'email-guest'
-    id on the email input you will need to update the id value for emailInputId
+    /*  If your checkout is not built with SFRA or you have customized and removed the 'email-guest'
+        id on the email input you will need to update the id value for emailInputId
 
-    Note: A 1.5 second delay has been added before attaching to the email trigger to the email field to
-    accommodate users who may have incorporated browser autofills. The pop-up will appear if the field
-    is autofilled with a recognized email address
+        Note: A 1.5 second delay has been added before attaching to the email trigger to the email field to
+        accommodate users who may have incorporated browser autofills. The pop-up will appear if the field
+        is autofilled with a recognized email address
     */
     setTimeout(function() {
         window.ShopPay.PaymentRequest.createLogin({emailInputId: 'email-guest'})
@@ -84,17 +84,18 @@ function initShopPayEmailRecognition() {
 }
 
 $('body').on('cart:update product:afterAddToCart promotion:success', function () {
-    /* Only interested in cart updates on Cart page (cart updates are not triggered in checkout). Buy Now already
-    has a separate event handler for changes to attribute selections */
+    /*  Only interested in cart updates on Cart page (cart updates are not triggered in checkout). Buy Now already
+        has a separate event handler for changes to attribute selections
+    */
     if (window.ShopPay && !isBuyNow) {
         if (!session) {
             session = initShopPaySession();
         } else {
-            const paymentRequestResponse = buildPaymentRequest();
+            const paymentRequestResponse = helper.buildPaymentRequest(session);
             const responseJSON =  paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
 
             if (responseJSON) {
-                helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"));
+                helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"));
             }
 
             if (responseJSON && !responseJSON.error && responseJSON.paymentRequest !== null) {
@@ -118,28 +119,31 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
         if (productData) {
             paymentRequestResponse = helper.createResponse(productData, window.shoppayClientRefs.urls.BuyNowData);
             if (paymentRequestResponse.exception || paymentRequestResponse.error){
-                // No need to close any session because a session does not exist at this point (has not yet been initiated).
-                // Return to exit function - don't reload the page in case there is a page rendering issue (will result in infinite reload loop).
+                /*  No need to close any session because a session does not exist at this point (has not yet been
+                    initiated). Return to exit function - don't reload the page in case there is a page rendering
+                    issue (will result in infinite reload loop).
+                */
                 return;
             }
             paymentRequest = paymentRequestResponse.paymentRequest;
             responseJSON = paymentRequestResponse ? paymentRequestResponse : null;
         }
     } else {
-        paymentRequest = buildPaymentRequest();
-        responseJSON = paymentRequest ? paymentRequest.responseJSON : null;
+        paymentRequestResponse = helper.buildPaymentRequest(session);
+        responseJSON = paymentRequestResponse ? paymentRequestResponse.responseJSON : null;
     }
 
     if (paymentRequest || (responseJSON && !responseJSON.error)) {
         const initialPaymentRequest = responseJSON && responseJSON.paymentRequest ? window.ShopPay.PaymentRequest.build(responseJSON.paymentRequest) : window.ShopPay.PaymentRequest.build(paymentRequest);
-        helper.shopPayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder); // Enable BuyNow Button Click on PDP if Product is Ready To Order
+        // Enable BuyNow Button Click on PDP if Product is Ready To Order
+        helper.shoppayBtnDisabledStyle(document.getElementById("shop-pay-button-container"), readyToOrder);
 
-        let shopPaySession = window.ShopPay.PaymentRequest.createSession({
+        let shoppaySession = window.ShopPay.PaymentRequest.createSession({
             paymentRequest: initialPaymentRequest
         });
 
-        if (shopPaySession) {
-            helper.setSessionListeners(shopPaySession);
+        if (shoppaySession) {
+            helper.setSessionListeners(shoppaySession);
             $('body').off('product:afterAttributeSelect', initBuyNow);
 
             $('body').on('product:afterAttributeSelect', function(e, response) {
@@ -150,14 +154,14 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         quantity: responseProduct.selectedQuantity,
                         options: responseProduct.options
                     });
-                    if (shopPaySession) {
-                        shopPaySession.close();
+                    if (shoppaySession) {
+                        shoppaySession.close();
                         let updatedPaymentRequest = window.ShopPay.PaymentRequest.build(responseProduct.buyNow);
-                        shopPaySession = window.ShopPay.PaymentRequest.createSession({
+                        shoppaySession = window.ShopPay.PaymentRequest.createSession({
                             paymentRequest: updatedPaymentRequest
                         });
 
-                        helper.setSessionListeners(shopPaySession);
+                        helper.setSessionListeners(shoppaySession);
                     }
 
                 } else {
@@ -168,20 +172,21 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
                         async: false,
                         success: function (data) {
                             if (!data.error) {
-                                if (shopPaySession) {
-                                    shopPaySession.close();
+                                if (shoppaySession) {
+                                    shoppaySession.close();
                                 }
                                 let paymentRequest = window.ShopPay.PaymentRequest.build(response.product.buyNow);
-                                shopPaySession = window.ShopPay.PaymentRequest.createSession({
+                                shoppaySession = window.ShopPay.PaymentRequest.createSession({
                                     paymentRequest: paymentRequest
                                 });
-                                helper.setSessionListeners(shopPaySession);
+                                helper.setSessionListeners(shoppaySession);
                             }
                         },
                         error: function (err) {
                             if (err.responseJSON || err.status !== 200) {
                                 session.close();
-                                window.location.reload()
+                                // modal hasn't opened yet so "windowclosed" listener won't fire
+                                window.location.reload();
                                 return;
                             }
                         }
@@ -190,29 +195,10 @@ function initShopPaySession(paymentRequestInput, readyToOrder) {
             });
         }
 
-        return shopPaySession;
+        return shoppaySession;
     }
 }
 
-/**
- * Handles AJAX call to get the payment response.
- * @returns {Object} paymentResponse - an response object.
- */
-function buildPaymentRequest () {
-    let token = document.querySelector('[data-csrf-token]');
-    if (token) {
-        const paymentResponse = $.ajax({
-            url: helper.getUrlWithCsrfToken(window.shoppayClientRefs.urls.GetCartSummary),
-            type: 'GET',
-            contentType: 'application/json',
-            async: false
-        }) || {};
-
-        return paymentResponse;
-    } else {
-        session.close();
-    }
-}
 
 module.exports = {
     initShopPaySession: initShopPaySession

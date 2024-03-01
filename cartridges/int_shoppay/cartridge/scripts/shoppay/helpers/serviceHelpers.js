@@ -262,13 +262,13 @@ function getStorefrontRequestLogMessage(request) {
         if (jsonBody.variables && jsonBody.variables.paymentRequest) {
             var paymentRequest = jsonBody.variables.paymentRequest;
             if (paymentRequest != null && paymentRequest.shippingAddress != null) {
-                // replace shipping address object with string to remove customer info
+                // Replace shipping address object with string to remove customer info
                 paymentRequest.shippingAddress = "****";
             }
         }
         return JSON.stringify(jsonBody);
     } catch (e) {
-        // no action - log request as is
+        // No action - log request as is
     }
     return request;
 }
@@ -291,19 +291,19 @@ function getStorefrontResponseLogMessage(response) {
             && data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession
             && data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token
         ) {
-            // mask session token
+            // Mask session token
             data.shopPayPaymentRequestSessionCreate.shopPayPaymentRequestSession.token = "****";
         // Session Submit
         } else if (data.shopPayPaymentRequestSessionSubmit
             && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt
             && data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token
         ) {
-            // mask payment token
+            // Mask payment token
             data.shopPayPaymentRequestSessionSubmit.paymentRequestReceipt.token = "****";
         }
         return JSON.stringify(jsonBody);
     } catch (e) {
-        // no action - log response as is
+        // No action - log response as is
     }
     return response.text;
 }
@@ -368,16 +368,16 @@ function getAdminResponseLogMessage(response) {
         }
         return JSON.stringify(jsonBody);
     } catch (e) {
-        // no action - log response as is
+        // No action - log response as is
     }
     return response.text;
 };
 
 module.exports = {
+    getAdminRequestLogMessage: getAdminRequestLogMessage,
+    getAdminResponseLogMessage: getAdminResponseLogMessage,
     getMockPaymentRequest: getMockPaymentRequest,
     getMockResponse: getMockResponse,
     getStorefrontRequestLogMessage: getStorefrontRequestLogMessage,
-    getStorefrontResponseLogMessage: getStorefrontResponseLogMessage,
-    getAdminRequestLogMessage: getAdminRequestLogMessage,
-    getAdminResponseLogMessage: getAdminResponseLogMessage
+    getStorefrontResponseLogMessage: getStorefrontResponseLogMessage
 };
