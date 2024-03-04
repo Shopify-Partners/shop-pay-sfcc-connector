@@ -45,9 +45,9 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
 
     viewData.includeShopPayJS = activeABTest !== 'shoppayAA' && activeAssignmentGroup === 'treatment';
     var shoppayClientRefs = JSON.parse(viewData.shoppayClientRefs);
-    var experimentId = currentSite.getCustomPreferenceValue('experimentId');
-    if(experimentId) {
-        shoppayClientRefs['constants']['experimentId'] = experimentId;
+    var shoppayExperimentId = currentSite.getCustomPreferenceValue('shoppayExperimentId');
+    if(shoppayExperimentId) {
+        shoppayClientRefs['constants']['shoppayExperimentId'] = shoppayExperimentId;
         viewData.shoppayClientRefs = viewData.includeShopPayJS
             ? JSON.stringify(shoppayClientRefs)
             : JSON.stringify({});
