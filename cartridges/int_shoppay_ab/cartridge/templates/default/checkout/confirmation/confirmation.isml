@@ -6,7 +6,7 @@
         assets.addJs('/js/checkoutRegistration.js');
         assets.addJs('/js/shoppayTrackComplete.js');
     </isscript>
-    <iscomment>BEGIN SHOPPAY (shoppayTrackComplete.js)</iscomment>
+    <iscomment>END SHOPPAY (shoppayTrackComplete.js)</iscomment>
 
     <isif condition="${pdict.reportingURLs && pdict.reportingURLs.length}">
         <isinclude template="reporting/reportingUrls" />
