@@ -526,7 +526,6 @@ function buildPaymentRequest(session) {
     }
 }
 
-
 module.exports = {
     buildPaymentRequest: buildPaymentRequest,
     createResponse: createResponse,

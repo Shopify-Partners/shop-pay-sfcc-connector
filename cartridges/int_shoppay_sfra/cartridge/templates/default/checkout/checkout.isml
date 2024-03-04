@@ -47,7 +47,9 @@
                 </div>
 
                 <iscomment>BEGIN SHOPPAY</iscomment>
-                <isinclude template="checkout/express/expressPaymentsCard" />
+                <isif condition="${pdict.includeShopPayJS}">
+                    <isinclude template="checkout/express/expressPaymentsCard" />
+                </isif>
                 <iscomment>END SHOPPAY</iscomment>
 
                 <!-- Step 1: Customer -->

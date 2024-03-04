@@ -48,6 +48,7 @@ module.exports.excludeJS = {
 module.exports.cartridges = [
     "storefront-reference-architecture/cartridges/app_storefront_base",
     // "plugin_wishlists/cartridges/plugin_wishlists",
+    "cartridges/int_shoppay_ab",
     "cartridges/int_shoppay_sfra",
 ];
 

@@ -5,7 +5,7 @@ let session;
 
 $(document).ready(function () {
     if(window.ShopPay) {
-        if(window.shoppayClientRefs.constants.initShopPayEmailRecognition) {
+        if(window.shoppayClientRefs.constants.isCheckout) {
             initShopPayEmailRecognition();
         }
 

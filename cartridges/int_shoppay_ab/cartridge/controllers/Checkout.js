@@ -15,26 +15,46 @@ const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
 /* API Includes */
 var BasketMgr = require('dw/order/BasketMgr');
 var Cookie = require('dw/web/Cookie');
-
+var currentSite = require('dw/system/Site').current;
+var StringUtils = require('dw/util/StringUtils');
 
 server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
+    var activeABTest;
+    var activeAssignmentGroup;
     var currentBasket = BasketMgr.getCurrentBasket();
     var shoppayABCookie = request.httpCookies['shoppayAB'];
     var shoppayApplicable = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);
+    var viewData = res.getViewData();
 
     //If there is no cookie create it else do nothing
     if(!shoppayABCookie || shoppayABCookie.value === '{}') {
-        var shoppayABCookie = new Cookie(
-            'shoppayAB',
-            JSON.stringify({
-                subjectId: session.customer.getID(),
-                assignmentGroup: abTestHelpers.getAssignmentGroup(shoppayApplicable)
-            })
-        );
-        //set cookie to expire in 90 days
-        shoppayABCookie.setMaxAge(7776000);
-        response.addHttpCookie(shoppayABCookie);
+        var assignmentObject = abTestHelpers.getAssignmentGroup(shoppayApplicable);
+        var { abTest, assignmentGroup } = assignmentObject;
+        abTestHelpers.createShopPayABCookie({
+            subjectId: session.customer.getID(),
+            abTest: abTest,
+            assignmentGroup: assignmentGroup
+        });
+        activeABTest = abTest;
+        activeAssignmentGroup = assignmentGroup;
+    } else {
+        var shoppayABCookieValue = abTestHelpers.decodeString(shoppayABCookie.value);
+        activeABTest = shoppayABCookieValue.abTest;
+        activeAssignmentGroup = shoppayABCookieValue.assignmentGroup;
     }
+
+    viewData.includeShopPayJS = activeABTest !== 'shoppayAA' && activeAssignmentGroup === 'treatment';
+    var shoppayClientRefs = JSON.parse(viewData.shoppayClientRefs);
+    var experimentId = currentSite.getCustomPreferenceValue('experimentId');
+    if(experimentId) {
+        shoppayClientRefs['constants']['experimentId'] = experimentId;
+        viewData.shoppayClientRefs = viewData.includeShopPayJS
+            ? JSON.stringify(shoppayClientRefs)
+            : JSON.stringify({});
+    }
+
+    viewData.initShopPayABTest = true;
+    res.setViewData(viewData);
 
     next();
 });
