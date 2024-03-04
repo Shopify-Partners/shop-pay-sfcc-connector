@@ -179,7 +179,7 @@
                 <externally-managed-flag>false</externally-managed-flag>
                 <default-value>false</default-value>
             </attribute-definition>
-            <attribute-definition attribute-id="experimentId">
+            <attribute-definition attribute-id="shoppayExperimentId">
                 <display-name xml:lang="x-default">Experiment Id</display-name>
                 <description xml:lang="x-default">A unique identifier for the A/A or A/B test, provided by Shopify</description>
                 <type>string</type>
@@ -202,7 +202,7 @@
                 <attribute attribute-id="shoppayStorefrontAPIVersion"/>
                 <attribute attribute-id="shoppayModalImageViewType"/>
                 <attribute attribute-id="shoppayModalDebugEnabled"/>
-                <attribute attribute-id="experimentId"/>
+                <attribute attribute-id="shoppayExperimentId"/>
             </attribute-group>
         </group-definitions>
     </type-extension>
