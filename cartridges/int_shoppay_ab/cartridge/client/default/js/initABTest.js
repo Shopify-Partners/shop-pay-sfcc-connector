@@ -14,7 +14,7 @@ $(document).ready(function () {
                     subjectId: subjectId,
                     assignmentGroup: assignmentGroup,
                     shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
-                    experimentId: window.shoppayClientRefs.preferences.shoppayExperimentId,
+                    experimentId: window.shoppayClientRefs.constants.shoppayExperimentId,
                     timestamp: new Date().toISOString()
                 });
                 abCookieJSON['isAssigned'] = true;
