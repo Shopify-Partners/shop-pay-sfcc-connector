@@ -2,9 +2,9 @@ name: Build and deploy Storefront
 
 on:
   push:
-    branches: [ develop, SSPSC-47_ops-and-automation ]
+    branches: [ SSPSC-47_ops-and-automation ]
   pull_request:
-    branches: [ develop ]
+    branches: [ main, develop ]
 
 jobs:
   lint:
