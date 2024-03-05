@@ -1,10 +1,16 @@
-const ProductMgr = function () {};
+const Product = require('../mocks/dw.catalog.Product')
+
+const product = new Product()
+
+const ProductMgr = function () {}
 
 ProductMgr.getProduct = function () {
-    const productClass = require('../mocks/dw.catalog.Product');
-    const product = new productClass();
-    return product;
-};
+    return product
+}
+
+ProductMgr.getImages = (size) => {
+    return product.getImages(size)
+}
 
 ProductMgr.queryAllSiteProducts = function () {};
 ProductMgr.queryProductsInCatalog = function () {};

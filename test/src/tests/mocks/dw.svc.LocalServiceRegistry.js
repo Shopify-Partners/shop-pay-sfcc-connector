@@ -1,22 +1,14 @@
-const sinon = require('sinon');
-
-const Service = {
-
-    call: sinon.stub(),
-    createRequest: sinon.stub(),
-    parseResponse: sinon.stub(),
-    getRequestLogMessage: sinon.stub(),
-    getResponseLogMessage: sinon.stub(),
-
-    createService(svc) {
+const LocalServiceRegistry = {
+    createService(serviceName, callback) {
         return {
-            svc,
-            call: this.call.returns({
-                status: 'OK'
-            }),
-            createRequest: this.createRequest
-        };
+            serviceName,
+            createRequest: callback.createRequest,
+            parseResponse: callback.parseResponse,
+            getRequestLogMessage: callback.getRequestLogMessage,
+            getResponseLogMessage: callback.getResponseLogMessage,
+            mockCall: callback.mockCall,
+        }
     }
-};
+}
 
-module.exports = Service;
+module.exports = LocalServiceRegistry

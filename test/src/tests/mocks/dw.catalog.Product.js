@@ -1,5 +1,6 @@
 const ProductPriceModel = require('../mocks/dw.catalog.ProductPriceModel');
 const ProductVariationModel = require('../mocks/dw.catalog.ProductVariationModel');
+const ArrayList = require('../mocks/dw.util.Collection')
 
 class Product {
     constructor(props) {
@@ -32,13 +33,13 @@ class Product {
         };
         this.primaryCategory = this.getCategory();
         this.image = {
-            'small': {
-                URL: 'https://sforce.co/43Pig4s'
+            small: {
+                URL: 'http://tinyurl.com/ycynwzb3'
             },
-            'medium': {
-                URL: 'https://sforce.co/43Pig4s'
+            medium: {
+                URL: 'http://tinyurl.com/ycynwzb3'
             },
-            'large': {
+            large: {
                 URL: 'https://sforce.co/43Pig4s'
             }
         };
@@ -53,15 +54,50 @@ class Product {
         this.priceValue = 1;
     }
 
+    getImages(size) {
+        return [{
+            alt: 'First Image',
+            title: 'First Image',
+            index: '0',
+            URL: {
+                toString: function () {
+                    return 'https://sforce.co/43Pig4s';
+                }
+            },
+            absURL: {
+                toString: function () {
+                    return 'https://sforce.co/43Pig4s';
+                }
+            }
+        }, {
+            alt: 'Second Image',
+            title: 'Second Image',
+            index: '1',
+            URL: {
+                toString: function () {
+                    return 'https://sforce.co/43Pig4s';
+                }
+            },
+            absURL: {
+                toString: function () {
+                    return 'https://sforce.co/43Pig4s';
+                }
+            },
+        }]
+    }
+
     getImage(size) {
         const _image = this.image[size];
         if (!_image) {
             return;
         }
+
+        console.log(_image)
+
         return {
             _image,
             getAbsURL() {
-                return 'https://sforce.co/43Pig4s';
+                return 'http://tinyurl.com/ycynwzb3';
             }
         };
     }

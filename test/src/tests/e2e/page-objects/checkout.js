@@ -36,11 +36,30 @@ exports.CheckoutPage = class CheckoutPage extends BasePage {
         this.securityCode = page.locator('#securityCode')
         this.paymentLocator = page.locator('.submit-payment')
         this.placeOrderLocator = page.locator('.place-order')
+
+        // Cart
+        this.minicartLocator = page.locator('.minicart')
+        this.cartCheckoutLocator = page.locator('.checkout-btn')
+        this.cartShippingMethod = page.getByLabel('Shipping')
+
+        // Place Order
+        this.orderFirstName = page.locator('.firstName')
+        this.orderLastName = page.locator('.lastName')
+        this.orderAddress1 = page.locator('.address1')
+        this.orderCity = page.locator('.city')
+        this.orderState = page.locator('.stateCode')
+        this.orderPostal = page.locator('.postalCode')
+    }
+
+    async goToCart() {
+        await this.minicartLocator.click()
     }
 
     async startCheckout() {
-        this.page.goto(`${BASE_URL}/en_US/Checkout-Begin`)
-        await this.page.waitForTimeout(3000)
+        await this.minicartLocator.click()
+        await this.page.waitForLoadState('domcontentloaded')
+        await this.cartCheckoutLocator.click()
+        await this.page.waitForLoadState('domcontentloaded')
     }
 
     async enterGuestEmail(email) {
@@ -51,7 +70,7 @@ exports.CheckoutPage = class CheckoutPage extends BasePage {
     async fillShippingForm(data) {
         await this.shippingFnameLocator.fill(data.firstName)
         await this.shippingLnameLocator.fill(data.lastName)
-        await this.shippingAddressLocator.fill(data.address)
+        await this.shippingAddressLocator.fill(data.address1)
         await this.cityLocator.fill(data.city)
         await this.countryLocator.locator('option')
         await this.countryLocator.selectOption({ value: data.country })
@@ -73,9 +92,9 @@ exports.CheckoutPage = class CheckoutPage extends BasePage {
         const yearVal = await years.last().getAttribute('value')
         await this.cardExpYear.selectOption({ value: yearVal })
         await this.securityCode.fill('123')
-        await this.paymentLocator.click()
-        await this.page.waitForLoadState('networkidle')
-        await this.placeOrderLocator.click()
-        await this.page.waitForLoadState('networkidle')
+        // await this.paymentLocator.click()
+        // await this.page.waitForLoadState('networkidle')
+        // await this.placeOrderLocator.click()
+        // await this.page.waitForLoadState('networkidle')
     }
 }

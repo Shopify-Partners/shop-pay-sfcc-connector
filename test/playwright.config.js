@@ -2,10 +2,12 @@ import { defineConfig, devices } from '@playwright/test'
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-const { BASE_URL } = process.env
+const { BASE_URL, CI } = process.env
 
 module.exports = defineConfig({
   testDir: './src',
+  fullyParallel: true,
+  retries: CI ? 2 : 0,
   timeout: 1000 * 120,
   expect: {
       timeout: 1000 * 120

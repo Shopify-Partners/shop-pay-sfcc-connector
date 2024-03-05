@@ -1,18 +1,19 @@
 class Money {
-    constructor(value, currencyCode) {
+    constructor(value = 0, currencyCode = 'USD') {
+        this.currencyCode = currencyCode;
         this.value = value;
-        this.currencyCode = currencyCode || 'USD';
         this.available = true;
         this.valueOrNull = value;
-        this.getValue = this.getValue();
     }
 
-    add(value) {
-        return new Money(this.value + valueOf(value), 'USD');
+    add(money) {
+        this.value += money.value;
+        return this;
     }
 
-    subtract() {
-        return this.value - 1;
+    subtract(money) {
+        this.value -= money.value;
+        return this;
     }
 
     getAmount() {
@@ -20,17 +21,6 @@ class Money {
     }
     toFormattedString() {
         return '$' + this.value;
-    }
-
-    valueOf(value) {
-        if (typeof (value) === 'object' && value !== null) {
-            return value.value;
-        }
-        return value;
-    }
-
-    getValue() {
-        return this.value;
     }
 }
 
