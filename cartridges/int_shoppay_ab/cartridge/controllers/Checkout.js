@@ -53,9 +53,6 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
             ? JSON.stringify(shoppayClientRefs)
             : JSON.stringify({});
     }
-    if (activeABTest == 'shoppayAA') {
-        shoppayClientRefs['preferences']['shoppayAATest'] = true;
-    }
 
     if(activeABTest === 'shoppayAA' || activeAssignmentGroup === 'control') {
        viewData.hideCheckoutShoppayButton = true;
