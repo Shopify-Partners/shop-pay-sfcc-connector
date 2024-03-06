@@ -1,15 +1,20 @@
 /* Global Variables */
 const helper = require('../helpers/shoppayHelper');
 const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
+const isAATest = window.shoppayClientRefs.preferences[shoppayAATest] ? window.shoppayClientRefs.preferences[shoppayAATest] : false;
 let session;
 
 $(document).ready(function () {
     if(window.ShopPay) {
-        if(window.shoppayClientRefs.constants.isCheckout && $('#email-guest').length) {
-            initShopPayEmailRecognition();
-        }
+        initShopPayConfig();
 
-        initShopPayButton();
+        if (!isAATest) {
+            if(window.shoppayClientRefs.constants.isCheckout && $('#email-guest').length) {
+                initShopPayEmailRecognition();
+            }
+
+            initShopPayButton();
+        }
 
         let readyOnPageLoad = helper.isReadyToOrderOnPageLoad();
         if (readyOnPageLoad) {
@@ -40,8 +45,6 @@ function initShopPayConfig() {
 }
 
 function initShopPayButton() {
-    initShopPayConfig();
-
     let paymentSelector = '#shop-pay-button-container';
     window.ShopPay.PaymentRequest.createButton({buyWith: isBuyNow}).render(paymentSelector);
     helper.shoppayMutationObserver(paymentSelector);
@@ -68,8 +71,6 @@ function initBuyNow(e, response) {
 }
 
 function initShopPayEmailRecognition() {
-    initShopPayConfig();
-
     /*  If your checkout is not built with SFRA or you have customized and removed the 'email-guest'
         id on the email input you will need to update the id value for emailInputId
 
