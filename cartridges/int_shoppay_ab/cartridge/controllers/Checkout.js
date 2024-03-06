@@ -55,7 +55,8 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
     }
 
     if(activeABTest === 'shoppayAA' || activeAssignmentGroup === 'control') {
-       viewData.hideCheckoutShoppayButton = true;
+        shoppayClientRefs['preferences']['shoppayAATest'] = true;
+        viewData.hideCheckoutShoppayButton = true;
     }
 
     viewData.initShopPayABTest = true;
