@@ -49,10 +49,16 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
     var shoppayExperimentId = currentSite.getCustomPreferenceValue('shoppayExperimentId');
     if(shoppayExperimentId) {
         shoppayClientRefs['constants']['shoppayExperimentId'] = shoppayExperimentId;
-        viewData.shoppayClientRefs = viewData.includeShopPayJS
+    }
+
+    if(activeABTest === 'shoppayAA' || activeAssignmentGroup === 'control') {
+        shoppayClientRefs['preferences']['shoppayAATest'] = true;
+        viewData.hideCheckoutShoppayButton = true;
+    }
+
+    viewData.shoppayClientRefs = viewData.includeShopPayJS
             ? JSON.stringify(shoppayClientRefs)
             : JSON.stringify({});
-    }
 
     if(activeABTest === 'shoppayAA' || activeAssignmentGroup === 'control') {
         shoppayClientRefs['preferences']['shoppayAATest'] = true;
