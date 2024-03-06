@@ -43,7 +43,8 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
         activeAssignmentGroup = shoppayABCookieValue.assignmentGroup;
     }
 
-    viewData.includeShopPayJS = activeABTest !== 'shoppayAA' && activeAssignmentGroup === 'treatment';
+    //The ShopPay SDK should alaways be added for A/A or A/B test so we can send tracking events
+    viewData.includeShopPayJS = true;
     var shoppayClientRefs = JSON.parse(viewData.shoppayClientRefs);
     var shoppayExperimentId = currentSite.getCustomPreferenceValue('shoppayExperimentId');
     if(shoppayExperimentId) {
@@ -51,6 +52,11 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
         viewData.shoppayClientRefs = viewData.includeShopPayJS
             ? JSON.stringify(shoppayClientRefs)
             : JSON.stringify({});
+    }
+
+    if(activeABTest === 'shoppayAA' || activeAssignmentGroup === 'control') {
+        shoppayClientRefs['preferences']['shoppayAATest'] = true;
+        viewData.hideCheckoutShoppayButton = true;
     }
 
     viewData.initShopPayABTest = true;
