@@ -20,6 +20,8 @@ Run following:
 
 The above will install both project and SFRA dependencies
 
+### Note the install may take a few minutes
+
 ### Local Development
 
 You can use `npm run watch` as you develop in conjunction with the VS Code [Prophet Debugger](https://marketplace.visualstudio.com/items?itemName=SqrTT.prophet) extension
