@@ -1,13 +1,12 @@
 {
-  "name": "sfra-webpack-builder",
+  "name": "webpack-bundler",
   "version": "3.5.0",
   "main": "index.js",
   "license": "BSD-3",
   "scripts": {
     "test": "mocha test/unit/**/*.js",
     "test:fixture": "webpack --env testRunner",
-    "postinstall": "node ./scripts/peerDeps.js",
-    "release": "release-it"
+    "postinstall": "node ./scripts/peerDeps.js"
   },
   "peerDependencies": {
     "@babel/core": "7.22.10",

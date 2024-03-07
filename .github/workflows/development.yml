@@ -22,7 +22,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
           cache-dependency-path: |
-            sfra-webpack-builder/package-lock.json
+            build/package-lock.json
       - run: |
           npm run install
 
@@ -87,7 +87,7 @@ jobs:
           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
           # cache-dependency-path: |
           #   package-lock.json
-          #   sfra-webpack-builder/package-lock.json
+          #   build/package-lock.json
           #   storefront-reference-architecture/package-lock.json
       - run: |
           npm ci
