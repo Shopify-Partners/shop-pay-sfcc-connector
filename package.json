@@ -14,7 +14,8 @@
     "code:zip": "node devops/index code:zip",
     "prod": "node ./build/webpackHandling/webpack.js --config ./build/webpack.config.js --env local",
     "dev": "node ./build/webpackHandling/webpack.js --config ./build/webpack.config.js --env dev --env local",
-    "watch": "node ./build/webpackHandling/webpack.js --config ./build/webpack.config.js --env dev --watch --env local"
+    "watch": "node ./build/webpackHandling/webpack.js --config ./build/webpack.config.js --env dev --watch --env local",
+    "postinstall": "cd test && npm install"
   },
   "repository": {
     "type": "git",
