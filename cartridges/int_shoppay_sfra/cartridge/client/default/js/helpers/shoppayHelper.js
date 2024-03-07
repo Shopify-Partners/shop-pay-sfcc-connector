@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* Global Variables */
 let checkoutUrl = null;
 let observer;
@@ -66,9 +67,7 @@ function setInitProductData(data) {
  * @param {Object} session - Accepts the Shop Pay session object and establishes necessary event listeners on the session.
  */
 function setSessionListeners(session) {
-    /* eslint-disable no-unused-vars */
     session.addEventListener("sessionrequested", function (ev) {
-        /* eslint-enable no-unused-vars */
         let sessionPaymentRequest;
 
         if (window.shoppayClientRefs.constants.isBuyNow) {
@@ -210,7 +209,6 @@ function setSessionListeners(session) {
         session.completeDiscountCodeChange({ updatedPaymentRequest: updatedPaymentRequest });
     });
 
-    /* eslint-disable no-unused-vars */
     session.addEventListener("deliverymethodchanged", function(ev) {
         const currentPaymentRequest = session.paymentRequest;
         let requestData = {
@@ -405,7 +403,6 @@ function setSessionListeners(session) {
             window.location.reload();
         }
     });
-    /* eslint-enable no-unused-vars */
 }
 
 /**

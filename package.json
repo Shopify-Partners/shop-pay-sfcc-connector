@@ -8,13 +8,13 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "install": "cd sfra-webpack-builder && npm install --legacy-peer-deps",
-    "sfra:install": "node ./sfra-webpack-builder/installHandling/install.js",
-    "lint": "node ./sfra-webpack-builder/webpackHandling/webpack.js --config ./sfra-webpack-builder/webpack.config.js --env dev --env useLinter --env local",
+    "install": "cd build && npm install --legacy-peer-deps",
+    "sfra:install": "node ./build/installHandling/install.js",
+    "lint": "node ./build/webpackHandling/webpack.js --config ./build/webpack.config.js --env dev --env useLinter --env local",
     "code:zip": "node devops/index code:zip",
-    "prod": "node ./sfra-webpack-builder/webpackHandling/webpack.js --config ./sfra-webpack-builder/webpack.config.js --env local",
-    "dev": "node ./sfra-webpack-builder/webpackHandling/webpack.js --config ./sfra-webpack-builder/webpack.config.js --env dev --env local",
-    "watch": "node ./sfra-webpack-builder/webpackHandling/webpack.js --config ./sfra-webpack-builder/webpack.config.js --env dev --watch --env local"
+    "prod": "node ./build/webpackHandling/webpack.js --config ./build/webpack.config.js --env local",
+    "dev": "node ./build/webpackHandling/webpack.js --config ./build/webpack.config.js --env dev --env local",
+    "watch": "node ./build/webpackHandling/webpack.js --config ./build/webpack.config.js --env dev --watch --env local"
   },
   "repository": {
     "type": "git",

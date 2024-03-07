@@ -47,7 +47,7 @@ function getNodeModulesFolder(env, folder) {
         process.env.PWD = process.cwd();
     }
     return `${process.env.PWD}${env.local ? "" : "/node_modules"}${
-        env.testRunner ? "" : "/sfra-webpack-builder/node_modules"
+        env.testRunner ? "" : "/build/node_modules"
     }/${folder}`;
 }
 

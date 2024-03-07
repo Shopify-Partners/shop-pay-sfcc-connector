@@ -20,14 +20,48 @@ Run following:
 
 The above will install both project and SFRA dependencies
 
+### Note the install may take a few minutes
+
 ### Local Development
 
 You can use `npm run watch` as you develop in conjunction with the VS Code [Prophet Debugger](https://marketplace.visualstudio.com/items?itemName=SqrTT.prophet) extension
 
-## Deployment (CI/CD)
+## Testing
 
-## Authors
+The following frameworks and packages are used for testing
 
-Erik Marty - erik@themazegroup.com
+ - [mocha](https://mochajs.org/)
+ - [Playwright](https://playwright.dev/)
 
-Aidrian O'Connor - aidrian@themazegroup.com
+    - SFCC API calls are mocked & stubbed using:
+
+        - [proxyquire](https://github.com/thlorenz/proxyquire)
+        - [sinon.js](https://sinonjs.org/)
+        - [dw-mock-api](https://github.com/SalesforceCommerceCloud/dw-api-mock)
+
+
+## Prerequisites
+
+`.env` file at the root of this directory with the following variables. See [example](test/env.example) file
+
+```
+# Storefront URL
+BASE_URL=https://<INSTANCE>.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site
+# Url for integration tests
+SITE_URL=https://<INSTANCE>.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site
+```
+
+### Note - Integration and E2E tests require a live and fully configured SFRA Sandbox
+
+## Instructions
+
+Change into the `test` directory
+
+Run  `npm install`
+
+- Running tests:
+
+    - Unit Tests: `npm run test:unit`
+    - Integration Tests: `npm run test:integration`
+    - UI Tests: `npm run test:ui`
+    - Integration + UI tests: `npm run test:e2e`
