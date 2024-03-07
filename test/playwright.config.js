@@ -7,7 +7,7 @@ const { BASE_URL, CI } = process.env
 module.exports = defineConfig({
   testDir: './src',
   fullyParallel: true,
-  retries: CI ? 2 : 0,
+  retries: 2,
   timeout: 1000 * 120,
   expect: {
       timeout: 1000 * 120
