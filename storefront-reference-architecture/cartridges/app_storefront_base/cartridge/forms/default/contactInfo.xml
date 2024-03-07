@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<form xmlns="http://www.demandware.com/xml/form/2008-04-19">
-
-    <!-- fields for phone number -->
-    <field formid="phone" label="profile.phone" description="address.phone.example" type="string" mandatory="true"
-           binding="phone" min-length="10" max-length="20" missing-error="error.card.info.missing.phone" range-error="error.message.between10and20" />
-
-</form>

@@ -1,3 +1,0 @@
-<isset name="product" value="${pdict.product}" scope="page" />
-<isset name="loopState" value="${{count: 1}}" scope="page" />
-<isinclude template="product/components/attributes" />
