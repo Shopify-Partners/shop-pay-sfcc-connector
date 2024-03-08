@@ -10,11 +10,9 @@ This project was built using node `v14.21.3` but any version of node 14 will wor
 
 Run following:
 
-* Note the following assumes there is a working copy of the [storefront-reference-architecture](https://github.com/SalesforceCommerceCloud/storefront-reference-architecture) at the root of your project
+`npm install && sfra:install`
 
-`npm install && npm run sfra:install`
-
-The above will install both project and SFRA dependencies
+The above will install project dependencies
 
 ### Note the install may take a few minutes
 
