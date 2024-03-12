@@ -60,7 +60,6 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
             ? JSON.stringify(shoppayClientRefs)
             : JSON.stringify({});
 
-    viewData.shoppayClientRefs = JSON.stringify(shoppayClientRefs);
     viewData.initShopPayABTest = true;
     res.setViewData(viewData);
 
