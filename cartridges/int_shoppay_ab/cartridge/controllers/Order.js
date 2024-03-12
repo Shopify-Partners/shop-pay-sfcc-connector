@@ -21,8 +21,7 @@ server.append('Confirm',
     csrfProtection.generateToken,
     function (req, res, next) {
         var currentBasket = BasketMgr.getCurrentBasket();
-        var shoppayApplicable = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);
-        res.viewData.includeShopPayJS = shoppayGlobalRefs.shoppayElementsApplicable('checkout') && shoppayApplicable;
+        res.viewData.includeShopPayJS = true;
         res.viewData.shoppayClientRefs = res.viewData.includeShopPayJS
         ? JSON.stringify(shoppayGlobalRefs.getClientRefs('checkout'))
         : JSON.stringify({});
