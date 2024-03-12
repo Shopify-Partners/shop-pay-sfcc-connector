@@ -34,7 +34,7 @@ $(document).ready(function () {
                     timestamp: new Date().toISOString()
                 };
                 // Send the checkout events
-                window.ShopPay.PaymentRequest.track();
+                window.ShopPay.PaymentRequest.track(trackObject);
                 console.log('ShopPay Tracking Event:', trackObject);
                 abCookieJSON['isStarted'] = true;
             }
