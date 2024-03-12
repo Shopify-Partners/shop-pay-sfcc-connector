@@ -20,6 +20,7 @@ $(document).ready(function () {
             };
             // Send the checkout events
             window.ShopPay.PaymentRequest.track(trackObject);
+            console.log('ShopPay Tracking Event:', trackObject);
             delete abCookieJSON.isStarted;
             delete abCookieJSON.st;
 
