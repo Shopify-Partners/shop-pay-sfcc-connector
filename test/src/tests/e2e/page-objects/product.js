@@ -20,6 +20,8 @@ exports.ProductPage = class ProductPage extends BasePage {
         this.sizeSelect = page.locator('#size-1')
         this.widthSelect = page.locator('#width-1')
         this.addToCartLocator = page.locator('.add-to-cart')
+
+        this.shopPayFrameSelector = 'iframe[title="Shop Pay Quick Checkout"]'
     }
 
     async getProduct() {
@@ -41,6 +43,29 @@ exports.ProductPage = class ProductPage extends BasePage {
         await this.addToCartLocator.click()
     }
 
+    async shopPayPayment(email) {
+        const pagePromise = this.page.waitForEvent('popup')
+        await this.page.getByLabel('Buy with Shop Pay').click();
+        const shopPayWindow = await pagePromise
+
+        await shopPayWindow
+            .frameLocator(this.shopPayFrameSelector)
+            .getByPlaceholder('Email')
+            .click()
+
+        await shopPayWindow
+            .frameLocator(this.shopPayFrameSelector)
+            .getByLabel('Email')
+            .fill(email)
+
+        await shopPayWindow
+            .frameLocator(this.shopPayFrameSelector)
+            .getByRole('button', { name: 'Continue with Shop Pay' })
+            .click()
+
+        return shopPayWindow
+    }
+
     async selectSize() {
         if (await this.sizeSelect.isVisible()) {
             const options = await this.sizeSelect.locator('option')
@@ -59,15 +84,19 @@ exports.ProductPage = class ProductPage extends BasePage {
         return
     }
 
+    async updateQuantity(value) {
+        await this.page.getByLabel('Quantity').selectOption(value)
+    }
+
     async visitPDP() {
         await this.newArrivals.click()
         await this.page.waitForTimeout(5000)
         const categories = await this.categoryLocator
         await categories.first().click()
-        await this.page.waitForLoadState('networkidle')
+        await this.page.waitForLoadState('domcontentloaded')
         const products = await this.productLocator
         await products.first().click()
-        await this.page.waitForLoadState('networkidle')
+        await this.page.waitForLoadState('domcontentloaded')
     }
 
     async visitPLP() {
@@ -75,6 +104,6 @@ exports.ProductPage = class ProductPage extends BasePage {
         await this.page.waitForTimeout(5000)
         const categories = await this.categoryLocator
         await categories.first().click()
-        await this.page.waitForLoadState('networkidle')
+        await this.page.waitForLoadState('domcontentloaded')
     }
 }

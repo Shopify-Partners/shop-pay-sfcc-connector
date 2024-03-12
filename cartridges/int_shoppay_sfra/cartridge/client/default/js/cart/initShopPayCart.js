@@ -1,7 +1,7 @@
 /* Global Variables */
 const helper = require('../helpers/shoppayHelper');
 const isBuyNow = window.shoppayClientRefs.constants.isBuyNow;
-const isAATest = window.shoppayClientRefs.preferences[shoppayAATest] ? window.shoppayClientRefs.preferences[shoppayAATest] : false;
+const isAATest = window.shoppayClientRefs.preferences.shoppayAATest ? window.shoppayClientRefs.preferences.shoppayAATest : false;
 let session;
 
 $(document).ready(function () {

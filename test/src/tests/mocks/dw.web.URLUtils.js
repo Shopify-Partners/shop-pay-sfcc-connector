@@ -1,12 +1,39 @@
 var URLUtils = function () {};
 
 URLUtils.http = function () {};
-URLUtils.https = function () {
-    return 'https://production-sitegenesis-dw.demandware.net/s/RefArch/home?lang=en_US';
-};
+
+URLUtils.https = function (path) {
+    let match = []
+    let urls = []
+    urls.push(path)
+    controllers = [
+        'ShopPay-GetCartSummary',
+        'ShopPay-BeginSession',
+        'ShopPay-DiscountCodeChanged',
+        'ShopPay-DeliveryMethodChanged',
+        'ShopPay-SubmitPayment',
+        'ShopPay-ShippingAddressChanged',
+        'ShopPay-PrepareBasket',
+        'ShopPay-BuyNowData'
+
+    ]
+    for (let i = 0; i < controllers.length; i++) {
+        for (let j = 0; j < urls.length; j++) {
+            if (controllers[i] === urls[j]) {
+                return {
+                    toString: () => {
+                        return `https://zzys-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site/default/${controllers[i]}`
+                    }
+                }
+            }
+        }
+    }
+}
+
 URLUtils.abs = function () {
     return 'https://production-sitegenesis-dw.demandware.net/s/RefArch/home?lang=en_US';
 };
+
 URLUtils.url = function () {};
 URLUtils.home = function () {};
 URLUtils.webRoot = function () {};

@@ -1,8 +1,18 @@
 let mockPreferences = {
-    api_key: 'ababababababababab',
-};
+    shoppayStoreName: 'The Best Store Ever',
+    shoppayStorefrontAPIVersion: '2.0',
+    shoppayStorefrontAPIToken: 'asdf',
+    shoppayCartButtonEnabled: true,
+    shoppayStoreId: 'qwerty',
+    shoppayClientId: '999',
+    shoppayAdminAPIVersion: 'v1',
+    shoppayStorefrontAPIVersion: 'v2',
+    shoppayModalImageViewType: 'small',
+    shoppayPDPButtonEnabled: true,
+    shoppayModalDebugEnabled: false
+}
 
-const preferences = {};
+const preferences = {}
 
 const Site = {
     current: {
@@ -15,6 +25,9 @@ const Site = {
             }
 
             return preferences[key];
+        },
+        getDefaultLocale() {
+            return 'en-US'
         }
     },
     getCurrent() {

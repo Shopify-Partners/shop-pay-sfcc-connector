@@ -1,7 +1,0 @@
-<isif condition="${lineItem.appliedPromotions}">
-    <isloop items="${lineItem.appliedPromotions}" var="appliedPromotion">
-        <div>
-            <isprint value="${appliedPromotion.callOutMsg}" encoding="off"/>
-        </div>
-    </isloop>
-</isif>

@@ -5,13 +5,14 @@ import * as dotenv from 'dotenv'
 
 dotenv.config({ path: path.join('..', '.env') })
 
-const { BASE_URL } = process.env
+const { BASE_URL, SITE_URL } = process.env
 
 exports.BasePage = class BasePage {
     constructor(page, isMobile) {
         this.page = page
         this.isMobile = isMobile
         this.baseUrl = BASE_URL
+        this.siteUrl = SITE_URL
 
         // Cookies accept locator
         this.acceptCookiesButton = page.locator('#consent-tracking > div > div > div.modal-footer > div > button.affirm.btn.btn-primary')

@@ -1,4 +1,4 @@
-const BasketMgr = require('../BasketMgr');
+const BasketMgr = require('../dw.order.BasketMgr');
 const ProductMgr = require('../dw.catalog.ProductMgr');
 const sinon = require('sinon');
 

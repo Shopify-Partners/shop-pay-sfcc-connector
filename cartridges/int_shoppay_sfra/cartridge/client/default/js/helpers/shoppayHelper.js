@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* Global Variables */
 let checkoutUrl = null;
 let observer;
@@ -382,7 +383,7 @@ function setSessionListeners(session) {
         let redirect = $('<form>').appendTo(document.body).attr({
             method: 'POST',
             action: data.continueUrl
-            });
+        });
         $('<input>').appendTo(redirect).attr({
             name: 'orderID',
             value: data.orderID
@@ -471,7 +472,7 @@ function createResponse (requestObj, controllerURL) {
         contentType: 'application/json',
         success: function(data) {
             responseJSON = data;
-            responseJSON.exception = false
+            responseJSON.exception = false;
         },
         error: function (err) {
             responseJSON = err.responseJSON ? err.responseJSON : {};
