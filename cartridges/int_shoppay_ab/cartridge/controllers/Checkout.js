@@ -60,11 +60,6 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
             ? JSON.stringify(shoppayClientRefs)
             : JSON.stringify({});
 
-    if(activeABTest === 'shoppayAA' || activeAssignmentGroup === 'control') {
-        shoppayClientRefs['preferences']['shoppayAATest'] = true;
-        viewData.hideCheckoutShoppayButton = true;
-    }
-
     viewData.initShopPayABTest = true;
     res.setViewData(viewData);
 

@@ -3,11 +3,16 @@
     <!----------------------------------------------------------------------------------->
     <!-- Load Static Assets -->
     <!----------------------------------------------------------------------------------->
+    <iscomment>BEGIN SHOPPAY (including initABTest.js)</iscomment>
     <isscript>
         var assets = require('*/cartridge/scripts/assets.js');
         assets.addJs('/js/checkout.js');
         assets.addCss('/css/checkout/checkout.css');
+        if(pdict.initShopPayABTest) {
+            assets.addJs('/js/initABTest.js');
+        }
     </isscript>
+    <iscomment>END SHOPPAY (including initABTest.js)</iscomment>
 
     <isif condition="${pdict.reportingURLs && pdict.reportingURLs.length}">
         <isinclude template="reporting/reportingUrls" />
