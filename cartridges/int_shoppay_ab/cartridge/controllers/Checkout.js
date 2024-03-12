@@ -59,6 +59,7 @@ server.append('Begin', csrfProtection.generateToken, function (req, res, next) {
         viewData.hideCheckoutShoppayButton = true;
     }
 
+    viewData.shoppayClientRefs = JSON.stringify(shoppayClientRefs);
     viewData.initShopPayABTest = true;
     res.setViewData(viewData);
 
