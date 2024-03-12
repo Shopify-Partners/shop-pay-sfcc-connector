@@ -20,11 +20,8 @@ server.append('Confirm',
     server.middleware.https,
     csrfProtection.generateToken,
     function (req, res, next) {
-        var currentBasket = BasketMgr.getCurrentBasket();
         res.viewData.includeShopPayJS = true;
-        res.viewData.shoppayClientRefs = res.viewData.includeShopPayJS
-        ? JSON.stringify(shoppayGlobalRefs.getClientRefs('checkout'))
-        : JSON.stringify({});
+        res.viewData.shoppayClientRefs = JSON.stringify(shoppayGlobalRefs.getClientRefs('checkout'));
     return next();
 });
 
