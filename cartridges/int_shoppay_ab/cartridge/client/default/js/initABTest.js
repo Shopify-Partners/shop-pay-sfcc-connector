@@ -10,28 +10,30 @@ $(document).ready(function () {
             const { subjectId, assignmentGroup } = abCookieJSON;
 
             if(!abCookieJSON.isAssigned) {
-                // Send the assignment event
-                window.ShopPay.PaymentRequest.track({
+                const trackObject = {
                     subjectId: subjectId,
                     assignmentGroup: assignmentGroup,
                     shopId: window.shoppayClientRefs.preferences.shoppayStoreId,
                     experimentId: window.shoppayClientRefs.constants.shoppayExperimentId,
                     timestamp: new Date().toISOString()
-                });
+                };
+                // Send the assignment event
+                window.ShopPay.PaymentRequest.track(trackObject);
                 abCookieJSON['isAssigned'] = true;
             }
 
             if(!abCookieJSON.isStarted) {
                 //If you have modified SFRA checkout classes please verify the correct price is pulled
                 const totalPrice = $('.order-total-summary .grand-total-sum').text().replace(/\$|\./gm, '');
-                // Send the checkout events
-                window.ShopPay.PaymentRequest.track({
+                const trackObject = {
                     subjectId: subjectId,
                     shopPayToken: null,
                     action: 'checkout-begin',
                     totalPrice: totalPrice, // The total price of the order in cents
                     timestamp: new Date().toISOString()
-                });
+                };
+                // Send the checkout events
+                window.ShopPay.PaymentRequest.track(trackObject);
                 abCookieJSON['isStarted'] = true;
             }
 
