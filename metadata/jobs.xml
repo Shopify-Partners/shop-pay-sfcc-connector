@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jobs xmlns="http://www.demandware.com/xml/impex/jobs/2015-07-01">
+    <job job-id="Shop Pay Order Reconciliation" priority="0">
+        <description/>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="Order Reconciliation" type="custom.shoppay.OrderReconciliation" enforce-restart="false">
+                <description/>
+                <parameters>
+                    <parameter name="MaxOrderAgeHrs">48</parameter>
+                    <parameter name="MinOrderAgeSecs">30</parameter>
+                </parameters>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-once enabled="false">
+                <date>2024-02-07Z</date>
+                <time>18:16:00.000Z</time>
+            </run-once>
+        </triggers>
+    </job>
+
+    <job job-id="Shopify Webhook Subscribe" priority="0">
+        <description/>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="Webhook Subscribe" type="custom.shoppay.SubscribeWebhook" enforce-restart="false">
+                <description/>
+                <parameters>
+                    <parameter name="WebhookTopic">ORDERS_CREATE</parameter>
+                </parameters>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-once enabled="false">
+                <date>2024-02-09Z</date>
+                <time>15:55:00.000Z</time>
+            </run-once>
+        </triggers>
+    </job>
+
+    <job job-id="Shopify Webhook Unsubscribe" priority="0">
+        <description/>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="Unsubscribe Webhook" type="custom.shoppay.UnsubscribeWebhook" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-once enabled="false">
+                <date>2024-02-09Z</date>
+                <time>15:56:00.000Z</time>
+            </run-once>
+        </triggers>
+    </job>
+
+    <job job-id="Maintain Shopify Webhook Subscriptions">
+        <description/>
+        <parameters/>
+        <flow>
+            <context site-id="RefArch"/>
+            <step step-id="Maintain Webhook Subscriptions" type="custom.shoppay.MaintainWebhookSubscriptions" enforce-restart="false">
+                <description/>
+                <parameters/>
+            </step>
+        </flow>
+        <rules/>
+        <triggers>
+            <run-once enabled="false">
+                <date>2024-02-28Z</date>
+                <time>18:54:00.000Z</time>
+            </run-once>
+        </triggers>
+    </job>
+
+</jobs>

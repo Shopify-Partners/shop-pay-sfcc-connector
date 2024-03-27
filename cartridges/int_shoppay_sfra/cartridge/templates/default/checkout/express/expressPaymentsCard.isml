@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-header-custom">${Resource.msg('heading.checkout.express', 'checkout', null)}</h2>
+    </div>
+    <div class="card-body">
+        <isinclude template="common/shoppayButton" />
+    </div>
+</div>

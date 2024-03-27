@@ -1,0 +1,12 @@
+{
+    "hooks": [
+        {
+            "name": "app.template.htmlHead",
+            "script": "./cartridge/scripts/hooks/template/templateHooks.js"
+        },
+        {
+            "name": "app.payment.processor.shoppay",
+            "script": "./cartridge/scripts/hooks/payment/processor/shoppay"
+        }
+    ]
+}

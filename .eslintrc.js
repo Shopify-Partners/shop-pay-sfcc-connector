@@ -5,6 +5,8 @@ module.exports = {
     extends: "eslint:recommended",
     env: {
         commonjs: true,
+        es6: true,
+        browser: true,
     },
     globals: {
         dw: true,
@@ -31,4 +33,10 @@ module.exports = {
         radix: ["error", "always"],
         semi: ["error", "always"],
     },
+    parserOptions: {
+        "ecmaVersion": 2018,
+        "ecmaFeatures": {
+          "jsx": true
+        }
+    }
 };
