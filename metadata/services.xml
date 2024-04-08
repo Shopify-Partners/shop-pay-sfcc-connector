@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns="http://www.demandware.com/xml/impex/services/2014-09-26">
+    <service-credential service-credential-id="shoppay.api.admin.credentials">
+        <url>https://{store_name}.myshopify.com/admin/api/{admin_api_version}/graphql.json</url>
+        <user-id/>
+        <password/>
+    </service-credential>
+
+    <service-credential service-credential-id="shoppay.api.storefront.credentials">
+        <url>https://{store_name}.myshopify.com/api/{storefront_api_version}/graphql.json</url>
+        <user-id/>
+        <password/>
+    </service-credential>
+
+    <service-profile service-profile-id="shoppay.api.admin.profile">
+        <timeout-millis>3000</timeout-millis>
+        <rate-limit-enabled>false</rate-limit-enabled>
+        <rate-limit-calls>0</rate-limit-calls>
+        <rate-limit-millis>0</rate-limit-millis>
+        <cb-enabled>false</cb-enabled>
+        <cb-calls>0</cb-calls>
+        <cb-millis>0</cb-millis>
+    </service-profile>
+
+    <service-profile service-profile-id="shoppay.api.storefront.profile">
+        <timeout-millis>3000</timeout-millis>
+        <rate-limit-enabled>false</rate-limit-enabled>
+        <rate-limit-calls>0</rate-limit-calls>
+        <rate-limit-millis>0</rate-limit-millis>
+        <cb-enabled>false</cb-enabled>
+        <cb-calls>0</cb-calls>
+        <cb-millis>0</cb-millis>
+    </service-profile>
+
+    <service service-id="shoppay.api.admin">
+        <service-type>HTTP</service-type>
+        <enabled>true</enabled>
+        <log-prefix>ShopPay_Admin_API</log-prefix>
+        <force-prd-enabled>false</force-prd-enabled>
+        <profile-id>shoppay.api.admin.profile</profile-id>
+        <credential-id>shoppay.api.admin.credentials</credential-id>
+    </service>
+
+    <service service-id="shoppay.api.storefront">
+        <service-type>HTTP</service-type>
+        <enabled>true</enabled>
+        <log-prefix>ShopPay_Storefront_API</log-prefix>
+        <force-prd-enabled>false</force-prd-enabled>
+        <profile-id>shoppay.api.storefront.profile</profile-id>
+        <credential-id>shoppay.api.storefront.credentials</credential-id>
+    </service>
+
+</services>

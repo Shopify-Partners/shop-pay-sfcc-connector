@@ -1,0 +1,14 @@
+<div class="mb-sm-3">
+    <a href="${URLUtils.https('Checkout-Begin')}"
+        class="btn btn-primary btn-block checkout-btn ${pdict.valid.error ? 'disabled' : ''}" role="button">
+        ${Resource.msg('button.checkout', 'cart', null)}
+    </a>
+</div>
+
+<iscomment>BEGIN SHOPPAY</iscomment>
+<isif condition="${pdict.includeShopPayJS}">
+    <div class="mb-sm-3 shoppayButtonContainer">
+        <isinclude template="common/shoppayButton" />
+    </div>
+</isif>
+<iscomment>END SHOPPAY</iscomment>

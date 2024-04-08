@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://www.demandware.com/xml/impex/metadata/2006-10-31">
+    <type-extension type-id="Basket">
+        <custom-attribute-definitions>
+            <attribute-definition attribute-id="shoppaySourceIdentifier">
+                <display-name xml:lang="x-default">Shop Pay Source Identifier</display-name>
+                <description xml:lang="x-default">Shop Pay reference to SFCC order</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+        </custom-attribute-definitions>
+    </type-extension>
+
+    <type-extension type-id="Order">
+        <custom-attribute-definitions>
+            <attribute-definition attribute-id="shoppayGraphQLOrderId">
+                <display-name xml:lang="x-default">Graph QL Order ID</display-name>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayOrder">
+                <display-name xml:lang="x-default">Is a Shop Pay Order</display-name>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayOrderCreateWebhookReceived">
+                <display-name xml:lang="x-default">Order Create Webhook Received</display-name>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayOrderNumber">
+                <display-name xml:lang="x-default">Shop Pay Order Number</display-name>
+                <description xml:lang="x-default">Shop Pay order display number ("name")</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppaySourceIdentifier">
+                <display-name xml:lang="x-default">Shop Pay Source Identifier</display-name>
+                <description xml:lang="x-default">Shop Pay reference to SFCC order</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+        </custom-attribute-definitions>
+        <group-definitions>
+            <attribute-group group-id="ShopPay">
+                <display-name xml:lang="x-default">Shop Pay</display-name>
+                <attribute attribute-id="shoppayOrderCreateWebhookReceived"/>
+                <attribute attribute-id="shoppayOrderNumber"/>
+                <attribute attribute-id="shoppaySourceIdentifier"/>
+                <attribute attribute-id="shoppayGraphQLOrderId"/>
+                <attribute attribute-id="shoppayOrder"/>
+            </attribute-group>
+        </group-definitions>
+    </type-extension>
+
+    <type-extension type-id="OrderPaymentInstrument">
+        <custom-attribute-definitions>
+            <attribute-definition attribute-id="shoppayPaymentToken">
+                <display-name xml:lang="x-default">Shop Pay Payment Token</display-name>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+        </custom-attribute-definitions>
+    </type-extension>
+
+    <type-extension type-id="Product">
+        <custom-attribute-definitions>
+            <attribute-definition attribute-id="shoppayPDPButtonEnabled">
+                <display-name xml:lang="x-default">Shop Pay PDP Button Enabled</display-name>
+                <description xml:lang="x-default">If Site Preference Shop Pay PDP Button Enabled is set to "Yes", this product-level attribute is ignored. The button is never shown on product set PDPs.</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+        </custom-attribute-definitions>
+        <group-definitions>
+            <attribute-group group-id="ShopPay">
+                <display-name xml:lang="x-default">Shop Pay</display-name>
+                <attribute attribute-id="shoppayPDPButtonEnabled"/>
+            </attribute-group>
+        </group-definitions>
+    </type-extension>
+
+    <type-extension type-id="SitePreferences">
+        <custom-attribute-definitions>
+            <attribute-definition attribute-id="shoppayAdminAPIToken">
+                <display-name xml:lang="x-default">Shopify Admin API Access Token</display-name>
+                <type>password</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayStorefrontAPIToken">
+                <display-name xml:lang="x-default">Shopify Storefront API Access Token</display-name>
+                <type>password</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayAdminAPIVersion">
+                <display-name xml:lang="x-default">Shopify Admin API Version</display-name>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+                <default-value>2024-01</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayCartButtonEnabled">
+                <display-name xml:lang="x-default">Shop Pay Cart Button Enabled</display-name>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>false</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayPDPButtonEnabled">
+                <display-name xml:lang="x-default">Shop Pay PDP Button Enabled</display-name>
+                <description xml:lang="x-default">If Yes, PDP button is enabled for all PDPs (except product sets). If No, PDP button is enabled based on product-level attribute.</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>false</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayClientId">
+                <display-name xml:lang="x-default">Shopify Client ID</display-name>
+                <description xml:lang="x-default">Provided by Shop Pay team</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayStoreName">
+                <display-name xml:lang="x-default">Shopify Store Name</display-name>
+                <description xml:lang="x-default">https://admin.shopify.com/store/&lt;Shopify Store Name&gt;/</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayStoreId">
+                <display-name xml:lang="x-default">Shopify Store ID</display-name>
+                <description xml:lang="x-default">Provided by Shop Pay team</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayStorefrontAPIVersion">
+                <display-name xml:lang="x-default">Shopify Storefront API Version</display-name>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+                <default-value>unstable</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayModalImageViewType">
+                <display-name xml:lang="x-default">Shop Pay Modal Image View Type</display-name>
+                <description xml:lang="x-default">Image view type from the product catalog to be used in the Shop Pay modal</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+                <default-value>small</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayModalDebugEnabled">
+                <display-name xml:lang="x-default">Shop Pay Modal Debug Enabled</display-name>
+                <description xml:lang="x-default">Enables browser console logging from the Shop Pay modal for troubleshooting</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>false</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="shoppayExperimentId">
+                <display-name xml:lang="x-default">Experiment Id</display-name>
+                <description xml:lang="x-default">A unique identifier for the A/A or A/B test, provided by Shopify</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+        </custom-attribute-definitions>
+        <group-definitions>
+            <attribute-group group-id="ShopPay">
+                <display-name xml:lang="x-default">Shop Pay</display-name>
+                <attribute attribute-id="shoppayPDPButtonEnabled"/>
+                <attribute attribute-id="shoppayCartButtonEnabled"/>
+                <attribute attribute-id="shoppayStoreName"/>
+                <attribute attribute-id="shoppayStoreId"/>
+                <attribute attribute-id="shoppayClientId"/>
+                <attribute attribute-id="shoppayAdminAPIToken"/>
+                <attribute attribute-id="shoppayStorefrontAPIToken"/>
+                <attribute attribute-id="shoppayAdminAPIVersion"/>
+                <attribute attribute-id="shoppayStorefrontAPIVersion"/>
+                <attribute attribute-id="shoppayModalImageViewType"/>
+                <attribute attribute-id="shoppayModalDebugEnabled"/>
+                <attribute attribute-id="shoppayExperimentId"/>
+            </attribute-group>
+        </group-definitions>
+    </type-extension>
+
+</metadata>

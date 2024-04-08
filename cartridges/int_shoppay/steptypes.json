@@ -1,0 +1,130 @@
+{
+    "step-types": {
+        "script-module-step": [{
+            "@type-id": "custom.shoppay.OrderReconciliation",
+            "@supports-parallel-execution": true,
+            "module": "int_shoppay/cartridge/scripts/shoppay/jobsteps/OrderReconciliation.js",
+            "description": "Retrieve and reconcile order data from incomplete Shop Pay orders.",
+            "@supports-site-context": "true",
+            "@supports-organization-context": "false",
+            "function": "Run",
+            "transactional": true,
+            "parameters": {
+                "parameter": [{
+                    "@name": "MaxOrderAgeHrs",
+                    "description": "Maximum age (in hours) of orders to process",
+                    "@type": "long",
+                    "@required": "false",
+                    "min-value": 1
+                },
+                {
+                    "@name": "MinOrderAgeSecs",
+                    "description": "Minimum age (in seconds) of orders to process",
+                    "@type": "long",
+                    "@required": "true",
+                    "min-value": 0
+                }]
+            },
+            "status-codes": {
+                "status": [{
+                        "@code": "ERROR",
+                        "description": "Used when an error occurred."
+                    },
+                    {
+                        "@code": "OK",
+                        "description": "Used when execution was successful."
+                    }
+                ]
+            }
+        },
+        {
+            "@type-id": "custom.shoppay.SubscribeWebhook",
+            "module": "int_shoppay/cartridge/scripts/shoppay/jobsteps/WebhookSubscriptions.js",
+            "description": "Subscribe to a Shopify webhook topic.",
+            "@supports-site-context": "true",
+            "@supports-organization-context": "false",
+            "function": "Subscribe",
+            "transactional": true,
+            "parameters": {
+                "parameter": [{
+                    "@name": "WebhookTopic",
+                    "description": "Webhook topic to subscribe to",
+                    "@type": "string",
+                    "@required": "false",
+                    "enum-values": {
+                        "value": [
+                            "ORDERS_CREATE"
+                        ]
+                    }
+                },
+                {
+                    "@name": "CallbackURL",
+                    "description": "Optional: Can be used to override mapped callback URLs for special aliasing scenarios, etc.",
+                    "@type": "string",
+                    "@required": "false",
+                    "@trim": "true"
+                }]
+            },
+            "status-codes": {
+                "status": [{
+                        "@code": "ERROR",
+                        "description": "Used when an error occurred."
+                    },
+                    {
+                        "@code": "OK",
+                        "description": "Used when execution was successful."
+                    }
+                ]
+            }
+        },
+        {
+            "@type-id": "custom.shoppay.UnsubscribeWebhook",
+            "module": "int_shoppay/cartridge/scripts/shoppay/jobsteps/WebhookSubscriptions.js",
+            "description": "Unsubscribe from a Shopify webhook topic.",
+            "@supports-site-context": "true",
+            "@supports-organization-context": "false",
+            "function": "Unsubscribe",
+            "transactional": true,
+            "parameters": {
+                "parameter": [{
+                    "@name": "WebhookId",
+                    "description": "GraphQL ID of the webhook to unsubscribe",
+                    "@type": "string",
+                    "@required": "false",
+                    "@trim": "true"
+                }]
+            },
+            "status-codes": {
+                "status": [{
+                        "@code": "ERROR",
+                        "description": "Used when an error occurred."
+                    },
+                    {
+                        "@code": "OK",
+                        "description": "Used when execution was successful."
+                    }
+                ]
+            }
+        },
+        {
+            "@type-id": "custom.shoppay.MaintainWebhookSubscriptions",
+            "module": "int_shoppay/cartridge/scripts/shoppay/jobsteps/WebhookSubscriptions.js",
+            "description": "Ensure all registered SFCC webhook subscriptions for the site are still active.",
+            "@supports-site-context": "true",
+            "@supports-organization-context": "false",
+            "function": "MaintainWebhookSubscriptions",
+            "transactional": true,
+            "status-codes": {
+                "status": [{
+                        "@code": "ERROR",
+                        "description": "Used when an error occurred."
+                    },
+                    {
+                        "@code": "OK",
+                        "description": "Used when execution was successful."
+                    }
+                ]
+            }
+        }]
+    }
+}

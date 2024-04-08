@@ -1,0 +1,35 @@
+<iscomment>BEGIN SHOPPAY</iscomment>
+<style>
+    .pdp-actions--shoppay-atc {
+        text-align: -webkit-center;
+
+        button {
+            margin-bottom: 16px;
+            height: 40px;
+        }
+    }
+</style>
+<iscomment>END SHOPPAY</iscomment>
+
+<div class="row cart-and-ipay ${pdict.includeShopPayJS ? 'pdp-actions--shoppay-atc' : ''}">
+    <div class="col-sm-12">
+        <input type="hidden" class="add-to-cart-url" value="${pdict.addToCartUrl}">
+        <button class="add-to-cart btn btn-primary col-sm-8"
+                data-toggle="modal" data-target="#chooseBonusProductModal"
+                data-pid="${product.id}"
+                ${!product.readyToOrder || !product.available ? "disabled" : ""}>
+            <i class="fa fa-shopping-bag"></i>
+            ${Resource.msg('button.addtocart', 'common', null)}
+        </button>
+
+        <isinclude template="product/components/addToCartButtonExtension"/>
+    </div>
+
+    <iscomment>BEGIN SHOPPAY (VARIANT PRODUCTS & MASTER PRODUCTS)</iscomment>
+    <isif condition="${pdict.includeShopPayJS && pdict.product.productType !== 'set' && !pdict.product.productType !== 'bundle'}">
+        <div class="col-sm-12">
+            <isinclude template="common/shoppayButton" />
+        </div>
+    </isif>
+    <iscomment>END SHOPPAY</iscomment>
+</div>

@@ -1,0 +1,5 @@
+<iscomment>This template will be included on every page that requires Shop Pay</iscomment>
+<script src="https://cdn.shopify.com/shopifycloud/shop-js/shop-pay-payment-request.js"></script>
+<script>
+    window.shoppayClientRefs = JSON.parse('<isprint encoding="jsonvalue" value="${pdict.shoppayClientRefs}" />')
+</script>

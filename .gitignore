@@ -1,0 +1,10 @@
+.DS_Store
+dw.json
+node_modules/
+.idea
+dist
+.vscode
+storefront-reference-architecture
+cartridges/int_shoppay/cartridge/static/
+cartridges/int_shoppay_sfra/cartridge/static/
+cartridges/int_shoppay_ab/cartridge/static/

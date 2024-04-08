@@ -1,0 +1,26 @@
+<isscript>
+    var assets = require('*/cartridge/scripts/assets.js');
+    assets.addJs('/js/cart/initShopPayCart.js');
+</isscript>
+
+<style>
+    shop-pay-payment-request-button {
+        --shop-pay-button-width: 100%;
+        --shop-pay-button-height: 40px;
+        --shop-pay-button-border-radius: 0.1875rem;
+    }
+
+    .shoppayButtonContainer {
+        padding: 0 !important;
+    }
+</style>
+
+<div class="shop-pay-container"
+    data-csrf-name="${pdict.csrf.tokenName}"
+    data-csrf-token="${pdict.csrf.token}"
+    data-empty-cart-load="${pdict.isEmptyCart}"
+    data-ready-to-order="${pdict.product ? pdict.product.readyToOrder : true}"
+    data-buy-now-init="${pdict.buyNowInitData}"
+    >
+    <div id="shop-pay-button-container" class="${pdict.action === 'Product-Show' ? 'btn col-sm-8 shoppayButtonContainer' : 'btn col-sm-12 shoppayButtonContainer'}"></div>
+</div>
