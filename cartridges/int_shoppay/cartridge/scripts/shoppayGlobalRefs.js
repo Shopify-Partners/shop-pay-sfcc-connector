@@ -53,6 +53,7 @@ var isShoppayPDPButtonEnabled = function(productId) {
 var isShoppayCartButtonEnabled  = function() { return currentSite.getCustomPreferenceValue('shoppayCartButtonEnabled'); }
 var shoppayStoreId              = function() { return currentSite.getCustomPreferenceValue('shoppayStoreId'); }
 var shoppayClientId             = function() { return currentSite.getCustomPreferenceValue('shoppayClientId'); }
+var shoppayClientSecret         = function() { return currentSite.getCustomPreferenceValue('shoppayClientSecret'); }
 var shoppayAdminAPIVersion      = function() { return currentSite.getCustomPreferenceValue('shoppayAdminAPIVersion'); }
 var shoppayStorefrontAPIVersion = function() { return currentSite.getCustomPreferenceValue('shoppayStorefrontAPIVersion'); }
 var shoppayModalImageViewType   = function() { return currentSite.getCustomPreferenceValue('shoppayModalImageViewType'); }
@@ -179,5 +180,6 @@ module.exports = {
     shoppayModalImageViewType: shoppayModalImageViewType(),
     shoppayPaymentMethodId: shoppayPaymentMethodId,
     shoppayStorefrontAPIVersion: shoppayStorefrontAPIVersion(),
-    shoppayStoreId: shoppayStoreId()
+    shoppayStoreId: shoppayStoreId(),
+    shoppayClientSecret: shoppayClientSecret()
 };

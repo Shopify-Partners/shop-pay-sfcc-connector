@@ -138,6 +138,14 @@
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
+            <attribute-definition attribute-id="shoppayClientSecret">
+                <display-name xml:lang="x-default">Shopify Client Secret</display-name>
+                <description xml:lang="x-default">Shopify Custom App API Secret Key</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
             <attribute-definition attribute-id="shoppayStoreName">
                 <display-name xml:lang="x-default">Shopify Store Name</display-name>
                 <description xml:lang="x-default">https://admin.shopify.com/store/&lt;Shopify Store Name&gt;/</description>
@@ -196,6 +204,7 @@
                 <attribute attribute-id="shoppayStoreName"/>
                 <attribute attribute-id="shoppayStoreId"/>
                 <attribute attribute-id="shoppayClientId"/>
+                <attribute attribute-id="shoppayClientSecret"/>
                 <attribute attribute-id="shoppayAdminAPIToken"/>
                 <attribute attribute-id="shoppayStorefrontAPIToken"/>
                 <attribute attribute-id="shoppayAdminAPIVersion"/>

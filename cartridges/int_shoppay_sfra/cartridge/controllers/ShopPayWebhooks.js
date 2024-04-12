@@ -6,8 +6,33 @@
 
 var server = require('server');
 
+/* Script Modules */
+const shoppayGlobalRefs = require('*/cartridge/scripts/shoppayGlobalRefs');
+
 /* API Includes */
 var Logger = require('dw/system/Logger').getLogger('ShopPay', 'ShopPay');
+
+/**
+ * Calculate a Hmac digest and encode it in Base64 String
+ *
+ * @param   {string} data data to calculate hmac for
+ * @param   {string} stringKey secret key for calculating digest
+ * @returns {string} Base64 encoded string of data digest
+ */
+function calculateHmac(data, stringKey) {
+    var Mac = require('dw/crypto/Mac');
+    var Encoding = require('dw/crypto/Encoding');
+    var Bytes = require('dw/util/Bytes');
+
+
+    var macSha256 = new Mac(Mac.HMAC_SHA_256);
+    var secretBytes = new Bytes(stringKey, 'UTF-8');
+    var dataBytes = new Bytes(data, 'UTF-8');
+    var calculatedHmac = macSha256.digest(dataBytes, secretBytes);
+    var calculatedHmacBase64 = Encoding.toBase64(calculatedHmac);
+
+    return calculatedHmacBase64;
+}
 
 /**
  * The ShopPayWebhooks-OrdersCreate controller receives the payload of the Shopify ORDERS_CREATE
@@ -29,6 +54,16 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
         var order;
         var placeOrderResult;
         var payload = JSON.parse(req.body);
+        var HMACHeader = req.httpHeaders.get('x-shopify-hmac-sha256');
+        var shoppayClientSecret = shoppayGlobalRefs.shoppayClientSecret;
+        var calculatedHmacBase64 = shoppayClientSecret ? calculateHmac(req.body, shoppayClientSecret) : '';
+
+        if (!HMACHeader || !calculatedHmacBase64 || HMACHeader !== calculatedHmacBase64) {
+            Logger.error('[ShopPayWebhooks-OrdersCreate] HMAC header validation failed');
+            res.json({});
+            return next();
+        }
+
         if (payload.source_identifier) {
             order = OrderMgr.queryOrder('custom.shoppaySourceIdentifier={0}', payload.source_identifier);
         }
@@ -43,6 +78,7 @@ server.post('OrdersCreate', server.middleware.https, function (req, res, next) {
             res.json({});
             return next();
         }
+
         // Webhooks can sometimes be received more than once. Ensure payload has not already been handled.
         if (order.status.value === Order.ORDER_STATUS_CREATED) {
             Transaction.wrap(function() {
