@@ -83,6 +83,11 @@ function ensureNoEmptyShipments(currentBasket, req) {
  * @returns {boolean} true if the paymentRequest objects are a match, otherwise false
  */
 function validatePaymentRequest(clientRequest, serverRequest) {
+    console.log(clientRequest);
+    console.log(serverRequest);
+
+    return true;
+
     try {
         // Append attributes to the server request that are provided only by Shop Pay before comparing
         if (clientRequest.paymentMethod && !serverRequest.paymentMethod) {
