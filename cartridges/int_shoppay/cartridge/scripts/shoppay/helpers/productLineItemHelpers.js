@@ -93,25 +93,14 @@ function getItemPricing(pli) {
 
     var priceFactoryPricing = priceFactory.getPrice(pli.product, pli.price.currencyCode, false, promotions, currentOptionModelPLI);
     var itemPrice = {};
-    if (priceFactoryPricing.list !== null) {
-        itemPrice.originalItemPrice = {
-            amount: priceFactoryPricing.list.value,
-            currencyCode: priceFactoryPricing.list.currency
-        };
-        itemPrice.finalItemPrice = {
-            amount: priceFactoryPricing.sales.value,
-            currencyCode: priceFactoryPricing.sales.currency
-        };
-    } else {
-        itemPrice.originalItemPrice = {
-            amount: priceFactoryPricing.sales.value,
-            currencyCode: priceFactoryPricing.sales.currency
-        };
-        itemPrice.finalItemPrice = {
-            amount: priceFactoryPricing.sales.value,
-            currencyCode: priceFactoryPricing.sales.currency
-        };
-    }
+    itemPrice.originalItemPrice = {
+        amount: priceFactoryPricing.sales.value,
+        currencyCode: priceFactoryPricing.sales.currency
+    };
+    itemPrice.finalItemPrice = {
+        amount: priceFactoryPricing.sales.value,
+        currencyCode: priceFactoryPricing.sales.currency
+    };
 
     return itemPrice;
 }
