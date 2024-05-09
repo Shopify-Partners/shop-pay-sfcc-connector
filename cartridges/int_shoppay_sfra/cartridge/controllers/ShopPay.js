@@ -34,7 +34,7 @@ function validateInputs(req, currentBasket, inputParams) {
         };
     }
 
-    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);;
+    var shoppayEligible = shoppayGlobalRefs.shoppayApplicable(req, currentBasket);
     if (!shoppayEligible) {
         return {
             error: true,
@@ -510,7 +510,7 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
         currentBasket = BasketMgr.getCurrentBasket();
     }
 
-    var inputValidation = validateInputs(req, currentBasket, ['deliveryMethod']);
+    var inputValidation = validateInputs(req, currentBasket, []);
     if (!inputValidation || inputValidation.error) {
         res.json({
             error: true,
@@ -535,22 +535,26 @@ server.post('DeliveryMethodChanged', server.middleware.https, csrfProtection.val
         return shippingMethod.ID === data.deliveryMethod.code;
     });
 
+    if(shippingMethod) {
+        Transaction.wrap(function () {
+            // Set selected shipping method
+            shippingHelpers.selectShippingMethod(shipment, shippingMethod.ID);
+        });
+    }
+
+    COHelpers.recalculateBasket(currentBasket);
+    var paymentRequestModel = new PaymentRequestModel(currentBasket);
+
     if (!shippingMethod) {
         // Shopper selected a shipping method that is not applicable
         res.json({
             error: true,
             errorMsg: Resource.msg('shoppay.error.shipping', 'shoppay', null),
+            paymentRequest: paymentRequestModel
         });
         return next();
     }
 
-    Transaction.wrap(function () {
-        // Set selected shipping method
-        shippingHelpers.selectShippingMethod(shipment, shippingMethod.ID);
-    });
-
-    COHelpers.recalculateBasket(currentBasket);
-    var paymentRequestModel = new PaymentRequestModel(currentBasket);
 
     res.json({
         error: false,
