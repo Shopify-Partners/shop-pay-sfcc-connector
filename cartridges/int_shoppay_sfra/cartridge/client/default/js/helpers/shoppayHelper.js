@@ -225,7 +225,7 @@ function setSessionListeners(session) {
             session.completeDeliveryMethodChange({
                 errors: [
                     {
-                        type: "deliveryMethodError",
+                        type: "shippingAddressError",
                         message: technicalErrorMsg
                     }
                 ]
@@ -240,13 +240,23 @@ function setSessionListeners(session) {
             if (responseJSON.errorMsg) {
                 errorMsg = responseJSON.errorMsg;
             }
+            const { shippingLines, totalShippingPrice, totalTax, total } = responseJSON.paymentRequest;
+            const updatedPaymentRequest = window.ShopPay.PaymentRequest.build({
+                ...currentPaymentRequest,
+                shippingLines: shippingLines,
+                totalShippingPrice: totalShippingPrice,
+                totalTax: totalTax,
+                total: total
+            });
+
             session.completeDeliveryMethodChange({
                 errors: [
                     {
-                        type: "deliveryMethodError",
+                        type: "shippingAddressError",
                         message: errorMsg
                     }
-                ]
+                ],
+                updatedPaymentRequest: updatedPaymentRequest
             });
             return;
         }

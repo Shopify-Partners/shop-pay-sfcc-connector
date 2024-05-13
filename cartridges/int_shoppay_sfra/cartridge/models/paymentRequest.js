@@ -33,8 +33,8 @@ function PaymentRequest(basket) {
     }
     this.discountCodes = discountHelpers.getDiscountCodes(basket);
     this.lineItems = productLineItemHelpers.getLineItems(basket);
-    this.shippingLines = shippingHelpers.getShippingLines(mainShipment);
     this.deliveryMethods = shippingHelpers.getApplicableDeliveryMethods(mainShipment);
+    this.shippingLines = this.deliveryMethods && this.deliveryMethods.length ? shippingHelpers.getShippingLines(mainShipment) : [];
     this.locale = paymentHelpers.getLocale();
     this.presentmentCurrency = paymentHelpers.getPresentmentCurrency(basket);
     this.subtotal = totalsHelpers.getSubtotal(basket);
