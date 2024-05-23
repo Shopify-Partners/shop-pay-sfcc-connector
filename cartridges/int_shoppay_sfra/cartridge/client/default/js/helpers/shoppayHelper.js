@@ -352,7 +352,7 @@ function setSessionListeners(session) {
             session.completePaymentConfirmationRequest({
                 errors: [
                     {
-                        type: "paymentConfirmationError",
+                        type: "generalError",
                         message: technicalErrorMsg
                     }
                 ]
@@ -370,7 +370,7 @@ function setSessionListeners(session) {
             session.completePaymentConfirmationRequest({
                 errors: [
                     {
-                        type: "paymentConfirmationError",
+                        type: "generalError",
                         message: errorMsg
                     }
                 ]
