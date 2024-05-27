@@ -10,7 +10,7 @@ This project was built using node `v14.21.3` but any version of node 14 will wor
 
 Run following:
 
-`npm install && sfra:install`
+`npm install && npm run sfra:install`
 
 The above will install project dependencies
 

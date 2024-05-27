@@ -10,8 +10,9 @@ var Result = require('dw/svc/Result');
  * @returns {Object} The GraphQL service response body
  */
 function shoppayPaymentRequestSessionCreate(basket, paymentRequest) {
-    if (paymentRequest.shippingAddress && paymentRequest.shippingAddress.id) {
-        delete paymentRequest.shippingAddress.id;
+    if (paymentRequest.shippingAddress) {
+        // shipping address was depreciated in ShopPayPaymentRequestInput as of 2024-07
+        delete paymentRequest.shippingAddress;
     }
     try {
         const bodyObj = {
@@ -65,10 +66,9 @@ function shoppayPaymentRequestSessionCreate(basket, paymentRequest) {
  * @returns {Object} The GraphQL service response body
  */
 function shoppayPaymentRequestSessionSubmit(paymentRequest, token) {
-    /* shippingAddress.id is a Shop Pay specific/provided element and is not a valid input for the GraphQL session
-       submit request, but is included in the payment request object from the client-side Shop Pay session */
-    if (paymentRequest.shippingAddress.id) {
-        delete paymentRequest.shippingAddress.id;
+    if (paymentRequest.shippingAddress) {
+        // shipping address was depreciated in ShopPayPaymentRequestInput as of 2024-07
+        delete paymentRequest.shippingAddress;
     }
     try {
         const bodyObj = {
