@@ -160,7 +160,7 @@
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
-                <default-value>unstable</default-value>
+                <default-value>2024-07</default-value>
             </attribute-definition>
             <attribute-definition attribute-id="shoppayModalImageViewType">
                 <display-name xml:lang="x-default">Shop Pay Modal Image View Type</display-name>

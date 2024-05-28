@@ -11,7 +11,7 @@ var Result = require('dw/svc/Result');
  */
 function shoppayPaymentRequestSessionCreate(basket, paymentRequest) {
     if (paymentRequest.shippingAddress) {
-        // shipping address was depreciated in ShopPayPaymentRequestInput as of 2024-07
+        // shipping address was deprecated in ShopPayPaymentRequestInput as of 2024-07
         delete paymentRequest.shippingAddress;
     }
     try {
@@ -67,7 +67,7 @@ function shoppayPaymentRequestSessionCreate(basket, paymentRequest) {
  */
 function shoppayPaymentRequestSessionSubmit(paymentRequest, token) {
     if (paymentRequest.shippingAddress) {
-        // shipping address was depreciated in ShopPayPaymentRequestInput as of 2024-07
+        // shipping address was deprecated in ShopPayPaymentRequestInput as of 2024-07
         delete paymentRequest.shippingAddress;
     }
     try {
