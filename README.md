@@ -20,6 +20,8 @@ The above will install project dependencies
 
 You can use `npm run watch` as you develop in conjunction with the VS Code [Prophet Debugger](https://marketplace.visualstudio.com/items?itemName=SqrTT.prophet) extension
 
+You can view our internal documentation for this cartridge [here](https://shop.docs.shopify.io/docs/pay/features/commerce_component/salesforce)
+
 ## Testing
 
 The following frameworks and packages are used for testing
