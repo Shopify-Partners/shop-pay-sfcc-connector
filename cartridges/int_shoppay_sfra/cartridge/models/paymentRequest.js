@@ -27,6 +27,8 @@ function PaymentRequest(basket) {
     var paymentMethod = paymentHelpers.getPaymentMethod(basket);
     var totalShippingPrice = totalsHelpers.getTotalShippingPrice(basket);
 
+    // shipping address is no longer required as an input to the ShopPayPaymentRequestSession mutations
+    // we still include it in this model in case merchants are using it for their logic
     this.shippingAddress = shippingHelpers.getShippingAddress(mainShipment, basket);
     if (paymentMethod != null) {
         this.paymentMethod = paymentMethod;

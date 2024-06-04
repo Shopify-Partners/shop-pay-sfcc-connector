@@ -1,5 +1,4 @@
 const mockPaymentRequestObject = {
-    shippingAddress: null,
     discountCodes: [
         'LOYALTY15'
     ],

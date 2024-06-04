@@ -10,7 +10,7 @@ This project was built using node `v14.21.3` but any version of node 14 will wor
 
 Run following:
 
-`npm install && sfra:install`
+`npm install && npm run sfra:install`
 
 The above will install project dependencies
 
@@ -19,6 +19,8 @@ The above will install project dependencies
 ### Local Development
 
 You can use `npm run watch` as you develop in conjunction with the VS Code [Prophet Debugger](https://marketplace.visualstudio.com/items?itemName=SqrTT.prophet) extension
+
+You can view our internal documentation for this cartridge [here](https://shop.docs.shopify.io/docs/pay/features/commerce_component/salesforce)
 
 ## Testing
 
