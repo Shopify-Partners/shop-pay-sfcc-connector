@@ -4,7 +4,7 @@ Version 1.0.0
 
 March 2024
 
-Table of Contents
+## Table of Contents
 
 [1. Connector reference code Version and Compatibility](#1-connector-reference-code-version-and-compatibility)
 
