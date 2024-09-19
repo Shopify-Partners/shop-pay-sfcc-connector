@@ -4,6 +4,8 @@ This link cartridge is based off of [storefront-reference-architecture](https://
 
 ## Getting Started
 
+Below are the instructions for working with this repository. For details on the Shop Pay connector reference code contained within, please see the [INTEGRATION GUIDE](./INTEGRATION_GUIDE.md).
+
 ### Install dependencies
 
 This project was built using node `v14.21.3` but any version of node 14 will work. [Node Version Manager](https://github.com/nvm-sh/nvm) or `nvm` is an easy way to use different versions of node
@@ -49,7 +51,7 @@ SITE_URL=https://<INSTANCE>.commercecloud.salesforce.com/on/demandware.store/Sit
 
 ### Note - Integration and E2E tests require a live and fully configured SFRA Sandbox
 
-## Instructions
+## Testing Instructions
 
 Change into the `test` directory
 
