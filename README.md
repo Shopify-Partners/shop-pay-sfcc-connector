@@ -1,6 +1,6 @@
-# Shop Pay Salesforce Commerce Cloud Cartridge
+# Shop Pay Commerce Component connector reference code for Salesforce Commerce Cloud SFRA
 
-This link cartridge is based off of [storefront-reference-architecture](https://github.com/SalesforceCommerceCloud/storefront-reference-architecture) (SFRA) `v6.3.0`
+This link cartridge reference code is based off of SFRA `v6.3.0`
 
 ## Getting Started
 
@@ -14,31 +14,26 @@ Run following:
 
 `npm install && npm run sfra:install`
 
-The above will install project dependencies
-
-### Note the install may take a few minutes
+The above will install project dependencies. This may take a few minutes.
 
 ### Local Development
 
-You can use `npm run watch` as you develop in conjunction with the VS Code [Prophet Debugger](https://marketplace.visualstudio.com/items?itemName=SqrTT.prophet) extension
-
-You can view our internal documentation for this cartridge [here](https://shop.docs.shopify.io/docs/pay/features/commerce_component/salesforce)
+You can optionally use `npm run watch` as you develop in conjunction with the VS Code [Prophet Debugger](https://marketplace.visualstudio.com/items?itemName=SqrTT.prophet) extension.
 
 ## Testing
 
 The following frameworks and packages are used for testing
 
- - [mocha](https://mochajs.org/)
- - [Playwright](https://playwright.dev/)
+- [mocha](https://mochajs.org/)
+- [Playwright](https://playwright.dev/)
 
-    - SFCC API calls are mocked & stubbed using:
+  - SFCC API calls are mocked & stubbed using:
 
-        - [proxyquire](https://github.com/thlorenz/proxyquire)
-        - [sinon.js](https://sinonjs.org/)
-        - [dw-mock-api](https://github.com/SalesforceCommerceCloud/dw-api-mock)
+    - [proxyquire](https://github.com/thlorenz/proxyquire)
+    - [sinon.js](https://sinonjs.org/)
+    - [dw-mock-api](https://github.com/SalesforceCommerceCloud/dw-api-mock)
 
-
-## Prerequisites
+### Prerequisites
 
 `.env` file at the root of this directory with the following variables. See [example](test/env.example) file
 
@@ -49,9 +44,10 @@ BASE_URL=https://<INSTANCE>.commercecloud.salesforce.com/on/demandware.store/Sit
 SITE_URL=https://<INSTANCE>.commercecloud.salesforce.com/on/demandware.store/Sites-RefArch-Site
 ```
 
-### Note - Integration and E2E tests require a live and fully configured SFRA Sandbox
+> Note:
+Integration and E2E tests require a live and fully configured SFRA Sandbox, and coordination from your Shopify launch team.
 
-## Testing Instructions
+### Instructions
 
 Change into the `test` directory
 
@@ -59,7 +55,7 @@ Run  `npm install`
 
 - Running tests:
 
-    - Unit Tests: `npm run test:unit`
-    - Integration Tests: `npm run test:integration`
-    - UI Tests: `npm run test:ui`
-    - Integration + UI tests: `npm run test:e2e`
+  - Unit Tests: `npm run test:unit`
+  - Integration Tests: `npm run test:integration`
+  - UI Tests: `npm run test:ui`
+  - Integration + UI tests: `npm run test:e2e`
