@@ -4,7 +4,7 @@ This link cartridge reference code is based off of SFRA `v6.3.0`
 
 ## Getting Started
 
-Below are the instructions for working with this repository. For details on the Shop Pay connector reference code contained within, please see the [INTEGRATION GUIDE](./INTEGRATION_GUIDE.md).
+Below are the instructions for working with this repository. For details on the Shop Pay connector reference code contained within, please see the [INTEGRATION GUIDE](./INTEGRATION_GUIDE.md) and [TECHNICAL SPECIFICATIONS](./TECHNICAL_SPECIFICATIONS.md).
 
 ### Install dependencies
 
