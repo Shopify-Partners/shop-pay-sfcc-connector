@@ -78,7 +78,9 @@
 
       * [3.6.1. Order](#361-order)
 
-      * [3.6.2. Order Payment Instrument](#362-order-payment-instrument)
+      * [3.6.2. Order Payment Instrument](#362-orderpaymentinstrument)
+
+      * [3.6.3. SitePreferences](#363-sitepreferences)
 
 [4. Server Side and Back End: Scripts and Controllers](#4-server-side-and-back-end-scripts-and-controllers)
 
@@ -151,10 +153,6 @@
       * [5.3.1. ORDERS_CREATE](#531-orders_create)
 
       * [5.3.2. ORDER_TRANSACTIONS_CREATE](#532-order_transactions_create)
-
-      * [5.3.3. DISPUTES_CREATE](#533-disputes_create)
-
-      * [5.3.4. DISPUTES_UPDATE](#534-disputes_update)
 
 ---
 
@@ -517,7 +515,7 @@ Group: ShopPay
 | shoppayPaymentToken | Shop Pay Payment Token | string |
 | | | |
 
-**SitePreferences**
+#### 3.6.3. **SitePreferences**
 
 Group: ShopPay
 
