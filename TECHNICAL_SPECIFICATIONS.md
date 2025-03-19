@@ -28,7 +28,7 @@
 
       * [1.3.3. Defer to OMS with Guidance](#133-defer-to-oms-with-guidance)
 
-[2. Client Side and Front End](#2-client-side-and-front-end)
+[2. Client Side and Frontend](#2-client-side-and-frontend)
 
    * [2.1. Script Include](#21-script-include)
 
@@ -84,7 +84,7 @@
 
       * [3.6.3. SitePreferences](#363-sitepreferences)
 
-[4. Server Side and Back End: Scripts and Controllers](#4-server-side-and-back-end-scripts-and-controllers)
+[4. Server Side and Backend: Scripts and Controllers](#4-server-side-and-backend-scripts-and-controllers)
 
    * [4.1. Custom Controllers](#41-custom-controllers)
 
@@ -220,7 +220,7 @@ Source: https://shopify.dev/docs/api/commerce-components/pay#sequence-diagram
 - Fulfillment tracking
 - Refund creation
 
-## 2. **Client Side and Front End**
+## 2. **Client Side and Frontend**
 
 ### 2.1. **Script Include**
 
@@ -229,10 +229,10 @@ Source: https://shopify.dev/docs/api/commerce-components/pay#sequence-diagram
 ```
 
 - Leverage the `app.template.htmlHead` hook in `htmlHead.isml` to include the script tag
-- Add a pdict var to the Cart-Show, Product-Show, and Checkout-Begin and any other relevant controllers to include the script on specific pages.
+- Add a pdict var to the `Cart-Show`, `Product-Show`, and `Checkout-Begin` and any other relevant controllers to include the script on specific pages.
 - Include logic in the hook to render the script tag on ALL site pages during merchant assigned A/B testing (and A/A testing)
 
-Sample (rough) implementation of the htmlHead(pdict) hook function and template:
+Sample (rough) implementation of the `htmlHead(pdict)` hook function and template:
 
 ```javascript
 'use strict';
@@ -277,9 +277,9 @@ Use a data attribute on the Shop Pay button on Cart, PDP, and Checkout pages to 
 
 #### 2.2.1. General Notes
 
-All event handler controllers will return information about error status, specifically `error`: `true`/`false`, `errorMsg`: `string`/`null`.
+All event handler controllers will return information about error status, specifically `error`: `true`/`false`, `errorMsg`: string/null.
 
-If `error` = `true`, send the errors object, instead of the `paymentRequestObject`, to the event completion handler to abort the Shop Pay payment flow (and render a message in the Shop Pay modal, where applicable). Simple example:
+If `error` = `true`, send the errors object, instead of the `paymentRequestObject`, to the event completion handler to abort the Shop Pay payment flow (and render a message in the Shop Pay modal, where applicable). Example:
 
 ```javascript
 session.completeDiscountCodeChange({
@@ -317,7 +317,7 @@ errors: [
 - Calls the `ShopPay-GetCartSummary` controller via AJAX
    - Sets `csrf_token` as an http parameter in the ajax request URL
    - Receives JSON response containing the `PaymentRequest` object
-   - Sets `shippingAddress` to `null` (in the event a registered customer already has their primary address set on the cart, Shop Pay addresses should take precedence) and set `deliveryMethods` to `[]`.
+   - Sets `shippingAddress` to null (in the event a registered customer already has their primary address set on the cart, Shop Pay addresses should take precedence) and set `deliveryMethods` to `[]`.
 - Create session by calling `ShopPay.PaymentRequest.createSession` from the Shop Pay SDK passing the `paymentRequest` object form the AJAX call above
 
 #### 2.3.2. **sessionrequested**
@@ -325,8 +325,9 @@ errors: [
 - Gets CSRF token from hidden data attribute on the page
 - Calls the `ShopPay-BeginSession` controller via AJAX
    - Sets `csrf_token` as an http parameter in the ajax request URL
-   - Receives JSON response containing the `token`, `checkoutUrl`, and `sourceIdentifier` - Then after the ASYNC AJAX response is received `session.completeSessionRequest` is called using the data retuned by `Shop-BeginSession`
-   - This verify’s the session allowing the Shop Pay Popup to start the checkout process
+   - Receives JSON response containing the `token`, `checkoutUrl`, and `sourceIdentifier`
+   - After the ASYNC AJAX response is received `session.completeSessionRequest` is called using the data retuned by `Shop-BeginSession`
+   - This verifies the session allowing the Shop Pay Popup to start the checkout process
 
 #### 2.3.3. **discountcodechanged**
 
@@ -373,7 +374,7 @@ errors: [
 
 - If event `processingStatus.status` equals `completed` , call `session.close` and redirect to the order confirmation page.
 - Data elements `continueUrl`, `orderID`, and `orderToken` will be returned by the Shop Pay `SubmitPayment` controller.
-- Sample redirect implementation (refer to `checkout/checkout.js` in the OOTB SFRA client-side JS)
+- Sample redirect implementation (refer to `checkout/checkout.js` in the included SFRA client-side JS)
 
 ```javascript
 {
@@ -409,8 +410,8 @@ There are multiple events that can occur on the PDP and Cart pages in which the 
 Upon clicking the Shop Pay button in Cart and PDP,
 
 - Call the `ShopPay-GetCartSummary` controller via AJAX to get the
-`updatedPaymentRequest` object from the SFCC back end
-- Set the `shippingAddress` to `null` (in the event a registered customer already has their primary address set on the cart, Shop Pay addresses should take precedence) and set `deliveryMethods` to `[]` in the payment Request object.
+`updatedPaymentRequest` object from the SFCC backend
+- Set the `shippingAddress` to null (in the event a registered customer already has their primary address set on the cart, Shop Pay addresses should take precedence) and set `deliveryMethods` to `[]` in the payment Request object.
 - Push the `paymentRequest` object to the Shop Pay session:
 
 ```javascript
@@ -505,8 +506,10 @@ Group: Shop Pay
 | shoppayOrderNumber | Shop Pay Order Number | string |
 | shoppayGraphQLOrderId | Graph QL Order ID | string |
 | shoppayOrderCreateWebhookReceived | Order Create Webhook Received | boolean |
-| shoppayOrder note: this is a convenience attribute for simple indexing and searching of orders paid with Shop Pay | Is a Shop Pay Order | boolean |
+| shoppayOrder | Is a Shop Pay Order | boolean |
 | | | |
+
+>Note: shoppayOrder is a convenience attribute for simple indexing and searching of orders paid with Shop Pay
 
 #### 3.6.2. **OrderPaymentInstrument**
 
@@ -531,33 +534,33 @@ Group: Shop Pay
 | shoppayABTestEnabled | Shop Pay A/B Testing Enabled | boolean |
 | | | |
 
-## 4. **Server Side and Back End: Scripts and Controllers**
+## 4. **Server Side and Backend: Scripts and Controllers**
 
 ### 4.1. **Custom Controllers**
 
 General notes:
 
 1. Use resource bundles for any error messages so that an integrator can easily update the error messaging.
-2. All shop pay custom controllers should confirm that Shop Pay is enabled before proceeding with the controller logic. Use the toggle on the Shop Pay payment method, rather than a site preference, to verify the status. For the Cart-Show, Product-Show, and Checkout-Begin appends just return next(). For the custom Shop Pay controllers, return the error status (`error`: `true`, `errorMessage`: `string`)
+2. All shop pay custom controllers should confirm that Shop Pay is enabled before proceeding with the controller logic. Use the toggle on the Shop Pay payment method, rather than a site preference, to verify the status. For the `Cart-Show`, `Product-Show`, and `Checkout-Begin` appends just return `next()`. For the custom Shop Pay controllers, return the error status (`error`: `true`, `errorMessage`: string)
 3. All error handling flows should include error logging.
-4. All debug, error, etc. logging should be handled in a dedicated "ShopPay" logger.
+4. All debug, error, etc. logging should be handled in a dedicated `ShopPay` logger.
 
 #### 4.1.1. **ShopPay-GetCartSummary**
 
 - Type: `GET`
 - Controller is called via ajax from client-side scripts
-- Use csrfProtection.validateAjaxRequest from the middleware to validate the CSRF token. CSRF token should be passed in as a query parameter on the ajax request (?csrf_token=xxx).
+- Use `csrfProtection.validateAjaxRequest` from the middleware to validate the CSRF token. CSRF token should be passed in as a query parameter on the ajax request (`?csrf_token=xxx`).
 - Retrieves the cart info needed to populate the `PaymentRequest` object, which is used to instantiate the Shop Pay Payment Request session client-side
 (https://shopify.dev/docs/api/commerce-components/pay#create-a-session)
 - Response must include an object that matches the structure of the PaymentRequest object
-- Leverage helper scripts to generate the object so it can be reused in Sitegenesis code if a
-Sitegenesis version is built in the future. This also allows reusability by web services if needed.
+- Leverage helper scripts to generate the object so it can be reused in SiteGenesis code if a
+SiteGenesis version is built in the future. This also allows reusability by web services if needed.
 
 #### 4.1.2. **ShopPay-BeginSession**
 
 - Type: `POST`
 - Inputs:
-   - current payment request object from client-side Shop Pay session
+   - Current payment request object from client-side Shop Pay session
 - Controller is called via ajax from the client-side Shop Pay `sessionrequested` event handler
 - Use `csrfProtection.validateAjaxRequest` from the middleware to validate the CSRF token. CSRF token should be passed in as a query parameter on the ajax request (`csrf_token=xxx`).
 - Use a helper script (to allow for customization) to verify that the current cart is eligible for Shop Pay checkout. Throw an error if any checks fail. Criteria to be considered:
@@ -565,11 +568,11 @@ Sitegenesis version is built in the future. This also allows reusability by web 
    - No BOPIS items in the cart
    - Only one shipment in the cart
    - Cart has total > $0
-   - Use `PaymentMethod.isApplicable(customer : Customer, countryCode : String, paymentAmount : Number)` to leverage OOTB max/min order totals, country restrictions, etc.
+   - Use `PaymentMethod.isApplicable(customer : Customer, countryCode : String, paymentAmount : Number)` to leverage default max/min order totals, country restrictions, etc.
 - Call the `ShopPayPaymentRequestSessionCreate` web service
-- returns:
+- Returns:
    - `token`, `checkoutUrl`, `sourceIdentifier` from `ShopPayPaymentRequestSessionCreate` web service request
-   - `status` (`error`: `true`/`false`, `errorMessage`: `string`/`null`)
+   - `status` (`error`: `true`/`false`, `errorMessage`: string/null)
 
 #### 4.1.3. **ShopPay-DiscountCodeChanged**
 
@@ -579,16 +582,17 @@ Sitegenesis version is built in the future. This also allows reusability by web 
    - Current payment request object from client-side Shop Pay session
    - `discountCodes` value from Shopify modal event
 - Use `csrfProtection.validateAjaxRequest` from the middleware to validate the CSRF token. CSRF token should be passed in as a query parameter on the ajax request (`csrf_token=xxx`).
-- Compares list of discount codes received from front end to list currently stored on the SFCC cart to determine whether to apply or remove coupons
+- Compares list of discount codes received from frontend to list currently stored on the SFCC cart to determine whether to apply or remove coupons
    - Compare input list to coupon line items in basket
 - If `discountCodes` contains a coupon code not in the coupon line items, use all logic from `Cart-AddCoupon` controller to add the necessary coupon code to the basket
 - If coupon line items have a coupon code that is not in the `discountCodes` list, use most of the logic from `Cart-RemoveCouponLineItem` controller
    - Remove identified coupon line item(s) from basket
    - Call `basketCalculationHelpers.calculateTotals(currentBasket)`
    - Error handling
-- Leverages the helpers from the payment request model to update the discount codes, line items, subtotal, discounts, totalTax, and total in the payment request object - returns:
-   - updated payment request object with latest cart totals and discounts
-   - `status` (`error`: `true`/`false`, `errorMessage`: `string`/`null`)
+- Leverages the helpers from the payment request model to update the discount codes, line items, subtotal, discounts, totalTax, and total in the payment request object
+- Returns:
+   - Updated payment request object with latest cart totals and discounts
+   - `status` (`error`: `true`/`false`, `errorMessage`: string/null)
 
 #### 4.1.4. **ShopPay-ShippingAddressChanged**
 
@@ -602,7 +606,7 @@ Sitegenesis version is built in the future. This also allows reusability by web 
    - Calls a helper function that verifies that all required address fields are populated. This will allow an integrator to easily override to integrate 3rd party
 address validation or custom logic like PO box exclusions.
    - Uses a helper script to set the new shipping address on the correct shipment This will allow an integrator to easily override for custom shipment splitting scenarios.
-      - Probably want to return the identified shipment for use in determining applicable shipping methods
+      - You may want to return the identified shipment for use in determining applicable shipping methods
    - Call `validationHelpers.validateProducts(currentBasket)`
    - `ShippingHelpers.getApplicableShippingMethods(shipment, address)`
 (`shippingHelpers.js`)
@@ -611,15 +615,15 @@ address validation or custom logic like PO box exclusions.
       - Additional logic can be provided by an integrator via script override
 - Recalculate the basket so that taxes and totals are updated in the SFCC cart, even though these don’t seem to be needed for the controller response object
 - Leverages the helpers from the payment request model to update the delivery methods in the payment request object
-- returns:
-   - updated payment request object with latest cart totals
-   - `status` (`error`: `true`/`false`, `errorMessage`: `string`/`null`)
+- Returns:
+   - Updated payment request object with latest cart totals
+   - `status` (`error`: `true`/`false`, `errorMessage`: string/null)
 
 #### 4.1.5. **ShopPay-DeliveryMethodChanged**
 
 - Controller is called via ajax from the client-side Shop Pay `deliverymethodchanged` event handler
 - Type: `POST`
-- Inputs
+- Inputs:
    - Current payment request object from client-side Shop Pay session
    - `deliveryMethod` value from Shopify modal event
 - Use `csrfProtection.validateAjaxRequest` from the middleware to validate the CSRF token. CSRF token should be passed in as a query parameter on the ajax request (`csrf_token=xxx`).
@@ -628,9 +632,9 @@ address validation or custom logic like PO box exclusions.
       - This will allow an integrator to easily override for custom shipment splitting scenarios
    - Recalculate the basket
 - Leverages the helpers from the payment request model to update the shipping lines and total in the payment request object
-- returns:
-   - updated payment request object
-   - `status` (`error`: `true`/`false`, `errorMessage`: `string`/`null`)
+- Returns:
+   - Updated payment request object
+   - `status` (`error`: `true`/`false`, `errorMessage`: string/null)
 
 #### 4.1.6. **ShopPay-SubmitPayment**
 
@@ -648,7 +652,7 @@ Implementation Details:
    - Shop Pay session token
 - Use `csrfProtection.validateAjaxRequest` from the middleware to validate the CSRF token. CSRF token should be passed in as a query parameter on the ajax request (`csrf_token=xxx`).
 - Recalculate the cart to ensure totals and taxes are all up to date
-- Verify that the payment request passed in the ajax request from the front end is consistent with the current SFCC cart (regenerate the full object in SFCC and compare). This should include validating the basket UUID saved in the session.
+- Verify that the payment request passed in the ajax request from the frontend is consistent with the current SFCC cart (regenerate the full object in SFCC and compare). This should include validating the basket UUID saved in the session.
    - Returns an error along with updated payment request with latest SFCC cart details if there is a mismatch and skips subsequent steps below
 - Complete the pre-payment checkout logic normally called in the `CheckoutServices` `SubmitShipping` controller
    - Ensure No empty shipments (if consistency check passes above, this condition should always be `true`)
@@ -656,7 +660,7 @@ Implementation Details:
       - Use a helper function for this so that the integrator can override for custom shipment splitting scenarios like e-gift card
 - Completes pre-payment checkout logic normally called in the CheckoutServices SubmitPayment controller
    - Clear/set the billing address on the order using `dw.order.LineItemCtnr.createBillingAddress()`
-      - all fields will be null.
+      - All fields will be null.
       - Billing address will be populated from the `CREATE_ORDERS` webhook response later.
   - Include and implement the `app.payment.form.processor.shoppay` hook if necessary
    - Call `validationHelpers.validateProducts(currentBasket)`
@@ -681,13 +685,13 @@ Implementation Details:
       - This function in turn calls the auth hook, above.
       - Implement error handling for this function AFTER the `postAuthorization` hook, below.
    - Call hook `app.post.auth postAuthorization`, which allows an integrator to append custom auth or order logic like populating custom attributes for OMS or other downstream systems
-      - Include error handling as per the OOTB `CheckoutServices-PlaceOrder` controller
-   - Call the `app.fraud.detection fraudDetection` hook and handle the response as per the OOTB `CheckoutServices-PlaceOrder` controller
+      - Include error handling as per the included `CheckoutServices-PlaceOrder` controller
+   - Call the `app.fraud.detection fraudDetection` hook and handle the response as per the included `CheckoutServices-PlaceOrder` controller
       - Use a helper function for the fail order piece instead of directly calling `OrderMgr.failOrder` to allow for a possible auth reversal call and/or other custom logic
    - Save the shipping address to the registered customer’s address book, if it is not already there
       - Leverage existing helpers `addressHelpers.checkIfAddressStored` and `addressHelpers.saveAddress`
 - returns:
-   - status (`error`: `true`/`false`, `errorMessage`: `string`/`null`)
+   - status (`error`: `true`/`false`, `errorMessage`: string/null)
    - orderID: `order.orderNo`
    - orderToken: `order.orderToken`
    - continueUrl: `URLUtils.url('Order-Confirm').toString()`
@@ -700,7 +704,7 @@ Implementation Details:
    - Shop Pay is enabled (use the payment method toggle as the master switch, rather than a custom site preference)
    - A/B test not enabled (during A/B test the Shop Pay script tag will be included on all pages via another mechanism)
    - Shop Pay cart button enabled
-   - Call `PaymentMethod.isApplicable(customer : Customer, countryCode : String, paymentAmount : Number)` to leverage OOTB max/min order totals, country restrictions, etc.
+   - Call `PaymentMethod.isApplicable(customer : Customer, countryCode : String, paymentAmount : Number)` to leverage default max/min order totals, country restrictions, etc.
 - Adds an attribute to pdict that will be used to control the inclusion of the Shop Pay script tag and button on the cart page (rough example snippet below).
 - Adds an attribute to pdict to assign the Shop Pay URLs to pdict. These URLs will be assigned to a window var for use by the client-side JS during checkout.
 - Generates a CSRF token to embed in the Shop Pay button URL for use in ajax calls to the Shop Pay controllers (note: the middleware verifies that a CSRF token is not already set in the viewData before generating a new token).
@@ -722,7 +726,7 @@ server.append('Show', csrfProtection.generateToken, function(req, res, next) {
    - Shop Pay is enabled (use the payment method toggle as the master switch, rather than a custom site preference)
    - A/B test not enabled (during A/B test the Shop Pay script tag will be included on all pages via another mechanism)
    - Shop Pay cart button enabled
-   - Call `PaymentMethod.isApplicable(customer : Customer, countryCode : String, paymentAmount : Number)` to leverage OOTB max/min order totals, country restrictions, etc.
+   - Call `PaymentMethod.isApplicable(customer : Customer, countryCode : String, paymentAmount : Number)` to leverage default max/min order totals, country restrictions, etc.
 - Adds an attribute to pdict that will be used to control the inclusion of the Shop Pay script tag and button on the PDP (see example snippet in `Cart-Show`).
 - Adds an attribute to pdict to assign the Shop Pay URLs to pdict. These URLs will be assigned to a window var for use by the client-side JS during checkout.
 - Generates a CSRF token to embed in the Shop Pay button URL for use in ajax calls to the Shop Pay controllers (note: the middleware verifies that a CSRF token is not already set in the `viewData` before generating a new token).
@@ -733,7 +737,7 @@ server.append('Show', csrfProtection.generateToken, function(req, res, next) {
    - Shop Pay is enabled (use the payment method toggle as the master switch, rather than a custom site preference)
    - A/B test not enabled (during A/B test the Shop Pay script tag will be included on all pages via another mechanism)
    - Shop Pay cart button enabled
-   - Call `PaymentMethod.isApplicable(customer : Customer, countryCode : String, paymentAmount : Number)` to leverage OOTB max/min order totals, country restrictions, etc.
+   - Call `PaymentMethod.isApplicable(customer : Customer, countryCode : String, paymentAmount : Number)` to leverage default max/min order totals, country restrictions, etc.
 - Adds an attribute to pdict that will be used to control the inclusion of the Shop Pay script tag and button on the cart page (see example snippet in `Cart-Show`).
 - Adds an attribute to pdict to assign the Shop Pay URLs to pdict. These URLs will be assigned to a window var for use by the client-side JS during checkout.
 - Generates a CSRF token to embed in the Shop Pay button URL for use in ajax calls to the Shop Pay controllers (note: the middleware verifies that a CSRF token is not already set in the `viewData` before generating a new token).
@@ -752,7 +756,7 @@ In some cases a complete model will need to be rendered from scratch. In other c
    - cartridge/scripts/shoppay/helpers/shippingHelpers.js
       - getShippingAddress
       - getShippingLines
-      - getApplicableDeliveryMethods (consider using the OOTB SFRA helper function here)
+      - getApplicableDeliveryMethods (consider using the included SFRA helper function here)
    - cartridge/scripts/shoppay/helpers/paymentHelpers.js
       - getPaymentMethod
       - getLocale
@@ -773,7 +777,7 @@ In some cases a complete model will need to be rendered from scratch. In other c
 
 **cartridge/config/shoppayUrls.js**
 
-- Exports a json structure of URLs needed by the client-side JS during Shop Pay checkout to access the back end controllers
+- Exports a json structure of URLs needed by the client-side JS during Shop Pay checkout to access the backend controllers
 
    - ShopPay-GetCartSummary
    - ShopPay-BeginSession
@@ -1078,7 +1082,7 @@ Sample Request:
 | lineItem.requiresShipping | boolean | No (defaults to `true`) | Set to `false` if `ProductLineItem.custom.populated*` |
 | lineItem.image | string | No | `ProductLineItem.product.getImages()` |
 | lineItem.originalItemPrice | object | No | `ProductLineItem.basePrice` / `quantityVa` |
-| lineItem.itemDiscounts | array of discounts | No | `ProductLineItem.priceAdjustments.leng` (consider rounding impacts) TBD: This one could be a little tricky if discount is limited to 1 unit |
+| lineItem.itemDiscounts | array of discounts | No | `ProductLineItem.priceAdjustments.leng` (consider rounding impacts, may be tricky if discount is limited to 1 unit) |
 | lineItem.finalItemPrice (unit price) | object | yes | `ProductLineItem.basePrice` |
 | lineItem.originalLinePrice | object | No | `ProductLineItem.adjustedNetPrice` / `qua` (consider rounding impacts) |
 | lineItem.lineDiscounts | object | No | `ProductLineItem.priceAdjustments` |
@@ -1091,7 +1095,7 @@ Sample Request:
 | deliveryMethod.amount | object | yes | `ShipmentShippingModel.getShippingC` (TBD: This would be custom logic per c)
 | deliveryMethod.minDeliveryDate | ISO date string | Maybe | Required unless `deliveryMethod.deliveryExpectationLabel` is prpopulated |
 | deliveryMethod.maxDeliveryDate | ISO date string | Maybe | Required unless `deliveryMethod.deliveryExpectationLabel is populated` |
-| deliveryMethod.deliveryExpectationLabel string | Maybe | `ShippingMethod.custom.estimatedArri` required unless `deliveryMethod.minDeliveryDate` and `deliveryMethod.maxDeliveryDate` are populated |
+| deliveryMethod.deliveryExpectationLabel | string | Maybe | `ShippingMethod.custom.estimatedArri` required unless `deliveryMethod.minDeliveryDate` and `deliveryMethod.maxDeliveryDate` are populated |
 | locale | ISO string | yes | `Locale.getLocale(request.locale).ISO3L` (this should just be language or both language and country where applicable, e.g., `en_US`) |
 | presentmentCurrency | ISO string | yes | `LineItemCtnr.currencyCode | LineItemCtnr.priceAdjustments (order 1)` |
 | subtotal | object | yes | `LineItemCtnr.merchandiseTotalNetPric` (this should be total not adjusted) |
@@ -1630,20 +1634,20 @@ Sample Response:
 ### 5.1. **Shopify Webhook Subscribe**
 
 - Job inputs:
-   - webhook topic
-      - use an enum for this attribute if possible, otherwise just verify against an array of possible topics on the back end to ensure the topic is allowed/valid.
-   - webhook callbackUrl (TBD - maybe omit and just map this on the back end in a helper function that could be overridden if a customer wants to customize or allow as input).
+   - Webhook topic
+      - use an enum for this attribute if possible, otherwise just verify against an array of possible topics on the backend to ensure the topic is allowed/valid.
+   - Webhook callbackUrl (Maybe omit and just map this on the backend in a helper function that could be overridden if a customer wants to customize or allow as input).
 - Makes a GraphQL call to the admin API for the webhookSubscriptionCreate mutation
    - Sets the callbackUrl for the webhook (use absolute URL reference)
       - Webhooks-OrdersCreate controller
 - Upon success:
-   - stores the following details from the response in a `WebhookSubscriptions` custom object
+   - Stores the following details from the response in a `WebhookSubscriptions` custom object
       - id: web hook legacy Resource ID (numerical string e.g., `1369147703589`)
       - topic
       - subscriptionId: id (graphQL string e.g., `gid://shopify/WebhookSubscription/1369147703589`)
       - format
       - callbackUrl
-- Upon failure - see if GraphQL response error message indicates a subscription to this topic with this callback URL already exists. If so, create/update the custom object for it as above using the topic to find potential matches to existing custom objects. Sample error response for this scenario:
+- Upon failure, see if GraphQL response error message indicates a subscription to this topic with this callback URL already exists. If so, create/update the custom object for it as above using the topic to find potential matches to existing custom objects. Sample error response for this scenario:
 
 ```json
 {
@@ -1672,9 +1676,9 @@ Sample Response:
 - Job inputs
    - Lookback time (hrs). This can be an optional attribute, used to prevent stuck orders from being retried for an excessive number of job executions.
 - Searches for and processes any SFCC orders that meet the following criteria:
-   - Order.status = created`
-   - `Order.custom.isShopPayOrder = true`
-   - `Order.custom.shoppayOrderCreateWebhookReceived = !true` (`false`/`empty`/`null`)
+   - `Order.status` = `created`
+   - `Order.custom.isShopPayOrder` = `true`
+   - `Order.custom.shoppayOrderCreateWebhookReceived` = `false`/empty/null
 - Uses the `source_identifier` attribute from the SFCC order to find the associated Shopify order (this correlates to order custom attribute `shoppaySourceIdentifier`)
    - Makes a GraphQL call to Shopify to retrieve the order.
    - If order is not found in Shopify, continue to the next order in the search results
