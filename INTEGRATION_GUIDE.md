@@ -1,8 +1,6 @@
-# SFCC Shop Pay Connector Reference Code Integration Guide
-
-Version 1.0.0
-
-March 2024
+# Shop Component Connector Reference Code
+# for Salesforce Commerce Cloud SFRA
+# Integration Guide
 
 ## Table of Contents
 
@@ -174,14 +172,14 @@ This integration includes webhooks and jobs for post-payment processing, includi
 
 ### 2.1. General Applicability
 
-To use the Shop Pay Commerce Component in SFCC, merchants must have a Shopify store that's been configured by Shopify for use of Shop Pay Commerce Component.
+To use the Shop Component in SFCC SFRA, merchants must have a Shopify store that's been configured by Shopify for use of Shop Component.
 
-The Shop Pay Commerce Component implementation does not include other Shopify Payments features such as:
+The Shop Component implementation does not include other Shopify Payments features such as:
 
 * Installments (pay over time)
 * Subscriptions
 
-The Shop Pay Commerce Component is not eligible for use in the following storefront scenarios:
+The Shop Component is not eligible for use in the following storefront scenarios:
 
 * Multi-shipping
 * "Buy with" (aka "Buy now") for Product Sets
@@ -330,7 +328,7 @@ The Express Checkout button and the email recognition in checkout are available 
 ### 3.1. Shopify Store Setup
 
 1. Shopify Store Necessity
-   * A Shopify store that's been configured by Shopify for Shop Pay Commerce Component is essential for seamless integration with the Shop.app and the Shop Pay SDK.
+   * A Shopify store that's been configured by Shopify for Shop Component is essential for seamless integration with the Shop.app and the Shop Pay SDK.
 2. Configuration Steps
    * Configure billing and payments for the Shopify store.
    * Set payment to test mode for testing in the Shopify store.
@@ -338,13 +336,13 @@ The Express Checkout button and the email recognition in checkout are available 
    * Create test user accounts at [Shop.app](https://shop.app).
    * Enable the test flag in the Shop.app account to add a test credit card and billing info. (The Shopify team will assist with this step.)
 3. Reference Materials
-   * Refer to Shopify's [Shop Pay Commerce Component shop configuration guide](https://shopify.dev/docs/api/commerce-components/pay/shop-configuration) for detailed explanations and instructions.
+   * Refer to Shopify's [Shop Component shop configuration guide](https://shopify.dev/docs/api/commerce-components/pay/shop-configuration) for detailed explanations and instructions.
 
 ### 3.2. SFCC Connector reference code Installation
 
 #### 3.2.1. Metadata Import
 
-The `metadata` folder in the connector reference code bundle contains all of the meta data necessary to support the Shop Pay Commerce Component integration. This directory does contain a site specific-subdirectory of metadata that can be used as a starting point for any/all sites, but does need to be renamed prior to zip and import. Below is a list of basic steps to follow to import the metadata into an SFCC environment.
+The `metadata` folder in the connector reference code bundle contains all of the meta data necessary to support the Shop Component integration. This directory does contain a site specific-subdirectory of metadata that can be used as a starting point for any/all sites, but does need to be renamed prior to zip and import. Below is a list of basic steps to follow to import the metadata into an SFCC environment.
 
 1. In the connector reference code code base, find and expand the `metadata` folder.
 2. Within the `metadata` folder, find the `RefArch` subfolder.
@@ -414,7 +412,7 @@ No changes are required to the credentials for these services. The configured we
 
 ##### Configure the `Cartridges` Paths
 
-In **SFCC Business Manager** , navigate to **Administration > Sites > Manage Sites**. Click on each site in the **Storefront Sites** section that will use the Shop Pay Commerce Component. In the Settings tab for each applicable site, add both `int_shoppay_sfra` and `int_shoppay` to the `Cartridges` field. The `int_shoppay_sfra` entry should always precede (sit "above") the `int_shoppay` entry in the path, as shown below for core SFRA.
+In **SFCC Business Manager** , navigate to **Administration > Sites > Manage Sites**. Click on each site in the **Storefront Sites** section that will use the Shop Component. In the Settings tab for each applicable site, add both `int_shoppay_sfra` and `int_shoppay` to the `Cartridges` field. The `int_shoppay_sfra` entry should always precede (sit "above") the `int_shoppay` entry in the path, as shown below for core SFRA.
 
 ![Cartridges paths configuration for Storefront sites in SFCC Business Manager](images/image17.png)
 
@@ -450,7 +448,7 @@ Configure the Shop Pay Order Reconciliation job as described in [Shop Pay Order 
 
 ## 4. The Shopify Commerce Component
 
-The API from Shop Pay’s Commerce Component JavaScript allows merchants to use Shop Pay for checkout on their existing ecommerce sites. The majority of interactions in the Shop Pay Commerce component happen within the context of a Shopify-hosted pop-up window.
+The API from Shop Pay’s Commerce Component JavaScript allows merchants to use Shop Pay for checkout on their existing ecommerce sites. The majority of customer interactions happen within the context of a Shopify-hosted pop-up window.
 
 The SDK provides the Shop Pay Button and the Login Web components. These are loaded by including the load script on the relevant pages. The `shoppayScriptsIncludes.isml` template in the `/int_shoppay` folder loads the script onto the pages that require Shop Pay (snippet below):
 
@@ -469,7 +467,7 @@ The Shop Pay SDK manages the communication between SFCC and the Shop Pay modal. 
 
 Shopify uses GraphQL for many of the web service interactions with its APIs. Although the SFCC service framework does not directly support a GraphQL-type service, these web service calls can be successfully implemented using the standard SFCC service framework with an HTTP-type service. To use a GraphQL request body with an SFCC HTTP service, the mutation or query must be stringified and passed as a `query` entry in the request body. Any variables should be passed as JSON in a `variables` entry in the request body. The GraphQL response is standard JSON and can be parsed and handled as with any other HTTP service. This integration guide includes several sample GraphQL requests that are presented in this format.
 
-Access tokens for using the GraphQL Storefront and Admin APIs can be found in the API configurations of the custom app that is installed on the Shopify store. The access token for the Storefront API must be passed in an `X-Shopify-Storefront-Access-Token` header with all requests. Refer to Shopify's [Shop Pay Commerce Component shop configuration guide](https://shopify.dev/docs/api/commerce-components/pay/shop-configuration) for more details on configuring the custom app in the Shopify store.
+Access tokens for using the GraphQL Storefront and Admin APIs can be found in the API configurations of the custom app that is installed on the Shopify store. The access token for the Storefront API must be passed in an `X-Shopify-Storefront-Access-Token` header with all requests. Refer to Shopify's [Shop Component shop configuration guide](https://shopify.dev/docs/api/commerce-components/pay/shop-configuration) for more details on configuring the custom app in the Shopify store.
 
 ## 5. SFCC Post-Checkout Processing
 
@@ -1091,11 +1089,11 @@ Note that a webhook subscription is automatically removed if 19 consecutive retr
 
 ## 7. A/A and A/B Testing
 
-The testing framework can measure the impact of the Shop Pay Commerce Component by validating whether the integration is improving the conversion lift. Evaluating success and key metrics is a two-part testing process composed of A/A and A/B testing.
+The testing framework can measure the impact of the Shop Component by validating whether the integration is improving the conversion lift. Evaluating success and key metrics is a two-part testing process composed of A/A and A/B testing.
 
 A/A testing must be performed to validate that the testing framework randomly and evenly assigns storefront customers to groups. During this test, assignment and checkout tracking events will fire, but no group will see the Shop Pay payment option. After successful completion of A/A testing, the A/B test will begin.
 
-A/B testing uses the same logic to assign storefront customers to groups and fire tracking events, however this time only the control group will not be presented with Shop Pay as a payment option. Refer to the Shop Pay Commerce Component Merchant-assigned A/B testing guide for more details on A/A and A/B testing.
+A/B testing uses the same logic to assign storefront customers to groups and fire tracking events, however this time only the control group will not be presented with Shop Pay as a payment option. Refer to the Shop Component Merchant-assigned A/B testing guide for more details on A/A and A/B testing.
 
 ### 7.1. A/A and A/B Testing Connector reference code
 
@@ -1225,7 +1223,7 @@ var shippingCost = shipmentShippingModel.getShippingCost(shippingMethod);
 
 In fact, there is no shipping-related API call that does return this information. The only way to get the "real" shipping cost including surcharges is to apply that shipping method to the current cart, recalculate totals, and get the shipping total cost. Computationally this is somewhat expensive, so in the list of applicable shipping methods on the SFRA OOTB checkout AND in the Shop Pay modal, these surcharges are not included. These costs do appear in the shipping total cost in both the storefront AND in the Shop Pay modal. Think of these as "shipping fees" rather than shipping method costs. See screenshots below.
 
-![Example checkout in SFCC with Shop Pay Commerce Component enabled, showing the "Shop Pay" button, shipping details and the Order Summary](images/image5.png)
+![Example checkout in SFCC with Shop Component enabled, showing the "Shop Pay" button, shipping details and the Order Summary](images/image5.png)
 
 ![Example checkout in the Shop Pay checkout pop-up, including the "Pay now" button](images/image3.png)
 
@@ -1243,7 +1241,7 @@ This can create a user interface challenge for mobile users who may assume the b
 
 ## 9.3. Shop Pay Button in Mini-Cart Flyout
 
-The Shop Pay Commerce Component integration does not include a Shop Pay button within the Mini-Cart flyout. This is due to limitations of both the Shop Pay SDK and the SFRA logic that renders the mini-cart. Each Shop Pay button is connected to a session by the Shop Pay SDK, but only a single session can be open at any given time. In addition, initializing the Shop Pay button in the mini-cart and handling subsequent changes to the cart state results in extra computation and/or ajax calls to SFCC controllers everywhere the Mini-Cart flyout is included.
+The Shop Component integration does not include a Shop Pay button within the Mini-Cart flyout. This is due to limitations of both the Shop Pay SDK and the SFRA logic that renders the mini-cart. Each Shop Pay button is connected to a session by the Shop Pay SDK, but only a single session can be open at any given time. In addition, initializing the Shop Pay button in the mini-cart and handling subsequent changes to the cart state results in extra computation and/or ajax calls to SFCC controllers everywhere the Mini-Cart flyout is included.
 
 ## 9.4. Product Options
 
